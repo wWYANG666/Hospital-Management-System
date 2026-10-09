@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>创建账号 · 医联云</title>
+    <link rel="stylesheet" href="/css/landing.css" />
+  </head>
+  <body class="landing-page register-page">
+    <main class="register-shell">
+      <a class="register-back" href="/login">← 返回登录</a>
+      <div class="register-heading">
+        <div class="landing-brand-mark">医</div>
+        <div class="landing-kicker">CREATE YOUR ACCOUNT</div>
+        <h1>选择你的使用角色</h1>
+        <p>患者注册后即可使用；医生提交执业信息后，由管理员审核开通。</p>
+      </div>
+      <div class="register-options">
+        <a
+          class="register-option register-option-patient"
+          href="/register/patient"
+        >
+          <span class="register-option-icon">患</span>
+          <span class="register-option-copy"
+            ><strong>患者账号</strong
+            ><small>预约挂号、查看报告、管理处方与账单</small></span
+          >
+          <span class="register-option-arrow">→</span>
+        </a>
+        <a
+          class="register-option register-option-doctor"
+          href="/register/doctor"
+        >
+          <span class="register-option-icon">医</span>
+          <span class="register-option-copy"
+            ><strong>医生账号</strong
+            ><small>提交执业信息，审核后使用医生工作台</small></span
+          >
+          <span class="register-option-arrow">→</span>
+        </a>
+      </div>
+      <p class="register-footnote">
+        管理员账号由系统统一配置，如需开通请联系系统管理员。
+      </p>
+    </main>
+  </body>
+</html>

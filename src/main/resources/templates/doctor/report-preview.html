@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告单预览</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .page {
+            max-width: 1100px;
+            margin: 16px auto 32px;
+            padding: 0 16px;
+        }
+
+        .sheet {
+            padding: 24px;
+            border-radius: 8px;
+        }
+
+        .sheet-head {
+            text-align: center;
+            margin-bottom: 22px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid rgba(64, 158, 255, 0.2);
+        }
+
+        .sheet-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #409EFF;
+            margin-bottom: 8px;
+        }
+
+        .sheet-sub {
+            font-size: 13px;
+            color: #909399;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .info-table td {
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(15, 88, 74, 0.08);
+        }
+
+        .info-table td:first-child {
+            width: 140px;
+            color: #909399;
+            font-weight: 700;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .info-table td:last-child {
+            color: #303133;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .report-content {
+            margin-top: 22px;
+            padding: 22px 20px;
+            border-radius: 8px;
+            background: #F5F7FA;
+            border: 1px solid #EBEEF5;
+            min-height: 180px;
+        }
+
+        .report-content h3 {
+            margin-bottom: 14px;
+            font-size: 16px;
+            color: #303133;
+        }
+
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media print {
+            .topbar,
+            .actions {
+                display: none;
+            }
+
+            .sheet {
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .page {
+                width: min(100% - 20px, 980px);
+                margin: 18px auto 28px;
+            }
+
+            .sheet {
+                padding: 18px;
+                border-radius: 22px;
+            }
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/reports', '报告单预览', '查看报告详情')}"></div>
+
+    <main class="page">
+        <section class="sheet card" th:if="${report}">
+            <div class="sheet-head">
+                <div class="sheet-title">医院检验 / 检查报告单</div>
+                <div class="sheet-sub">供临床参考。</div>
+            </div>
+
+            <table class="info-table">
+                <tr>
+                    <td>报告名称</td>
+                    <td th:text="${examination != null ? examination.name : report.reportType}">检查项目</td>
+                </tr>
+                <tr>
+                    <td>报告类型</td>
+                    <td th:text="${examination != null ? (examination.type != null ? examination.type : '检查') : '检查'}">检查</td>
+                </tr>
+                <tr>
+                    <td>生成时间</td>
+                    <td th:text="${report.reportDate != null ? #temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss') : ''}">2026-04-05 10:00:00</td>
+                </tr>
+                <tr th:if="${patientUser != null}">
+                    <td>患者姓名</td>
+                    <td th:text="${patientUser.realName}">张三</td>
+                </tr>
+                <tr th:if="${doctorUser != null}">
+                    <td>医生姓名</td>
+                    <td th:text="${doctorUser.realName}">李医生</td>
+                </tr>
+                <tr>
+                    <td>状态</td>
+                    <td th:text="${report.status.chineseName}">已完成</td>
+                </tr>
+            </table>
+
+            <div class="report-content">
+                <h3>报告内容</h3>
+                <div th:if="${report.reportContent != null and !report.reportContent.isEmpty()}"
+                     class="u-pretty-content"
+                     th:text="${report.reportContent}"></div>
+                <div th:if="${report.reportContent == null or report.reportContent.isEmpty()}"
+                     class="u-muted-italic-teal">
+                    暂无报告内容。
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" onclick="window.print()" class="btn btn-primary">打印</button>
+                <a href="/doctor/reports" class="btn ghost">返回列表</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

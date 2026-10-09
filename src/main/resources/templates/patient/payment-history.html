@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>账单记录</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-pay .page-head { margin-bottom: 20px; }
+        .patient-pay .crumb { font-size: 12px; color: #909399; margin-bottom: 6px; }
+        .patient-pay .crumb a { color: #409EFF; text-decoration: none; }
+        .patient-pay h1 { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+        .patient-pay .lead { font-size: 13px; color: #909399; margin: 0; }
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        @media (min-width: 1024px) {
+            .pay-grid { grid-template-columns: minmax(240px, 320px) 1fr; }
+        }
+        .pay-total-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            padding: 20px;
+            border: 1px solid #EBEEF5;
+        }
+        .pay-total-card .label { font-size: 13px; color: #909399; }
+        .pay-total-card .amount {
+            margin-top: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #E6A23C;
+        }
+        .pay-total-card .note { margin-top: 12px; font-size: 12px; color: #C0C4CC; }
+        .pay-detail-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            padding: 20px;
+            border: 1px solid #EBEEF5;
+        }
+        .pay-detail-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .pay-detail-head h2 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+        .pay-detail-head p { font-size: 13px; color: #909399; margin: 0; }
+        .patient-pay .table-wrap { margin-top: 16px; overflow-x: auto; }
+        .patient-pay table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .patient-pay th, .patient-pay td {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .patient-pay th { color: #909399; font-weight: 600; }
+        .patient-pay tbody tr:hover { background: #fafafa; }
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ECF5FF;
+            color: #409EFF;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .cell-amt { font-weight: 700; color: #303133; }
+        .btn-detail {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #409EFF;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .btn-detail:hover { opacity: 0.92; }
+        .empty-pay { text-align: center; color: #C0C4CC; padding: 40px 16px; font-size: 14px; }
+    </style>
+</head>
+<body class="patient-ui patient-pay theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '账单记录', '查看支付明细')}"></div>
+
+<main class="page">
+    <div class="page-head">
+        <div class="crumb"><span>患者服务</span> / <span class="u-text-primary">账单记录</span></div>
+        <h1>我的账单记录</h1>
+        <p class="lead">查看费用明细与总额。</p>
+    </div>
+
+    <section class="pay-grid">
+        <div class="pay-total-card">
+            <div class="label">总付款金额</div>
+            <div class="amount">
+                ¥<span th:text="${#numbers.formatDecimal(totalPaid, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+            </div>
+            <div class="note">含处方与住院缴费记录</div>
+        </div>
+
+        <div class="pay-detail-card">
+            <div class="pay-detail-head">
+                <div>
+                    <h2>付款明细</h2>
+                    <p>点击「查看详情」可跳转到对应单据。</p>
+                </div>
+            </div>
+
+            <div th:if="${paymentRecords.isEmpty()}" class="empty-pay">暂无账单记录</div>
+
+            <div class="table-wrap" th:if="${!paymentRecords.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>付款类型</th>
+                        <th>单号</th>
+                        <th>金额</th>
+                        <th>付款时间</th>
+                        <th>说明</th>
+                        <th>详情</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${paymentRecords}">
+                        <td><span class="type-pill" th:text="${r.type}">处方缴费</span></td>
+                        <td th:text="${r.orderNo}">NO-001</td>
+                        <td class="cell-amt">¥<span th:text="${#numbers.formatDecimal(r.amount, 1, 'COMMA', 2, 'POINT')}">0.00</span></td>
+                        <td th:text="${r.payTime != null ? #temporals.format(r.payTime, 'yyyy-MM-dd HH:mm:ss') : '-'}">-</td>
+                        <td th:text="${r.description}">费用支付</td>
+                        <td><a class="btn-detail" th:href="${r.detailUrl}">查看详情</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员个人信息</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .admin-profile-layout { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+        @media (max-width: 900px) { .admin-profile-layout { grid-template-columns: 1fr; } }
+        .profile-side { text-align: center; }
+        .profile-avatar-lg {
+            width: 72px; height: 72px; border-radius: 50%; background: #409EFF; color: #fff;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 26px; font-weight: 700; margin-bottom: 8px;
+        }
+        .profile-name { font-size: 18px; font-weight: 600; }
+        .profile-role { font-size: 12px; color: #909399; margin-top: 2px; }
+        .logout-btn {
+            margin-top: 12px; padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer;
+            font-size: 13px; background: #F56C6C; color: #fff; font-weight: 600;
+        }
+        .info-row-adm {
+            display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .info-row-adm:last-child { border-bottom: none; }
+        .info-row-adm .lbl { color: #909399; }
+        .info-row-adm .val { color: #303133; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '管理员个人信息', '当前登录账号')}"></div>
+
+<main class="page">
+    <div class="admin-profile-layout">
+        <div class="card profile-side">
+            <div class="profile-avatar-lg"
+                 th:text="${admin != null && admin.realName != null && !admin.realName.isEmpty() ? admin.realName.substring(0,1) : '—'}">—</div>
+            <div class="profile-name" th:text="${admin != null && admin.realName != null ? admin.realName : admin?.username}">管理员</div>
+            <div class="profile-role">系统管理员</div>
+            <form action="/logout" method="post">
+                <button type="submit" class="logout-btn">退出账户</button>
+            </form>
+        </div>
+        <div>
+            <div class="card">
+                <div class="admin-panel-title u-mb-6">璐︽埛淇℃伅</div>
+                <p class="admin-panel-sub u-mb-12">当前管理员资料</p>
+                <div th:if="${admin != null}">
+                    <div class="info-row-adm">
+                        <span class="lbl">用户名</span>
+                        <span class="val" th:text="${admin.username}"></span>
+                    </div>
+                    <div class="info-row-adm">
+                        <span class="lbl">濮撳悕</span>
+                        <span class="val" th:text="${admin.realName != null ? admin.realName : '-'}"></span>
+                    </div>
+                    <div class="info-row-adm">
+                        <span class="lbl">手机号</span>
+                        <span class="val" th:text="${admin.phone != null ? admin.phone : '-'}"></span>
+                    </div>
+                    <div class="info-row-adm">
+                        <span class="lbl">閭</span>
+                        <span class="val" th:text="${admin.email != null ? admin.email : '-'}"></span>
+                    </div>
+                    <div class="info-row-adm">
+                        <span class="lbl">瑙掕壊</span>
+                        <span class="val">管理员</span>
+                    </div>
+                </div>
+                <div th:if="${admin == null}" class="u-empty-xs-muted">未能获取当前管理员信息。</div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

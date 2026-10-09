@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药品入库</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .medicine-info { background: #F5F7FA; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; }
+        .medicine-info h3 { color: #409EFF; margin-bottom: 8px; font-size: 15px; }
+        .medicine-info p { margin: 4px 0; }
+        .admin-form-grid label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        .admin-form-grid input, .admin-form-grid select { width: 100%; padding: 8px 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 13px; }
+        .admin-form-grid .form-group { margin-bottom: 12px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .total-amount { background: #ECF5FF; padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 16px; font-weight: 600; color: #409EFF; }
+        .inbound-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+    </style>
+    <script>
+        function calculateTotal() {
+            var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            var price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+            document.getElementById('totalAmount').textContent = '¥' + (quantity * price).toFixed(2);
+        }
+    </script>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/medicines', '药品入库', '录入入库批次')}"></div>
+
+<main class="page">
+    <div class="card admin-form-grid u-max-720-center">
+        <div th:if="${success}" class="admin-msg-success" th:text="${success}"></div>
+        <div th:if="${error}" class="admin-msg-error" th:text="${error}"></div>
+
+        <div class="medicine-info" th:if="${medicine}">
+            <h3>药品信息</h3>
+            <p><strong>药品名称：</strong><span th:text="${medicine.name}"></span></p>
+            <p><strong>规格：</strong><span th:text="${medicine.specification}"></span></p>
+            <p><strong>单位：</strong><span th:text="${medicine.unit}"></span></p>
+            <p><strong>当前库存：</strong><span th:text="${medicine.stock != null ? medicine.stock : 0}"></span></p>
+            <p th:if="${medicine.purchasePrice != null}"><strong>参考采购价：</strong>¥<span th:text="${medicine.purchasePrice}"></span></p>
+        </div>
+
+        <form th:action="@{/admin/medicines/{id}/inbound(id=${medicine.id})}" method="post">
+            <div class="form-group">
+                <label>批次号 *</label>
+                <input type="text" name="batchNumber" required placeholder="如：20250125001">
+                <small class="u-block-muted-mt4">批次号用于追踪，建议格式：日期+序号</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>生产日期</label>
+                    <input type="date" name="productionDate">
+                </div>
+                <div class="form-group">
+                    <label>有效期 *</label>
+                    <input type="date" name="expiryDate" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>入库数量 *</label>
+                    <input type="number" id="quantity" name="quantity" required min="1" oninput="calculateTotal()">
+                </div>
+                <div class="form-group">
+                    <label>采购单价（元） *</label>
+                    <input type="number" id="purchasePrice" name="purchasePrice" step="0.01" required min="0" oninput="calculateTotal()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>存放位置</label>
+                <select name="location">
+                    <option value="药房">药房</option>
+                    <option value="住院药房">住院药房</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" name="operator" placeholder="操作人姓名">
+            </div>
+
+            <div class="total-amount">
+                总金额：<span id="totalAmount">¥0.00</span>
+            </div>
+
+            <div class="inbound-actions">
+                <a href="/admin/medicines" class="btn ghost">取消</a>
+                <button type="submit" class="btn btn-primary">确认入库</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>住院申请</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .hero-title { font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin: 8px 0; line-height: 1.2; color: #303133; }
+        .hero-text { max-width: 720px; font-size: 14px; line-height: 1.75; color: #909399; }
+        .patient-banner { margin-top: 16px; padding: 14px 16px; border-radius: 8px; background: #F5F7FA; }
+        .patient-main { font-weight: 700; font-size: 16px; margin-bottom: 6px; color: #303133; }
+        .patient-sub { font-size: 13px; color: #606266; line-height: 1.7; }
+        .reason-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .reason-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            background: #ECF5FF;
+            color: #409EFF;
+            border: 1px solid rgba(64, 158, 255, 0.2);
+        }
+        .reason-btn:hover { opacity: 0.9; }
+        .actions { margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+        .common-reasons { margin-top: 8px; font-size: 12px; color: #909399; }
+        .form-group small { color: #909399; margin-top: 6px; display: block; line-height: 1.6; }
+    </style>
+    <script>
+        function selectReason(reason) {
+            document.getElementById('admissionReason').value = reason;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.reason-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var reason = this.getAttribute('data-reason');
+                    if (reason) selectReason(reason);
+                });
+            });
+        });
+    </script>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/diagnose', '住院申请', '提交住院申请')}"></div>
+
+    <main class="page">
+        <section class="card">
+            <h1 class="hero-title">住院申请</h1>
+            <p class="hero-text">补充住院申请信息</p>
+
+            <div class="patient-banner" th:if="${patientUser}">
+                <div class="patient-main">患者：<span th:text="${patientUser.realName}"></span></div>
+                <div class="patient-sub">
+                    主诉：「<span th:text="${appointment.symptoms}"></span>」
+                    <span th:if="${appointment.diagnosis != null}">；当前诊断：<span th:text="${appointment.diagnosis}"></span></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <form th:action="@{/doctor/hospitalizations/request}" method="post">
+                <input type="hidden" name="appointmentId" th:value="${appointment.id}">
+
+                <div class="form-group">
+                    <label for="admissionReason">住院原因 *</label>
+                    <textarea name="admissionReason" id="admissionReason" required
+                              placeholder="请输入住院原因"></textarea>
+                    <div class="common-reasons">
+                        <span>常用原因：</span>
+                        <div class="reason-list">
+                            <span th:each="reason : ${commonReasons}" class="reason-btn" th:text="${reason}" th:attr="data-reason=${reason}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="expectedDays">预计住院天数 *</label>
+                    <input id="expectedDays" type="number" name="expectedDays" required min="1" max="365" placeholder="请输入预计住院天数">
+                </div>
+
+                <div class="form-group">
+                    <label for="requestDepartmentId">申请科室 *</label>
+                    <select name="requestDepartmentId" id="requestDepartmentId" required>
+                        <option value="">请选择科室</option>
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.id}"
+                                th:text="${dept.name}"
+                                th:selected="${requestDepartmentId != null and requestDepartmentId == dept.id}">
+                        </option>
+                    </select>
+                    <small>默认科室：<span th:text="${doctor?.department ?: '未设置'}"></span></small>
+                </div>
+
+                <div class="form-group">
+                    <label>申请时间</label>
+                    <input type="text" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm')}" disabled class="u-bg-soft-gray">
+                    <small>系统自动记录申请时间。</small>
+                </div>
+
+                <div class="actions">
+                    <a href="/doctor/diagnose" class="btn ghost">取消</a>
+                    <button type="submit" class="btn btn-primary">提交申请</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

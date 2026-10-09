@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出院结算</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 14px;
+            background: #F5F7FA;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+        }
+        @media (max-width: 760px) { .info-grid { grid-template-columns: 1fr; } }
+        .info-item strong { color: #606266; }
+        .cost-list { border: 1px solid #EBEEF5; border-radius: 8px; overflow: hidden; }
+        .cost-item { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #EBEEF5; font-size: 13px; }
+        .cost-item:last-child { border-bottom: none; }
+        .cost-total { font-size: 16px; font-weight: 600; color: #409EFF; padding: 12px; background: #ECF5FF; }
+        .settle-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/hospitalizations', '出院结算', '核对费用并结账')}"></div>
+
+<main class="page">
+    <div class="card">
+        <div class="admin-panel-title u-mb-8">患者与床位信息</div>
+        <p class="admin-panel-sub u-mb-12">核对住院信息</p>
+        <div class="info-grid">
+            <div class="info-item"><strong>姓名：</strong><span th:text="${patientUser?.realName}"></span></div>
+            <div class="info-item"><strong>床位号：</strong><span th:text="${bed?.bedNumber ?: '未分配'}"></span></div>
+            <div class="info-item"><strong>入院日期：</strong><span th:text="${hospitalization.admissionDate != null ? #temporals.format(hospitalization.admissionDate, 'yyyy-MM-dd') : '-'}"></span></div>
+            <div class="info-item"><strong>出院日期：</strong><span th:text="${hospitalization.dischargeDate != null ? #temporals.format(hospitalization.dischargeDate, 'yyyy-MM-dd') : '-'}"></span></div>
+            <div class="info-item u-grid-full"><strong>出院诊断：</strong><span th:text="${hospitalization.dischargeDiagnosis ?: '-'}"></span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="admin-panel-title u-mb-8">费用明细</div>
+        <p class="admin-panel-sub u-mb-12">核对费用并完成结算</p>
+        <div class="cost-list">
+            <div class="cost-item">
+                <span>床位费</span>
+                <span>¥<span th:text="${bedCost}">0.00</span></span>
+            </div>
+            <div class="cost-item">
+                <span>药品费</span>
+                <span>¥<span th:text="${medicineCost}">0.00</span></span>
+            </div>
+            <div class="cost-item">
+                <span>检查费</span>
+                <span>¥<span th:text="${examinationCost}">0.00</span></span>
+            </div>
+            <div class="cost-total">
+                总计：¥<span th:text="${totalCost}">0.00</span>
+            </div>
+        </div>
+        <form th:action="@{/admin/hospitalizations/{id}/settle(id=${hospitalization.id})}" method="post">
+            <div class="settle-actions">
+                <button type="submit" class="btn btn-primary">确认结算并释放床位</button>
+                <a href="/admin/hospitalizations" class="btn ghost">取消</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约挂号</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-form-shell { max-width: 920px; margin: 16px auto 36px; padding: 0 16px; }
+        .patient-form-shell .card-title { margin-bottom: 6px; }
+        .patient-form-shell .card-sub { font-size: 13px; color: #909399; margin-bottom: 14px; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 16px;
+        }
+        .form-grid .full { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #303133; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea { resize: vertical; }
+        .btn-submit {
+            margin-top: 16px;
+            padding: 10px 22px;
+            background: #409EFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-submit:hover { background: #66b1ff; }
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="patient-ui theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '预约挂号', '填写预约信息')}"></div>
+
+<main class="page patient-form-shell">
+        <div class="card">
+            <div class="card-title">快速预约</div>
+            <div class="card-sub">填写预约基础信息</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">填写预约信息</div>
+            <div class="card-sub">提交前请确认信息</div>
+
+            <form th:action="@{/patient/appointments}" th:object="${appointment}" method="post">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">患者ID</label>
+                        <input type="number" th:field="*{patientId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">医生ID</label>
+                        <input type="number" th:field="*{doctorId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">预约日期</label>
+                        <input type="date" th:field="*{appointmentDate}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">预约时间</label>
+                        <input type="time" th:field="*{appointmentTime}">
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">症状描述</label>
+                        <textarea th:field="*{symptoms}" rows="5" placeholder="请补充主要症状、持续时间或就诊诉求"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">提交预约</button>
+            </form>
+        </div>
+</main>
+</body>
+</html>

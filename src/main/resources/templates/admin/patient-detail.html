@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者就诊信息</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .patient-detail-wrap { max-width: 1200px; margin: 18px auto 32px; padding: 0 18px; }
+        .card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-bottom: 14px; }
+        .title { font-size: 16px; font-weight: 600; color: #303133; margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size:13px; }
+        th, td { border: 1px solid #EBEEF5; padding: 8px 6px; text-align: left; }
+        th { background-color: #F5F7FA; color: #606266; }
+        .btn { padding: 6px 10px; background: #409EFF; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-size:13px; }
+        .btn.reports { background: #409EFF; }
+        .btn.prescriptions { background: #67C23A; }
+        .btn.danger { background:#F56C6C; }
+        .btn.gray { background:#909399; }
+        .muted { color: #909399; font-size: 12px; }
+        .pill { display:inline-block; padding:4px 10px; border-radius:999px; background:#F5F7FA; color:#606266; font-size:12px; }
+        .status-badge { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-dispensed { background: #D4EDDA; color: #155724; }
+        .status-cancelled { background: #FDE2E2; color: #C45656; }
+        .success { background: #f0f9eb; color: #529b2e; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; font-size:13px; }
+        .error { background: #fef0f0; color: #c45656; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; font-size:13px; }
+
+        /* 患者信息卡片美化 */
+        .patient-card { padding: 18px; border-radius: 12px; background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%); border: 1px solid #d9ecff; }
+        .patient-header { display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-bottom: 12px; }
+        .patient-title { display:flex; align-items:center; gap: 12px; }
+        .avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: #409EFF;
+            color: #fff; display:flex; align-items:center; justify-content:center;
+            font-weight: 800; letter-spacing: .5px; box-shadow: 0 6px 18px rgba(64, 158, 255, .25);
+        }
+        .patient-name { font-size: 18px; font-weight: 800; color: #303133; line-height: 1.1; }
+        .patient-sub { margin-top: 3px; font-size: 12px; color: #909399; }
+        .patient-meta { display:grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 10px 14px; margin-top: 10px; }
+        .meta-item { display:flex; gap: 8px; align-items: baseline; padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px solid #EBEEF5; }
+        .meta-label { min-width: 64px; font-size: 12px; color: #909399; font-weight: 700; }
+        .meta-value { font-size: 13px; color: #303133; font-weight: 700; word-break: break-all; }
+        @media (max-width: 720px) { .patient-meta { grid-template-columns: 1fr; } }
+    </style>
+    <script>
+        function toggleAllPatientAppointments(source) {
+            var boxes = document.querySelectorAll('#patientAppointmentsSection input[name="ids"]');
+            boxes.forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeletePatientAppointments() {
+            var checked = document.querySelectorAll('#patientAppointmentsSection input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的挂号记录');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 条挂号记录吗？此操作不可恢复。');
+        }
+        function toggleAllPatientReports(source) {
+            var boxes = document.querySelectorAll('#patientReportsSection input[name="ids"]');
+            boxes.forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeletePatientReports() {
+            var checked = document.querySelectorAll('#patientReportsSection input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的报告单');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 份报告单吗？此操作不可恢复。');
+        }
+        function toggleAllPatientPrescriptions(source) {
+            var boxes = document.querySelectorAll('#patientPrescriptionsSection input[name="ids"]');
+            boxes.forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeletePatientPrescriptions() {
+            var checked = document.querySelectorAll('#patientPrescriptionsSection input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的处方');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 份处方吗？此操作不可恢复。');
+        }
+        function confirmDeletePatientPrescription() {
+            return confirm('确定要删除该处方吗？此操作不可恢复。');
+        }
+        function toggleAllPatientHospitalizations(source) {
+            var boxes = document.querySelectorAll('#patientHospitalizationsSection input[name="ids"]');
+            boxes.forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeletePatientHospitalizations() {
+            var checked = document.querySelectorAll('#patientHospitalizationsSection input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的住院记录');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 条住院记录吗？此操作不可恢复。');
+        }
+    </script>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/patients', '患者就诊信息', '就诊信息汇总')}"></div>
+
+<main class="page patient-detail-wrap">
+        <div th:if="${success}" class="success" th:text="${success}"></div>
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+
+        <div class="card patient-card">
+            <div class="patient-header">
+                <div class="patient-title">
+                    <div class="avatar"
+                         th:text="${patientUser != null && patientUser.realName != null && !patientUser.realName.isEmpty() ? patientUser.realName.substring(0,1) : 'P'}">P</div>
+                    <div>
+                        <div class="patient-name" th:text="${patientUser != null ? patientUser.realName : '未知患者'}">未知患者</div>
+                        <div class="patient-sub">
+                            <span class="pill">患者信息</span>
+                            <span class="pill u-ml-6">ID：<span th:text="${patient.id}"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="patient-meta">
+                <div class="meta-item">
+                    <div class="meta-label">身份证</div>
+                    <div class="meta-value" th:text="${patient.idCard != null ? patient.idCard : '-'}">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">电话</div>
+                    <div class="meta-value" th:text="${patientUser != null ? (patientUser.phone != null ? patientUser.phone : '-') : '-'}">-</div>
+                </div>
+            </div>
+
+            <div class="muted u-mt-10">
+                可管理挂号、报告、处方与住院
+            </div>
+
+            <div class="u-actions-end-mt12">
+                <a class="btn gray"
+                   th:if="${patientUser != null}"
+                   th:href="@{/admin/users/{uid}/change-password(uid=${patientUser.id}, returnTo=${'/admin/patients/' + patient.id})}">
+                    修改密码
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="title">挂号列表</div>
+            <div th:if="${appointments == null or #lists.isEmpty(appointments)}" class="muted">该患者暂无挂号记录。</div>
+            <form id="bulkDeletePatientAppointmentsForm"
+                  th:action="@{/admin/patients/{id}/appointments/bulk-delete(id=${patient.id})}"
+                  method="post"
+                  onsubmit="return confirmBulkDeletePatientAppointments()"
+                  th:if="${appointments != null and !#lists.isEmpty(appointments)}"
+                  class="u-mt-10">
+                <button class="btn danger" type="submit">删除</button>
+            </form>
+            <table th:if="${appointments != null and !#lists.isEmpty(appointments)}" id="patientAppointmentsSection">
+                <thead>
+                <tr>
+                    <th class="u-w50"><input type="checkbox" onclick="toggleAllPatientAppointments(this)"></th>
+                    <th>ID</th>
+                    <th>医生</th>
+                    <th>预约日期</th>
+                    <th>预约时间</th>
+                    <th>状态</th>
+                    <th>症状</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${appointments}">
+                    <td>
+                        <input type="checkbox"
+                               name="ids"
+                               th:value="${a.id}"
+                               form="bulkDeletePatientAppointmentsForm">
+                    </td>
+                    <td th:text="${a.id}"></td>
+                    <td th:text="${doctorUserMap.containsKey(a.id) ? doctorUserMap[a.id].realName : a.doctorId}"></td>
+                    <td th:text="${a.appointmentDate}"></td>
+                    <td th:text="${a.appointmentTime}"></td>
+                    <td th:text="${a.status != null ? a.status.chineseName : '-'}"></td>
+                    <td th:text="${a.symptoms}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="title">报告单（汇总）</div>
+            <div th:if="${reports == null or #lists.isEmpty(reports)}" class="muted">该患者暂无报告单。</div>
+            <form id="bulkDeletePatientReportsForm"
+                  th:action="@{/admin/patients/{id}/reports/bulk-delete(id=${patient.id})}"
+                  method="post"
+                  onsubmit="return confirmBulkDeletePatientReports()"
+                  th:if="${reports != null and !#lists.isEmpty(reports)}"
+                  class="u-mt-10">
+                <button class="btn danger" type="submit">删除</button>
+            </form>
+            <table th:if="${reports != null and !#lists.isEmpty(reports)}" id="patientReportsSection">
+                <thead>
+                <tr>
+                    <th class="u-w50"><input type="checkbox" onclick="toggleAllPatientReports(this)"></th>
+                    <th>ID</th>
+                    <th>挂号ID</th>
+                    <th>检查项目</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${reports}">
+                    <td>
+                        <input type="checkbox"
+                               name="ids"
+                               th:value="${r.id}"
+                               form="bulkDeletePatientReportsForm">
+                    </td>
+                    <td th:text="${r.id}"></td>
+                    <td th:text="${r.appointmentId}"></td>
+                    <td th:text="${examinationMap.containsKey(r.id) ? examinationMap[r.id].name : (r.examinationId != null ? r.examinationId : '-')}"></td>
+                    <td th:text="${r.status != null ? r.status.chineseName : '-'}"></td>
+                    <td th:text="${r.reportDate}"></td>
+                    <td>
+                        <a class="btn reports" th:href="@{/admin/reports/{id}/preview(id=${r.id}, returnPatientId=${patient.id})}">预览</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="title">处方列表（药房窗口）</div>
+
+            <div th:if="${prescriptions == null or #lists.isEmpty(prescriptions)}" class="muted u-mt-4">
+                暂无处方记录
+            </div>
+
+            <form id="bulkDeletePatientPrescriptionsForm"
+                  th:if="${prescriptions != null and !#lists.isEmpty(prescriptions)}"
+                  th:action="@{/admin/pharmacy/bulk-delete}"
+                  method="post"
+                  onsubmit="return confirmBulkDeletePatientPrescriptions()"
+                  class="u-mt-10">
+                <input type="hidden" name="patientId" th:value="${patient.id}">
+                <button class="btn danger" type="submit">删除</button>
+            </form>
+
+            <table th:if="${prescriptions != null and !#lists.isEmpty(prescriptions)}" id="patientPrescriptionsSection" class="u-mt-8">
+                <thead>
+                <tr>
+                    <th class="u-w50"><input type="checkbox" onclick="toggleAllPatientPrescriptions(this)"></th>
+                    <th>处方编号</th>
+                    <th>患者姓名</th>
+                    <th>开方医生</th>
+                    <th>开方时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${prescriptions}">
+                    <td>
+                        <input type="checkbox"
+                               name="ids"
+                               th:value="${p.id}"
+                               form="bulkDeletePatientPrescriptionsForm">
+                    </td>
+                    <td th:text="${p.prescriptionNumber}"></td>
+                    <td th:text="${patientUser != null ? patientUser.realName : '未知'}"></td>
+                    <td th:text="${prescriptionDoctorUserMap.containsKey(p.id) ? prescriptionDoctorUserMap[p.id].realName : '未知'}"></td>
+                    <td th:text="${p.createdAt != null ? #temporals.format(p.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                    <td>
+                        <span th:if="${p.status != null}"
+                              class="status-badge"
+                              th:classappend="${p.status.name() == 'PENDING' ? ' status-pending' : (p.status.name() == 'DISPENSED' ? ' status-dispensed' : ' status-cancelled')}"
+                              th:text="${p.status.chineseName}">-</span>
+                        <span th:if="${p.status == null}">-</span>
+                    </td>
+                    <td>
+                        <a class="btn prescriptions" th:href="@{/admin/pharmacy/{id}(id=${p.id}, returnPatientId=${patient.id})}">查看详情</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="title">住院信息管理</div>
+
+            <div th:if="${hospitalizations == null or #lists.isEmpty(hospitalizations)}" class="muted u-mt-8">
+                该患者暂无住院记录
+            </div>
+
+            <form id="bulkDeletePatientHospitalizationsForm"
+                  th:if="${hospitalizations != null and !#lists.isEmpty(hospitalizations)}"
+                  th:action="@{/admin/patients/{id}/hospitalizations/bulk-delete(id=${patient.id})}"
+                  method="post"
+                  onsubmit="return confirmBulkDeletePatientHospitalizations()"
+                  class="u-mt-10">
+                <button class="btn danger" type="submit">删除</button>
+            </form>
+
+            <table th:if="${hospitalizations != null and !#lists.isEmpty(hospitalizations)}"
+                   id="patientHospitalizationsSection" class="u-mt-8">
+                <thead>
+                <tr>
+                    <th class="u-w50"><input type="checkbox" onclick="toggleAllPatientHospitalizations(this)"></th>
+                    <th>住院ID</th>
+                    <th>主治医生</th>
+                    <th>病床</th>
+                    <th>入院日期</th>
+                    <th>出院日期</th>
+                    <th>诊断</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${hospitalizations}">
+                    <td>
+                        <input type="checkbox"
+                               name="ids"
+                               th:value="${h.id}"
+                               form="bulkDeletePatientHospitalizationsForm">
+                    </td>
+                    <td th:text="${h.id}"></td>
+                    <td th:text="${hospitalizationDoctorUserMap.containsKey(h.id) ? hospitalizationDoctorUserMap[h.id].realName : (h.doctorId != null ? h.doctorId : '-')}"></td>
+                    <td th:text="${hospitalizationBedMap.containsKey(h.id) ? hospitalizationBedMap[h.id].bedNumber : (h.bedId != null ? h.bedId : '-')}"></td>
+                    <td th:text="${h.admissionDate != null ? h.admissionDate : '-'}"></td>
+                    <td th:text="${h.dischargeDate != null ? h.dischargeDate : '-'}"></td>
+                    <td th:text="${h.diagnosis != null && !h.diagnosis.isEmpty() ? h.diagnosis : (h.dischargeDiagnosis != null ? h.dischargeDiagnosis : '-')}"></td>
+                    <td>
+                        <span th:if="${h.status != null}"
+                              th:class="${h.status.name() == 'ADMITTED' ? 'status-badge status-pending' : 'status-badge status-dispensed'}"
+                              th:text="${h.status.chineseName}">-</span>
+                        <span th:if="${h.status == null and h.requestStatus != null}"
+                              th:class="${h.requestStatus.name() == 'PENDING' ? 'status-badge status-pending' : (h.requestStatus.name() == 'REJECTED' ? 'status-badge status-cancelled' : 'status-badge status-dispensed')}"
+                              th:text="${h.requestStatus.chineseName}">-</span>
+                        <span th:if="${h.status == null and h.requestStatus == null}" class="muted">-</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+</main>
+</body>
+</html>

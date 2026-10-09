@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 医院管理系统</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page auth-unified">
+    <main class="auth-shell auth-shell-compact">
+        <section class="auth-panel">
+            <h1 class="auth-title">用户登录</h1>
+            <p class="auth-subtitle">患者与医生账号登录入口</p>
+
+            <form th:action="@{/login}" method="post" class="auth-form">
+                <input type="hidden" name="loginType" value="user">
+
+                <div class="auth-field">
+                    <label class="auth-label" for="user-username">用户名</label>
+                    <input id="user-username" type="text" name="username" required autofocus class="auth-input" placeholder="请输入账号">
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label" for="user-password">密码</label>
+                    <input id="user-password" type="password" name="password" required class="auth-input" placeholder="请输入密码">
+                </div>
+
+                <button type="submit" class="auth-submit">登录</button>
+
+                <div th:if="${param.error}" class="auth-alert">
+                    <span th:if="${param.reason != null and #strings.equals(param.reason[0], 'disabled')}">账号已禁用或待审核，暂时无法登录。</span>
+                    <span th:if="${param.reason == null or #strings.equals(param.reason[0], 'bad_credentials')}">用户名或密码错误</span>
+                    <span th:if="${param.reason != null and #strings.equals(param.reason[0], 'locked')}">账号已锁定，请联系管理员。</span>
+                    <span th:if="${param.reason != null and #strings.equals(param.reason[0], 'expired')}">登录凭据已过期，请重置密码后重试。</span>
+                </div>
+            </form>
+
+            <div class="auth-links">
+                <div class="auth-link-row">
+                    还没有账号？
+                    <a class="auth-link" href="/register">立即注册</a>
+                </div>
+                <div class="auth-link-row">
+                    <a class="auth-link" href="/login">返回统一登录</a>
+                </div>
+                <div class="auth-link-row">
+                    <a class="auth-link" href="/">返回首页</a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

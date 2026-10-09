@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>住院医嘱与病历</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-hosp-d .page { max-width: 960px; }
+        .patient-hosp-d .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .patient-hosp-d .card-sub { font-size: 13px; color: #909399; margin-bottom: 12px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; font-size: 14px; }
+        .summary-row { display: flex; gap: 6px; }
+        .summary-row .k { color: #606266; min-width: 88px; }
+        .summary-row .v { color: #303133; word-break: break-word; }
+        table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table.data-table th, table.data-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #EBEEF5;
+            vertical-align: top;
+        }
+        table.data-table th { background: #F5F7FA; color: #606266; font-weight: 600; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .tag-med { background: #ECF5FF; color: #409EFF; }
+        .tag-exam { background: #F0F9EB; color: #67C23A; }
+        .tag-nurse { background: #FFF6E6; color: #E6A23C; }
+        .tag-other { background: #F4F4F5; color: #909399; }
+        .st-active { color: #E6A23C; }
+        .st-done { color: #67C23A; }
+        .st-cancel { color: #909399; }
+        .record-block { padding: 12px 0; border-bottom: 1px solid #EBEEF5; font-size: 14px; }
+        .record-block:last-child { border-bottom: none; }
+        .record-meta { font-size: 12px; color: #909399; margin-bottom: 6px; }
+        .record-body { color: #303133; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+        .record-section { margin-bottom: 10px; }
+        .record-section:last-child { margin-bottom: 0; }
+        .record-label { font-size: 13px; font-weight: 600; color: #606266; margin-bottom: 4px; }
+        .empty-hint { text-align: center; color: #C0C4CC; padding: 24px 12px; font-size: 14px; }
+        @media (max-width: 768px) {
+            .summary-grid { grid-template-columns: 1fr; }
+            table.data-table { font-size: 12px; }
+            table.data-table th, table.data-table td { padding: 8px 4px; }
+        }
+    </style>
+</head>
+<body class="patient-ui patient-hosp-d theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/hospitalizations', '医嘱与病历', '查看医嘱和病历')}"></div>
+
+<main class="page">
+        <div class="card">
+            <div class="card-title">住院概要</div>
+            <div class="summary-grid">
+                <div class="summary-row">
+                    <span class="k">入院日期</span>
+                    <span class="v" th:text="${hospitalization.admissionDate}">-</span>
+                </div>
+                <div class="summary-row" th:if="${hospitalization.dischargeDate != null}">
+                    <span class="k">出院日期</span>
+                    <span class="v" th:text="${hospitalization.dischargeDate}">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="k">状态</span>
+                    <span class="v">
+                        <span th:if="${hospitalization.status != null}" th:text="${hospitalization.status.chineseName}"></span>
+                        <span th:if="${hospitalization.status == null and hospitalization.requestStatus != null}" th:text="${hospitalization.requestStatus.chineseName}"></span>
+                        <span th:if="${hospitalization.status == null and hospitalization.requestStatus == null}">-</span>
+                    </span>
+                </div>
+                <div class="summary-row" th:if="${doctorDisplay != null}">
+                    <span class="k">主治医生</span>
+                    <span class="v" th:text="${doctorDisplay}">-</span>
+                </div>
+                <div class="summary-row u-grid-full">
+                    <span class="k">诊断</span>
+                    <span class="v" th:text="${hospitalization.diagnosis != null and !hospitalization.diagnosis.isEmpty() ? hospitalization.diagnosis : (hospitalization.dischargeDiagnosis != null ? hospitalization.dischargeDiagnosis : '暂无')}"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">医嘱列表</div>
+            <div class="card-sub">医嘱执行情况</div>
+            <div th:if="${orders == null or orders.isEmpty()}" class="empty-hint">暂无医嘱记录</div>
+            <table th:if="${orders != null and !orders.isEmpty()}" class="data-table">
+                <thead>
+                <tr>
+                    <th class="u-w88">类型</th>
+                    <th>内容</th>
+                    <th class="u-w88">状态</th>
+                    <th class="u-w160">时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${orders}">
+                    <td>
+                        <span th:if="${o.orderType != null and o.orderType.name() == 'MEDICATION'}" class="tag tag-med" th:text="${o.orderType.chineseName}">用药</span>
+                        <span th:if="${o.orderType != null and o.orderType.name() == 'EXAMINATION'}" class="tag tag-exam" th:text="${o.orderType.chineseName}">检查</span>
+                        <span th:if="${o.orderType != null and o.orderType.name() == 'NURSING'}" class="tag tag-nurse" th:text="${o.orderType.chineseName}">护理</span>
+                        <span th:if="${o.orderType != null and o.orderType.name() == 'OTHER'}" class="tag tag-other" th:text="${o.orderType.chineseName}">其他</span>
+                        <span th:if="${o.orderType == null}">-</span>
+                    </td>
+                    <td>
+                        <span th:text="${o.orderContent != null ? o.orderContent : '-'}">-</span>
+                        <span th:if="${o.orderType != null and o.orderType.name() == 'MEDICATION' and o.quantity != null}"
+                              class="u-link-xs-primary-ml4"
+                              th:text="|（数量：${o.quantity}）|"></span>
+                    </td>
+                    <td>
+                        <span th:if="${o.status != null and o.status.name() == 'ACTIVE'}" class="st-active" th:text="${o.status.chineseName}">执行中</span>
+                        <span th:if="${o.status != null and o.status.name() == 'COMPLETED'}" class="st-done" th:text="${o.status.chineseName}">已完成</span>
+                        <span th:if="${o.status != null and o.status.name() == 'CANCELLED'}" class="st-cancel" th:text="${o.status.chineseName}">已取消</span>
+                        <span th:if="${o.status == null}">-</span>
+                    </td>
+                    <td th:text="${o.createdAt != null ? #temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-title">病历记录</div>
+            <div class="card-sub">住院病历记录</div>
+            <div th:if="${records == null or records.isEmpty()}" class="empty-hint">暂无病历记录</div>
+            <div th:each="r : ${records}" class="record-block"
+                 th:with="cu=${r.conditionUpdate != null ? r.conditionUpdate.trim() : ''},
+                          mc=${r.medicalRecordContent != null ? r.medicalRecordContent.trim() : ''},
+                          showMc=${!#strings.isEmpty(mc) and (#strings.isEmpty(cu) or (!#strings.equals(mc, cu) and !#strings.equals(mc, '病情更新：' + cu) and !#strings.equals(mc, '病情更新:' + cu)))}">
+                <div class="record-meta">
+                    <span th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></span>
+                    <span th:if="${r.diagnosis != null and !r.diagnosis.isBlank()}">｜诊断：<span th:text="${r.diagnosis}"></span></span>
+                </div>
+                <div th:if="${!#strings.isEmpty(cu)}" class="record-section">
+                    <div class="record-label">病情更新</div>
+                    <div class="record-body" th:text="${r.conditionUpdate}"></div>
+                </div>
+                <div th:if="${showMc}" class="record-section">
+                    <div class="record-label">病历内容</div>
+                    <div class="record-body" th:text="${r.medicalRecordContent}"></div>
+                </div>
+                <div th:if="${#strings.isEmpty(cu) and #strings.isEmpty(mc) and (r.diagnosis == null or r.diagnosis.isBlank())}"
+                     class="record-body u-text-muted">（无详细内容）</div>
+            </div>
+        </div>
+</main>
+</body>
+</html>

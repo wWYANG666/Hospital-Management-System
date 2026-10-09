@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${bed.id == null ? '新增床位' : '编辑床位'}">床位表单</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .admin-form-grid label { display:block; margin-bottom:6px; font-weight:600; font-size:14px; }
+        .admin-form-grid input, .admin-form-grid select { width:100%; padding:8px 10px; border:1px solid #dcdfe6; border-radius:4px; font-size:13px; }
+        .admin-form-grid .form-group { margin-bottom:12px; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/beds', ${bed.id == null ? '新增床位' : '编辑床位'}, '维护床位信息')}"></div>
+
+<main class="page">
+    <div class="card admin-form-grid u-max560-center">
+        <form th:action="${bed.id == null} ? @{/admin/beds} : @{/admin/beds/{id}(id=${bed.id})}" method="post" th:object="${bed}">
+            <div class="form-group">
+                <label>床位号 *</label>
+                <input type="text" th:field="*{bedNumber}" required>
+            </div>
+            <div class="form-group">
+                <label>房间号</label>
+                <input type="text" th:field="*{roomNumber}">
+            </div>
+            <div class="form-group">
+                <label>科室</label>
+                <select th:field="*{departmentId}">
+                    <option value="">未分配</option>
+                    <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>类型</label>
+                <select th:field="*{bedType}">
+                    <option value="GENERAL">普通</option>
+                    <option value="VIP">VIP</option>
+                    <option value="ICU">ICU</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>状态</label>
+                <select th:field="*{status}">
+                    <option value="AVAILABLE">空闲</option>
+                    <option value="OCCUPIED">占用</option>
+                    <option value="MAINTENANCE">维修</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>价格/天</label>
+                <input type="number" step="0.01" th:field="*{pricePerDay}">
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

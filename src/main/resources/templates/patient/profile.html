@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-profile .page { max-width: 840px; }
+        .success {
+            background: #F0F9EB;
+            color: #67C23A;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .logout-btn {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 18px;
+            border: none;
+            background: #F56C6C;
+            color: #fff;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .layout { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+        .patient-profile .card-title { margin-bottom: 8px; }
+        .patient-profile .card-sub { font-size: 12px; color: #909399; margin-bottom: 12px; }
+        .profile-header { text-align: center; }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #409EFF;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 10px;
+        }
+        .profile-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .profile-meta { font-size: 12px; color: #909399; }
+        .form-group { margin-bottom: 14px; }
+        .patient-profile label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; color: #333; }
+        .patient-profile input, .patient-profile select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .patient-profile button[type="submit"] {
+            padding: 10px 26px;
+            background: #409EFF;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .footer-note { margin-top: 12px; font-size: 12px; color: #909399; text-align: center; }
+    </style>
+</head>
+<body class="patient-ui patient-profile theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '个人资料', '账号与患者信息')}"></div>
+
+<main class="page">
+        <div th:if="${param.success}" class="success">信息更新成功！</div>
+
+        <div class="layout">
+            <div class="card">
+                <div class="profile-header">
+                    <div class="profile-avatar"
+                         th:text="${user != null && user.realName != null && !user.realName.isEmpty() ? user.realName.substring(0,1) : '用'}"></div>
+                    <div class="profile-name" th:text="${user?.realName ?: user?.username}">用户名</div>
+                    <div class="profile-meta">
+                        <span th:text="${patient?.gender != null ? (patient.gender.name() == 'MALE' ? '男' : '女') : '未填写'}"></span>
+                        <span> · </span>
+                        <span th:text="${user?.phone != null ? user.phone : '手机号未填写'}"></span>
+                    </div>
+                    <a href="/logout" class="logout-btn">退出账号</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">账号信息</div>
+                <div class="card-sub">用于登录和联系</div>
+
+                <form th:action="@{/patient/profile}" method="post">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" th:value="${user?.username}" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>真实姓名 *</label>
+                            <input type="text" name="realName" th:value="${user?.realName}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>邮箱</label>
+                            <input type="email" name="email" th:value="${user?.email}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>手机号</label>
+                        <input type="text" name="phone" th:value="${user?.phone}">
+                    </div>
+
+                    <div class="card-title u-mt-10">患者信息</div>
+                    <div class="card-sub">用于档案管理</div>
+
+                    <div class="form-group">
+                        <label>身份证号</label>
+                        <input type="text" name="idCard" th:value="${patient?.idCard}" maxlength="18">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>性别</label>
+                            <select name="gender">
+                                <option value="">请选择</option>
+                                <option value="MALE" th:selected="${patient?.gender?.name() == 'MALE'}">男</option>
+                                <option value="FEMALE" th:selected="${patient?.gender?.name() == 'FEMALE'}">女</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>生日</label>
+                            <input type="date" name="birthday" th:value="${patient?.birthday}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>地址</label>
+                        <input type="text" name="address" th:value="${patient?.address}">
+                    </div>
+
+                    <div class="card-title u-mt-10">紧急联系人</div>
+                    <div class="card-sub">用于紧急联系</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>紧急联系人</label>
+                            <input type="text" name="emergencyContact" th:value="${patient?.emergencyContact}">
+                        </div>
+                        <div class="form-group">
+                            <label>紧急联系电话</label>
+                            <input type="text" name="emergencyPhone" th:value="${patient?.emergencyPhone}">
+                        </div>
+                    </div>
+
+                    <button type="submit">保存修改</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            个人信息仅用于医疗服务。
+        </div>
+</main>
+</body>
+</html>

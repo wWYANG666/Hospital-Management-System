@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 患者首页顶栏：与医生/管理端 doctor-shell 同结构 -->
+<div th:fragment="topbarPatientDashboard" class="topbar portal-topbar portal-topbar--patient">
+    <div class="topbar-left">
+        <div class="logo">患</div>
+        <div>
+            <div class="top-title-main">患者服务</div>
+            <div class="top-title-sub">个人健康与就医入口</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="/patient/profile" class="avatar-link" aria-label="个人资料">
+            <div class="avatar">我</div>
+        </a>
+    </div>
+</div>
+
+<!-- 患者子页：返回 + 标题 + 头像 -->
+<div th:fragment="topbarPatientSub (backUrl, title, subtitle)" class="topbar portal-topbar portal-topbar--patient">
+    <div class="topbar-left">
+        <a class="back-btn" th:href="${backUrl}" title="返回">←</a>
+        <div>
+            <div class="top-title-main" th:text="${title}">页面标题</div>
+            <div class="top-title-sub" th:text="${subtitle}">副标题</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="/patient/profile" class="avatar-link" aria-label="个人资料">
+            <div class="avatar">我</div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

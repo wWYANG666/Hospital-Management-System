@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病床管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .beds-page-main { max-width: 1400px; }
+        .btn-bed-sm { padding: 4px 12px; font-size: 12px; border-radius: 16px; border: none; cursor: pointer; font-weight: 600; }
+        .ward-section { margin-bottom: 28px; }
+        .ward-title { font-size: 16px; font-weight: 600; color: #303133; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #409EFF; }
+        .beds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .bed-card { border: 2px solid #EBEEF5; border-radius: 8px; padding: 15px; cursor: pointer; transition: box-shadow 0.2s; position: relative; background: #fff; }
+        .bed-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .bed-card.available { border-color: #67C23A; background: #f1f8f4; }
+        .bed-card.occupied { border-color: #F56C6C; background: #fff5f5; }
+        .bed-card.maintenance { border-color: #E6A23C; background: #fdf6ec; }
+        .bed-number { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .bed-status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 8px; }
+        .status-available { background: #67C23A; color: white; }
+        .status-occupied { background: #F56C6C; color: white; }
+        .status-maintenance { background: #E6A23C; color: white; }
+        .bed-info { font-size: 12px; color: #606266; margin: 5px 0; }
+        .patient-info { margin-top: 10px; padding-top: 10px; border-top: 1px solid #EBEEF5; }
+        .patient-name { font-weight: 600; color: #303133; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); overflow-y: auto; }
+        .modal-content { background: white; margin: 2% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
+        .close { float: right; font-size: 26px; font-weight: bold; cursor: pointer; line-height: 1; color: #909399; border: none; background: none; }
+        .close:hover { color: #409EFF; }
+        .pending-requests { margin-top: 8px; margin-bottom: 24px; }
+        .request-item { background: #FFFBF0; border-left: 4px solid #E6A23C; padding: 15px; margin-bottom: 10px; border-radius: 8px; font-size: 13px; }
+        .hospitalization-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+        .hospitalization-table th, .hospitalization-table td { border: 1px solid #EBEEF5; padding: 10px; text-align: left; }
+        .hospitalization-table th { background: #F5F7FA; color: #606266; font-weight: 600; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status-admitted { background: #67C23A; color: white; }
+        .status-discharged { background: #909399; color: white; }
+        .action-buttons { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        input[type="checkbox"].bed-cb { cursor: pointer; width: 18px; height: 18px; }
+        .admin-toolbar-tight { margin-top:14px; padding:0; }
+        .beds-subtitle { color:#409EFF; margin-bottom:12px; font-size:15px; }
+        .bed-note-mini { margin-top:6px; color:#909399; font-size:12px; }
+        .bed-select { padding:6px 8px; margin-right:10px; border-radius:4px; border:1px solid #dcdfe6; }
+        .bed-check-wrap { position:absolute; top:10px; right:10px; }
+        .bed-admit-date { font-size:11px; color:#909399; margin-top:5px; }
+        .bed-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; font-size:13px; }
+        .bed-modal-section { margin-top:24px; padding-top:16px; border-top:2px solid #409EFF; }
+        .bed-modal-title { color:#303133; margin:0 0 12px; font-size:15px; }
+        .bed-empty { text-align:center; padding:28px; color:#909399; }
+        .bed-modal-footer { margin-top:20px; padding-top:16px; border-top:1px solid #EBEEF5; }
+        .btn-bed-warning { background:#E6A23C; }
+    </style>
+    <script>
+        function confirmBulkDeleteBeds() {
+            var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的床位');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 个床位吗？此操作不可恢复。');
+        }
+        function showBedInfo(bedId) {
+            document.getElementById('bedModal' + bedId).style.display = 'block';
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        };
+    </script>
+</head>
+<body class="admin-dashboard theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '病床管理', '床位看板与分配')}"></div>
+
+<main class="page beds-page-main">
+    <div th:if="${success}" class="admin-msg-success"><span th:text="${success}">操作成功</span></div>
+    <div th:if="${error}" class="admin-msg-error"><span th:text="${error}">操作失败</span></div>
+
+    <section class="card">
+        <h1 class="admin-hero-title">床位总览</h1>
+        <p class="admin-hero-text">床位状态与审批申请</p>
+        <div class="admin-hero-stats">
+            <div class="admin-hero-stat">
+                <div class="lbl">床位总数</div>
+                <div class="val" th:text="${beds != null ? beds.size() : 0}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">空闲</div>
+                <div class="val" th:text="${beds != null ? beds.?[status.name() == 'AVAILABLE'].size() : 0}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">占用</div>
+                <div class="val" th:text="${beds != null ? beds.?[status.name() == 'OCCUPIED'].size() : 0}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">待审批申请</div>
+                <div class="val" th:text="${pendingRequests != null ? pendingRequests.size() : 0}">0</div>
+            </div>
+        </div>
+        <div class="admin-toolbar admin-toolbar-tight">
+            <a class="btn btn-primary" href="/admin/hospitalizations">住院管理</a>
+            <a class="btn ghost" href="/admin/beds">刷新本页</a>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">床位看板</div>
+                <div class="admin-panel-sub">按科室查看床位</div>
+            </div>
+            <div class="admin-toolbar u-m0">
+                <a class="btn btn-primary" href="/admin/beds/new">新增床位</a>
+                <form id="bulkDeleteBedsForm" th:action="@{/admin/beds/bulk-delete}" method="post" onsubmit="return confirmBulkDeleteBeds()" class="u-inline">
+                    <button class="btn-cancel btn-bed-sm" type="submit">删除选中</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="pending-requests" th:if="${pendingRequests != null and !pendingRequests.isEmpty()}">
+            <h3 class="beds-subtitle">待审批的住院申请</h3>
+            <div th:each="req : ${pendingRequests}" class="request-item">
+                <div><strong>患者：</strong><span th:text="${requestUserMap.containsKey(req.patientId) ? requestUserMap[req.patientId].realName : '未知'}"></span></div>
+                <div><strong>住院原因：</strong><span th:text="${req.admissionReason}"></span></div>
+                <div><strong>预计天数：</strong><span th:text="${req.expectedDays}"></span> 天</div>
+                <div><strong>申请时间：</strong><span th:text="${req.requestTime != null ? #temporals.format(req.requestTime, 'yyyy-MM-dd HH:mm') : ''}"></span></div>
+
+                <div th:if="${req.bedId != null}" class="u-mt-10">
+                    <div class="u-mb-8">
+                        <strong>已分配床位：</strong>
+                        <span th:each="bed : ${beds}" th:if="${bed.id == req.bedId}" th:text="${bed.bedNumber}">床位号</span>
+                        <span class="u-text-muted">（ID: <span th:text="${req.bedId}"></span>）</span>
+                    </div>
+                    <div class="action-buttons">
+                        <form th:action="@{/admin/beds/assign}" method="post" class="u-inline">
+                            <input type="hidden" name="hospitalizationId" th:value="${req.id}">
+                            <input type="hidden" name="bedId" th:value="${req.bedId}">
+                            <button type="submit" class="btn btn-primary btn-bed-sm">同意分配</button>
+                        </form>
+                        <form th:action="@{/admin/beds/reject}" method="post" class="u-inline">
+                            <input type="hidden" name="hospitalizationId" th:value="${req.id}">
+                            <button type="submit" class="btn-cancel btn-bed-sm" onclick="return confirm('确认拒绝该住院申请吗？');">拒绝</button>
+                        </form>
+                    </div>
+                    <div class="bed-note-mini">待管理员同意后生效。</div>
+                </div>
+
+                <div th:if="${req.bedId == null}" class="u-mt-10">
+                    <form th:action="@{/admin/beds/assign}" method="post" class="u-inline">
+                        <input type="hidden" name="hospitalizationId" th:value="${req.id}">
+                        <select name="bedId" required class="bed-select">
+                            <option value="">选择床位</option>
+                            <option th:each="bed : ${beds}"
+                                    th:if="${bed.status.name() == 'AVAILABLE'}"
+                                    th:value="${bed.id}"
+                                    th:text="${bed.bedNumber + ' (' + (bed.departmentId != null and departmentMap.containsKey(bed.departmentId) ? departmentMap[bed.departmentId].name : '未分配科室') + ')'}">
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-bed-sm">同意并分配</button>
+                    </form>
+                    <form th:action="@{/admin/beds/reject}" method="post" class="u-inline u-ml-6">
+                        <input type="hidden" name="hospitalizationId" th:value="${req.id}">
+                        <button type="submit" class="btn-cancel btn-bed-sm" onclick="return confirm('确认拒绝该住院申请吗？');">拒绝</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:each="deptEntry : ${bedsByDepartment}">
+            <div class="ward-section">
+                <div class="ward-title" th:text="${deptEntry.key}">科室</div>
+                <div class="beds-grid">
+                    <div th:each="bed : ${deptEntry.value}"
+                         class="bed-card"
+                         th:classappend="${bed.status.name() == 'AVAILABLE' ? ' available' : (bed.status.name() == 'OCCUPIED' ? ' occupied' : ' maintenance')}"
+                         th:onclick="'showBedInfo(' + ${bed.id} + ')'">
+                        <div class="bed-check-wrap" onclick="event.stopPropagation();">
+                            <input type="checkbox" name="ids" class="bed-cb" th:value="${bed.id}" form="bulkDeleteBedsForm">
+                        </div>
+                        <div class="bed-number" th:text="${bed.bedNumber}">床位号</div>
+                        <div>
+                            <span class="bed-status"
+                                  th:classappend="${bed.status.name() == 'AVAILABLE' ? ' status-available' : (bed.status.name() == 'OCCUPIED' ? ' status-occupied' : ' status-maintenance')}"
+                                  th:text="${bed.status != null ? bed.status.chineseName : '-'}">
+                            </span>
+                        </div>
+                        <div class="bed-info" th:if="${bed.roomNumber}">房间：<span th:text="${bed.roomNumber}"></span></div>
+                        <div class="bed-info">类型：<span th:text="${bed.bedType.name() == 'GENERAL' ? '普通' : (bed.bedType.name() == 'VIP' ? 'VIP' : 'ICU')}"></span></div>
+                        <div class="bed-info" th:if="${bed.pricePerDay}">价格：¥<span th:text="${bed.pricePerDay}"></span>/天</div>
+                        <div class="patient-info" th:if="${bed.status.name() == 'OCCUPIED' and bedHospitalizationMap.containsKey(bed.id)}">
+                            <div class="patient-name"
+                                 th:with="pid=${bedHospitalizationMap[bed.id].patientId}"
+                                 th:text="${pid != null and userMap[pid] != null ? userMap[pid].realName : '未知'}"></div>
+                            <div class="bed-admit-date">
+                                入院：<span th:text="${#temporals.format(bedHospitalizationMap[bed.id].admissionDate, 'yyyy-MM-dd')}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div th:each="bed : ${beds}" class="modal" th:id="'bedModal' + ${bed.id}">
+        <div class="modal-content">
+            <button type="button" class="close" th:onclick="'closeModal(\'bedModal' + ${bed.id} + '\')'" aria-label="关闭">&times;</button>
+            <div class="modal-header">床位详情 - <span th:text="${bed.bedNumber}"></span></div>
+            <div class="bed-modal-grid">
+                <div><strong>房间号：</strong><span th:text="${bed.roomNumber ?: '未设置'}"></span></div>
+                <div><strong>病区：</strong><span th:text="${bed.ward ?: '未分类'}"></span></div>
+                <div><strong>类型：</strong><span th:text="${bed.bedType.name() == 'GENERAL' ? '普通' : (bed.bedType.name() == 'VIP' ? 'VIP' : 'ICU')}"></span></div>
+                <div><strong>状态：</strong><span th:text="${bed.status != null ? bed.status.chineseName : '-'}"></span></div>
+                <div><strong>价格：</strong>¥<span th:text="${bed.pricePerDay}"></span>/天</div>
+            </div>
+            <div class="bed-modal-section">
+                <h3 class="bed-modal-title">住院记录</h3>
+                <div>
+                    <div class="table-wrap" th:if="${bedAllHospitalizationsMap.containsKey(bed.id) and !bedAllHospitalizationsMap[bed.id].isEmpty()}">
+                        <table class="hospitalization-table">
+                            <thead>
+                            <tr>
+                                <th>患者姓名</th>
+                                <th>主治医生</th>
+                                <th>入院日期</th>
+                                <th>出院日期</th>
+                                <th>状态</th>
+                                <th>总费用</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="hosp : ${bedAllHospitalizationsMap[bed.id]}">
+                                <td th:text="${hosp.patientId != null and userMap[hosp.patientId] != null ? userMap[hosp.patientId].realName : '未知'}"></td>
+                                <td th:text="${doctorUserMap.containsKey(hosp.id) ? doctorUserMap[hosp.id].realName : '未分配'}"></td>
+                                <td th:text="${#temporals.format(hosp.admissionDate, 'yyyy-MM-dd')}"></td>
+                                <td th:text="${hosp.dischargeDate != null ? #temporals.format(hosp.dischargeDate, 'yyyy-MM-dd') : '未出院'}"></td>
+                                <td>
+                                    <span class="status-badge"
+                                          th:classappend="${hosp.status != null and hosp.status.name() == 'ADMITTED' ? ' status-admitted' : ' status-discharged'}"
+                                          th:text="${hosp.status != null ? hosp.status.chineseName : '-'}">
+                                    </span>
+                                </td>
+                                <td th:text="${hosp.totalCost != null ? ('¥' + hosp.totalCost) : '未结算'}"></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a th:if="${hosp.status != null and hosp.status.name() == 'DISCHARGED' and (hosp.totalCost == null or hosp.totalCost == 0)}"
+                                           th:href="@{/admin/hospitalizations/{id}/settle(id=${hosp.id})}"
+                                           class="btn btn-primary btn-bed-sm btn-bed-warning">结算</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:if="${!bedAllHospitalizationsMap.containsKey(bed.id) or bedAllHospitalizationsMap[bed.id].isEmpty()}"
+                         class="bed-empty">
+                        该病床暂无住院记录
+                    </div>
+                </div>
+            </div>
+            <div class="bed-modal-footer">
+                <a class="btn btn-primary btn-bed-sm" th:href="@{/admin/beds/{id}/edit(id=${bed.id})}">编辑床位</a>
+                <form th:action="@{/admin/beds/{id}/delete(id=${bed.id})}" method="post" class="u-inline">
+                    <button class="btn ghost u-ml-8" type="submit" onclick="return confirm('确认删除该床位吗？')">删除床位</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

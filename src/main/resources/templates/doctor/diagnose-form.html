@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者诊断</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .page { max-width: 1100px; margin: 16px auto 32px; padding: 0 16px; }
+        .hero, .panel { border-radius: 16px; }
+        .hero { padding: 24px; margin-bottom: 18px; }
+        .hero-title { font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin: 8px 0; line-height: 1.2; color: #303133; }
+        .hero-text { max-width: 720px; font-size: 14px; line-height: 1.75; color: #909399; }
+        .patient-banner { margin-top: 16px; padding: 14px 16px; border-radius: 8px; background: #F5F7FA; }
+        .patient-main { font-weight: 700; font-size: 16px; margin-bottom: 6px; color: #303133; }
+        .patient-sub { font-size: 13px; color: #606266; line-height: 1.7; }
+        .panel { padding: 24px; }
+        .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+        .panel-title { font-size: 20px; font-weight: 800; }
+        .panel-sub { font-size: 13px; color: #909399; }
+
+        .layout { display: grid; grid-template-columns: 2.1fr 1.9fr; gap: 14px; }
+        .work-card {
+            padding: 16px 18px;
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid #EBEEF5;
+        }
+        .work-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .work-sub { font-size: 13px; color: #909399; margin-bottom: 10px; line-height: 1.6; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea { min-height: 120px; resize: vertical; }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .checkbox-item { display: flex; align-items: center; font-size: 13px; flex: 1; min-width: 0; }
+        .checkbox-item input[type="checkbox"] { width: auto; margin-right: 6px; flex-shrink: 0; }
+        .checkbox-item label { flex: 1; min-width: 0; }
+
+        .medicine-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-top: 6px;
+            border: 1px solid #EBEEF5;
+            border-radius: 8px;
+            padding: 4px 10px;
+            background: #FAFAFA;
+        }
+        .med-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            padding: 8px 4px;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .med-row:last-child { border-bottom: none; }
+        .med-qty-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .med-qty-label { font-size: 12px; color: #606266; font-weight: 500; white-space: nowrap; }
+        .med-qty-input { width: 72px; padding: 4px 8px; font-size: 13px; }
+
+        .exam-toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+        .exam-btn {
+            padding: 6px 10px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: #fff;
+        }
+        .exam-btn.all { background: #67C23A; }
+        .exam-btn.none { background: #909399; }
+        .exam-summary { color: #666; font-size: 12px; }
+        .exam-section-title { margin-top: 10px; font-weight: 700; color: #333; font-size: 13px; }
+        .exam-empty { color: #999; font-style: italic; padding: 6px 0; font-size: 12px; }
+
+        .actions-bar {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-primary {
+            padding: 10px 22px;
+            background: #409EFF;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-secondary-link {
+            padding: 10px 20px;
+            background: #F56C6C;
+            color: #fff;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1000px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 760px) {
+            .page { width: min(100% - 20px, 1080px); margin: 18px auto 28px; }
+            .hero, .panel { padding: 18px; border-radius: 22px; }
+            .actions-bar { justify-content: flex-start; }
+        }
+            .diag-alert { padding:10px 14px; border-radius:8px; margin-bottom:12px; font-size:13px; }
+        .diag-alert-error { background:#fef0f0; color:#f56c6c; border:1px solid #fde2e2; }
+        .diag-alert-success { background:#f0f9eb; color:#67c23a; }
+        .diag-summary-note { font-size:12px; color:#909399; margin-bottom:4px; }
+        .diag-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+        .diag-submit-note { font-size:13px; color:#909399; }
+    </style>
+    <script>
+        function updateExamSummary() {
+            var boxes = document.querySelectorAll('input[name="examinationItems"]');
+            var selected = 0;
+            var total = 0;
+            boxes.forEach(function (cb) {
+                if (cb.checked) {
+                    selected++;
+                    var price = parseFloat(cb.getAttribute('data-price') || '0');
+                    if (!isNaN(price)) total += price;
+                }
+            });
+            var selectedEl = document.getElementById('examSelectedCount');
+            var totalEl = document.getElementById('examTotalPrice');
+            if (selectedEl) selectedEl.textContent = selected.toString();
+            if (totalEl) totalEl.textContent = total.toFixed(2);
+            updateToolTotal();
+        }
+
+        function updateMedicineSummary() {
+            var boxes = document.querySelectorAll('input[name="medicines"]');
+            var selected = 0;
+            var total = 0;
+            boxes.forEach(function (cb) {
+                if (cb.checked) {
+                    selected++;
+                    var price = parseFloat(cb.getAttribute('data-price') || '0');
+                    var qtyEl = document.getElementById('qty_' + cb.value);
+                    var qty = qtyEl ? parseInt(qtyEl.value, 10) : 1;
+                    if (isNaN(qty) || qty < 1) qty = 1;
+                    if (qty > 9999) qty = 9999;
+                    if (!isNaN(price)) total += price * qty;
+                }
+            });
+            var selectedEl = document.getElementById('medSelectedCount');
+            var totalEl = document.getElementById('medTotalPrice');
+            if (selectedEl) selectedEl.textContent = selected.toString();
+            if (totalEl) totalEl.textContent = total.toFixed(2);
+            updateToolTotal();
+        }
+
+        function updateToolTotal() {
+            var med = parseFloat(document.getElementById('medTotalPrice')?.textContent || '0') || 0;
+            var exam = parseFloat(document.getElementById('examTotalPrice')?.textContent || '0') || 0;
+            var total = med + exam;
+            var el = document.getElementById('toolTotalPrice');
+            if (el) {
+                el.textContent = total.toFixed(2);
+            }
+        }
+
+        function toggleAllExams(checked) {
+            var items = document.querySelectorAll('[data-exam-item="1"] input[name="examinationItems"]');
+            items.forEach(function (cb) { cb.checked = checked; });
+            updateExamSummary();
+        }
+
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.name === 'examinationItems') {
+                updateExamSummary();
+            }
+            if (e.target && e.target.name === 'medicines') {
+                updateMedicineSummary();
+            }
+        });
+        document.addEventListener('input', function (e) {
+            if (e.target && e.target.classList && e.target.classList.contains('med-qty-input')) {
+                updateMedicineSummary();
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            updateExamSummary();
+            updateMedicineSummary();
+            updateToolTotal();
+        });
+    </script>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/diagnose', '患者诊断', '编辑病历与医嘱')}"></div>
+
+    <main class="page">
+        <div th:if="${error}" class="diag-alert diag-alert-error">
+            <span th:text="${error}">提示</span>
+        </div>
+        <div th:if="${success}" class="diag-alert diag-alert-success">
+            <span th:text="${success}">成功</span>
+        </div>
+        <section class="hero card">
+            <h1 class="hero-title">患者诊断</h1>
+            <p class="hero-text">填写诊断并完善医嘱</p>
+                <div class="patient-banner" th:if="${patientUser}">
+                <div class="patient-main">患者：<span th:text="${patientUser.realName}"></span></div>
+                <div class="patient-sub">
+                    主诉：<span th:text="${appointment.symptoms}"></span>
+                </div>
+            </div>
+        </section>
+
+        <form th:action="@{/doctor/diagnose/{id}(id=${appointment.id})}" method="post">
+            <input type="hidden" id="aiAppointmentId" th:value="${appointment.id}">
+            <input type="hidden" id="aiPatientGender" th:value="${patient != null and patient.gender != null ? patient.gender.name() : ''}">
+            <input type="hidden" id="aiPatientBirthday" th:value="${patient != null and patient.birthday != null ? patient.birthday : ''}">
+            <input type="hidden" id="aiDoctorDepartment" th:value="${currentDoctorDepartment != null ? currentDoctorDepartment : ''}">
+            <textarea id="aiHistorySummary"
+                      class="u-hidden"
+                      th:text="${existingRecord != null and existingRecord.medicalRecordContent != null ? existingRecord.medicalRecordContent : ''}"></textarea>
+            <section class="panel card">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">诊断与辅助工具</div>
+                        <div class="panel-sub">完善诊断并开立医嘱</div>
+                    </div>
+                </div>
+
+                <div class="layout">
+                    <!-- 左侧：病历编辑 -->
+                    <div class="work-card">
+                        <div class="work-title">诊断记录</div>
+                        <div class="work-sub">填写诊断与医嘱</div>
+
+                        <div class="form-group">
+                            <label>AI 诊断建议（草稿，仅供参考）</label>
+                            <div class="u-flex-wrap-gap8">
+                                <button type="button" class="btn btn-primary" onclick="loadAiDiagnosisSuggestion()">生成诊断草稿</button>
+                                <span class="u-text-xs-muted">不会自动提交，仅供参考，可编辑后再保存。</span>
+                            </div>
+                            <textarea id="aiDiagnosisSuggestion"
+                                      readonly
+                                      class="u-box-dashed-soft"
+                                      placeholder="点击「生成诊断草稿」后，此处会出现 AI 建议，可复制到下方正式诊断中。"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>诊断结果 *</label>
+                            <textarea name="diagnosis"
+                                      id="diagnosisField"
+                                      required
+                                      placeholder="请输入诊断结果，例如：原发性高血压 3级，极高危"
+                                      th:text="${existingRecord != null and existingRecord.diagnosis != null ? existingRecord.diagnosis : (appointment.diagnosis != null ? appointment.diagnosis : '')}"></textarea>
+                            <button type="button"
+                                    class="btn ghost u-mt-6 u-chip-xs"
+                                    onclick="appendAiToDiagnosis()">
+                                将 AI 建议追加到诊断结果
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>处方（文字说明）</label>
+                            <textarea name="prescription"
+                                      placeholder="请输入处方信息，或结合右侧药品选择自动生成用药建议"
+                                      th:text="${existingRecord != null and existingRecord.prescription != null ? existingRecord.prescription : (appointment.prescription != null ? appointment.prescription : '')}"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：药品与检查工具 -->
+                    <div class="work-card">
+                        <div class="work-title">辅助工具</div>
+                        <div class="work-sub">
+                            选择药品与检查项目。预计费用合计：¥<strong id="toolTotalPrice">0.00</strong>
+                        </div>
+
+                        <div class="form-group">
+                            <label>药品选择（可多选）</label>
+                            <div class="diag-summary-note">
+                                已选 <strong id="medSelectedCount">0</strong> 种药品（单价×数量），合计 ¥<strong id="medTotalPrice">0.00</strong>
+                            </div>
+                            <div class="medicine-list">
+                                <div th:each="medicine : ${medicines}" class="med-row">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox"
+                                               name="medicines"
+                                               th:value="${medicine.id}"
+                                               th:id="${'med_' + medicine.id}"
+                                               th:checked="${appointmentMedicineQty != null and appointmentMedicineQty.containsKey(medicine.id)}"
+                                               th:attr="data-price=${medicine.price}">
+                                        <label th:for="${'med_' + medicine.id}"
+                                               th:text="${medicine.name + ' (' + medicine.specification + ') 单价 ¥' + medicine.price}"></label>
+                                    </div>
+                                    <div class="med-qty-wrap">
+                                        <span class="med-qty-label">数量</span>
+                                        <input type="number"
+                                               class="med-qty-input"
+                                               min="1"
+                                               max="9999"
+                                               th:value="${appointmentMedicineQty != null and appointmentMedicineQty.containsKey(medicine.id) ? appointmentMedicineQty.get(medicine.id) : 1}"
+                                               th:name="${'medicineQty_' + medicine.id}"
+                                               th:id="${'qty_' + medicine.id}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>检查 / 检验项目（多选）</label>
+                            <div class="exam-toolbar">
+                                <button type="button" class="exam-btn all" onclick="toggleAllExams(true)">全选</button>
+                                <button type="button" class="exam-btn none" onclick="toggleAllExams(false)">全不选</button>
+                                <div class="exam-summary">
+                                    已选 <strong id="examSelectedCount">0</strong> 项，合计 ¥<strong id="examTotalPrice">0.00</strong>
+                                </div>
+                            </div>
+
+                            <div class="exam-section-title">检查（含影像等）</div>
+                            <div class="checkbox-group">
+                                <div th:each="exam : ${examinations}"
+                                     th:if="${exam.type == null or !exam.type.contains('检验')}"
+                                     class="checkbox-item"
+                                     data-exam-item="1"
+                                     th:attr="data-exam-name=${exam.name},data-exam-type=${exam.type}">
+                                    <input type="checkbox"
+                                           name="examinationItems"
+                                           th:value="${exam.id}"
+                                           th:id="${'exam_' + exam.id}"
+                                           th:checked="${selectedExamIds != null and selectedExamIds.contains(exam.id)}"
+                                           th:attr="data-price=${exam.price}">
+                                    <label th:for="${'exam_' + exam.id}" th:text="${exam.name + ' - ¥' + exam.price}"></label>
+                                </div>
+                                <div class="exam-empty" th:if="${#lists.isEmpty(examinations)}">暂无检查项目</div>
+                            </div>
+
+                            <div class="exam-section-title">检验</div>
+                            <div class="checkbox-group">
+                                <div th:each="exam : ${examinations}"
+                                     th:if="${exam.type != null and exam.type.contains('检验')}"
+                                     class="checkbox-item"
+                                     data-exam-item="1"
+                                     th:attr="data-exam-name=${exam.name},data-exam-type=${exam.type}">
+                                    <input type="checkbox"
+                                           name="examinationItems"
+                                           th:value="${exam.id}"
+                                           th:id="${'exam2_' + exam.id}"
+                                           th:checked="${selectedExamIds != null and selectedExamIds.contains(exam.id)}"
+                                           th:attr="data-price=${exam.price}">
+                                    <label th:for="${'exam2_' + exam.id}" th:text="${exam.name + ' - ¥' + exam.price}"></label>
+                                </div>
+                                <div class="exam-empty" th:if="${#lists.isEmpty(examinations)}">暂无检验项目</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions-bar diag-actions">
+                    <a th:if="${appointment.status != null and appointment.status.name() == 'COMPLETED'}"
+                       th:href="@{/doctor/hospitalizations/request/{id}(id=${appointment.id})}" class="btn-secondary-link">
+                        发起住院申请
+                    </a>
+                    <span th:if="${appointment.status == null or appointment.status.name() != 'COMPLETED'}"
+                          class="diag-submit-note">
+                        请先点击「提交诊断」后，再申请住院
+                    </span>
+                    <button type="submit" class="btn-primary">提交诊断</button>
+                </div>
+            </section>
+
+        </form>
+    </main>
+
+    <script>
+        async function loadAiDiagnosisSuggestion() {
+            var existingDiagnosis = document.getElementById('diagnosisField') ? document.getElementById('diagnosisField').value : '';
+            var symptomsText = '';
+            try {
+                symptomsText = document.querySelector('.patient-sub span')?.textContent || '';
+            } catch (e) {
+                symptomsText = '';
+            }
+
+            var medIds = [];
+            document.querySelectorAll('input[name="medicines"]:checked').forEach(function (cb) {
+                if (cb && cb.value) medIds.push(cb.value);
+            });
+            var examIds = [];
+            document.querySelectorAll('input[name="examinationItems"]:checked').forEach(function (cb) {
+                if (cb && cb.value) examIds.push(cb.value);
+            });
+
+            var params = new URLSearchParams();
+            if (symptomsText) params.append('symptoms', symptomsText);
+            if (existingDiagnosis) params.append('existingDiagnosis', existingDiagnosis);
+            medIds.forEach(function (id) { params.append('medicineIds', id); });
+            examIds.forEach(function (id) { params.append('examinationIds', id); });
+            var appointmentId = document.getElementById('aiAppointmentId')?.value || '';
+            var gender = document.getElementById('aiPatientGender')?.value || '';
+            var birthday = document.getElementById('aiPatientBirthday')?.value || '';
+            var department = document.getElementById('aiDoctorDepartment')?.value || '';
+            var historySummary = document.getElementById('aiHistorySummary')?.value || '';
+            if (appointmentId) params.append('appointmentId', appointmentId);
+            if (gender) params.append('gender', gender);
+            if (department) params.append('department', department);
+            if (historySummary) params.append('historySummary', historySummary.slice(0, 200));
+            if (birthday) {
+                var b = new Date(birthday);
+                if (!isNaN(b.getTime())) {
+                    var now = new Date();
+                    var age = now.getFullYear() - b.getFullYear();
+                    var m = now.getMonth() - b.getMonth();
+                    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) {
+                        age--;
+                    }
+                    if (age >= 0 && age <= 120) {
+                        params.append('age', String(age));
+                    }
+                }
+            }
+
+            var output = document.getElementById('aiDiagnosisSuggestion');
+            if (output) output.value = '生成中…';
+
+            try {
+                var resp = await fetch('/doctor/ai/diagnosis-suggestion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                    body: params.toString()
+                });
+                var text = await resp.text();
+                if (output) output.value = (text && text.trim()) ? text : '当前信息不足，无法生成合适建议。';
+            } catch (e) {
+                if (output) output.value = '生成建议失败，请稍后重试。';
+                console.error(e);
+            }
+        }
+
+        function appendAiToDiagnosis() {
+            var aiText = document.getElementById('aiDiagnosisSuggestion') ? document.getElementById('aiDiagnosisSuggestion').value : '';
+            var diagField = document.getElementById('diagnosisField');
+            if (!diagField) return;
+            if (!aiText || !aiText.trim()) return;
+            var current = diagField.value || '';
+            diagField.value = current ? (current.trim() + '\n\n---\n' + aiText) : aiText;
+            diagField.focus();
+        }
+    </script>
+</body>
+</html>

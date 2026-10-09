@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>办理出院</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .hero-title { font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin: 8px 0; line-height: 1.2; color: #303133; }
+        .hero-text { max-width: 720px; font-size: 14px; line-height: 1.75; color: #909399; }
+        .patient-grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .patient-item { padding: 14px 16px; border-radius: 8px; background: #F5F7FA; }
+        .patient-label { display: block; margin-bottom: 6px; font-size: 12px; color: #909399; }
+        .patient-value { font-size: 15px; font-weight: 700; color: #303133; }
+        .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+        @media (max-width: 900px) {
+            .patient-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/hospitalizations', '办理出院', '填写出院信息')}"></div>
+
+    <main class="page">
+        <section class="card" th:if="${patientUser}">
+            <h1 class="hero-title">办理出院</h1>
+            <p class="hero-text">填写出院诊断与建议</p>
+            <div class="patient-grid">
+                <div class="patient-item">
+                    <span class="patient-label">患者姓名</span>
+                    <div class="patient-value" th:text="${patientUser.realName}">张三</div>
+                </div>
+                <div class="patient-item">
+                    <span class="patient-label">入院日期</span>
+                    <div class="patient-value" th:text="${#temporals.format(hospitalization.admissionDate, 'yyyy-MM-dd')}">2026-04-05</div>
+                </div>
+                <div class="patient-item">
+                    <span class="patient-label">当前诊断</span>
+                    <div class="patient-value" th:text="${hospitalization.diagnosis != null ? hospitalization.diagnosis : '暂无诊断'}">病情稳定</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <form th:action="@{/doctor/hospitalizations/{id}/discharge(id=${hospitalization.id})}" method="post">
+                <div class="form-group">
+                    <label for="dischargeDiagnosis">出院诊断 *</label>
+                    <textarea id="dischargeDiagnosis" name="dischargeDiagnosis" required
+                              placeholder="请输入出院诊断"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="dischargeNotes">出院注意事项 *</label>
+                    <textarea id="dischargeNotes" name="dischargeNotes" required
+                              placeholder="请输入出院建议"></textarea>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">确认办理出院</button>
+                    <a href="/doctor/hospitalizations" class="btn ghost">取消</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

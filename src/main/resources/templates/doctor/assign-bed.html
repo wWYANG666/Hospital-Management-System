@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分配床位</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .hero-title { font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin: 8px 0; line-height: 1.2; color: #303133; }
+        .hero-text { max-width: 760px; font-size: 14px; line-height: 1.75; color: #909399; }
+        .patient-box { margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+        .patient-item { padding: 14px 16px; border-radius: 8px; background: #F5F7FA; }
+        .patient-label { display: block; margin-bottom: 6px; font-size: 12px; color: #909399; }
+        .patient-value { font-size: 15px; font-weight: 700; color: #303133; }
+        .panel { padding: 18px; margin-bottom: 14px; }
+        .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .panel-title { font-size: 18px; font-weight: 800; color: #303133; }
+        .panel-sub { font-size: 13px; color: #909399; }
+        .dept-notice { margin-bottom: 12px; padding: 12px 14px; border-radius: 8px; background: #ECF5FF; color: #409EFF; font-size: 13px; line-height: 1.7; }
+        .ward-section { margin-bottom: 22px; }
+        .ward-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; color: #303133; }
+        .beds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .bed-card {
+            padding: 14px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #EBEEF5;
+            background: #fff;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .bed-card:hover { box-shadow: 0 4px 12px rgba(64, 158, 255, 0.12); }
+        .bed-card.selected {
+            border-color: #409EFF !important;
+            background: #ECF5FF;
+            box-shadow: 0 6px 16px rgba(64, 158, 255, 0.2) !important;
+        }
+        .bed-number { font-size: 17px; font-weight: 800; color: #409EFF; margin-bottom: 8px; }
+        .bed-info { font-size: 13px; color: #606266; margin: 4px 0; }
+        .bed-info strong { color: #303133; margin-right: 4px; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .bed-type-badge, .bed-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .type-general { background: #ECF5FF; color: #409EFF; }
+        .type-vip { background: #fff5e8; color: #bf7a13; }
+        .type-icu { background: #fff0f0; color: #bc5454; }
+        .bed-status { background: #edf8ef; color: #398454; }
+        .price-tag { margin-top: 8px; font-size: 13px; font-weight: 700; color: #409EFF; }
+        .empty-state { padding: 32px 16px; text-align: center; border-radius: 8px; color: #909399; }
+        .action-bar { margin-top: 20px; padding-top: 16px; border-top: 1px solid #EBEEF5; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        @media (max-width: 900px) {
+            .patient-box { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/hospitalizations', '分配床位', '选择空闲床位')}"></div>
+
+    <main class="page">
+        <section class="card" th:if="${patientUser}">
+            <h1 class="hero-title">床位分配</h1>
+            <p class="hero-text">为患者选择合适床位</p>
+            <div class="patient-box">
+                <div class="patient-item">
+                    <span class="patient-label">患者姓名</span>
+                    <div class="patient-value" th:text="${patientUser.realName}">张三</div>
+                </div>
+                <div class="patient-item">
+                    <span class="patient-label">住院原因</span>
+                    <div class="patient-value" th:text="${hospitalization.admissionReason != null ? hospitalization.admissionReason : '未填写'}">病情观察</div>
+                </div>
+                <div class="patient-item">
+                    <span class="patient-label">预计住院天数</span>
+                    <div class="patient-value"><span th:text="${hospitalization.expectedDays != null ? hospitalization.expectedDays : 0}">0</span> 天</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card panel">
+            <div class="panel-head">
+                <div>
+                    <div class="panel-title">选择空闲床位</div>
+                    <div class="panel-sub">选择并确认床位</div>
+                </div>
+            </div>
+            <div class="dept-notice" th:if="${currentDoctor != null and currentDoctor.department != null}">
+                仅显示本科室可分配空床。
+            </div>
+
+            <form th:action="@{/doctor/hospitalizations/{id}/assign-bed(id=${hospitalization.id})}" method="post" id="assignForm">
+                <input type="hidden" name="bedId" id="selectedBedId" required>
+
+                <div th:each="deptEntry : ${bedsByDepartment}" class="ward-section" th:attr="data-dept=${deptEntry.key}">
+                    <div class="ward-title" th:text="${deptEntry.key}">科室</div>
+                    <div class="beds-grid">
+                        <div th:each="bed : ${deptEntry.value}"
+                             class="bed-card"
+                             th:attr="data-bed-id=${bed.id}, data-ward=${bed.ward}, data-dept-id=${bed.departmentId}, data-type=${bed.bedType}, data-bed-number=${bed.bedNumber}, data-room-number=${bed.roomNumber}"
+                             th:onclick="|selectBed(this, ${bed.id})|">
+                            <div class="bed-number" th:text="${bed.bedNumber}">A-101</div>
+                            <div class="bed-info" th:if="${bed.roomNumber}">
+                                <strong>房间：</strong><span th:text="${bed.roomNumber}"></span>
+                            </div>
+                            <div class="bed-info" th:if="${bed.ward}">
+                                <strong>病区：</strong><span th:text="${bed.ward}"></span>
+                            </div>
+                            <div class="price-tag" th:if="${bed.pricePerDay != null and bed.pricePerDay > 0}">
+                                ¥<span th:text="${bed.pricePerDay}"></span> / 天
+                            </div>
+                            <div class="badge-row">
+                                <span class="bed-type-badge"
+                                      th:classappend="${bed.bedType.name() == 'GENERAL'} ? ' type-general' : (${bed.bedType.name() == 'VIP'} ? ' type-vip' : ' type-icu')"
+                                      th:text="${bed.bedType.name() == 'GENERAL' ? '普通' : (bed.bedType.name() == 'VIP' ? 'VIP' : 'ICU')}"></span>
+                                <span class="bed-status">可用</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button type="submit" id="submitBtn" class="btn btn-primary" disabled>确认分配床位</button>
+                    <a href="/doctor/hospitalizations" class="btn ghost">取消</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        let selectedBedId = null;
+
+        function selectBed(element, bedId) {
+            document.querySelectorAll('.bed-card').forEach(function (card) {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedBedId = bedId;
+            document.getElementById('selectedBedId').value = bedId;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        document.getElementById('assignForm').addEventListener('submit', function (e) {
+            if (!selectedBedId) {
+                e.preventDefault();
+                alert('请先选择一个床位');
+                return false;
+            }
+            var selectedCard = document.querySelector('.bed-card.selected');
+            if (selectedCard) {
+                var bedNumber = selectedCard.querySelector('.bed-number').textContent;
+                if (!confirm('确认将患者分配到床位「' + bedNumber + '」吗？')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

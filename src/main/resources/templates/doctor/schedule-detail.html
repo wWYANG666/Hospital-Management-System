@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时段接诊情况</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .hero-title { font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin: 8px 0; line-height: 1.2; color: #303133; }
+        .hero-text { max-width: 720px; font-size: 14px; line-height: 1.75; color: #909399; }
+        .status-pill {
+            display: inline-flex;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/schedules', |${workTimeName} 接诊情况|, '号源与预约详情')}"></div>
+
+    <main class="page">
+        <section class="card">
+            <h1 class="hero-title" th:text="|${workTimeName} 接诊情况总览|">时段接诊情况总览</h1>
+            <p class="hero-text">查看时段号源与预约</p>
+        </section>
+
+        <section class="card">
+            <div th:if="${scheduleDetails.isEmpty()}" class="empty">该时段暂无排班安排。</div>
+
+            <div class="slot-list" th:if="${!scheduleDetails.isEmpty()}">
+                <article th:each="detail, iterStat : ${scheduleDetails}" class="slot-card">
+                    <div class="slot-head">
+                        <div class="slot-title" th:text="|时间段 ${iterStat.count}|">时间段 1</div>
+                        <div class="slot-stats">
+                            <span class="slot-stat">总号源 <span th:text="${detail.maxAppointments}">0</span></span>
+                            <span class="slot-stat">已预约 <span th:text="${detail.usedAppointments}">0</span></span>
+                            <span class="slot-stat">剩余 <span th:text="${detail.availableAppointments}">0</span></span>
+                        </div>
+                    </div>
+
+                    <div th:if="${detail.appointments.isEmpty()}" class="empty u-p16">该时间段暂无预约患者。</div>
+
+                    <div class="apt-list" th:if="${!detail.appointments.isEmpty()}">
+                        <div th:each="apt, aptIterStat : ${detail.appointments}" class="apt-card-row">
+                            <div>
+                                <div class="apt-head-row">
+                                    <span class="apt-name"
+                                          th:text="${aptIterStat.count + '. ' + (userMap.containsKey(apt.patientId) ? userMap[apt.patientId].realName : ('患者 ' + apt.patientId))}">1. 张三</span>
+                                    <span class="apt-time-chip" th:text="${apt.appointmentTime != null ? apt.appointmentTime : '时间未定'}">09:00</span>
+                                    <span class="status-pill"
+                                          th:classappend="${apt.status.name() == 'PENDING'} ? ' status-pending-a' : (${apt.status.name() == 'CONFIRMED'} ? ' status-confirmed-a' : (${apt.status.name() == 'COMPLETED'} ? ' status-completed-a' : ' status-cancelled-a'))"
+                                          th:text="${apt.status.chineseName}">待诊</span>
+                                </div>
+                                <div class="symptom-line" th:if="${apt.symptoms != null and !apt.symptoms.isEmpty()}">
+                                    主诉：<span th:text="${apt.symptoms}"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <a th:href="@{/doctor/diagnose/{id}(id=${apt.id})}"
+                                   th:if="${apt.status == T(xmu.edu.yiyuan.entity.Appointment.AppointmentStatus).PENDING or apt.status == T(xmu.edu.yiyuan.entity.Appointment.AppointmentStatus).CONFIRMED}"
+                                   class="btn btn-primary">开始诊断</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

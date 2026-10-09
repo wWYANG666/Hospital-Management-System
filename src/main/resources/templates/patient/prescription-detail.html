@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>处方详情</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-rx-detail .page { max-width: 1000px; }
+        .patient-rx-detail .card-title { margin-bottom: 8px; }
+        .patient-rx-detail .card-sub { font-size: 12px; color: #909399; margin-bottom: 12px; }
+        .alert { padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 14px; }
+        .alert-success { background: #F0F9EB; color: #67C23A; }
+        .alert-error { background: #FDE2E2; color: #F56C6C; }
+        .prescription-header {
+            border-bottom: 2px solid #EBEEF5;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .prescription-number { font-size: 20px; font-weight: 600; color: #409EFF; margin-bottom: 8px; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending { background: #FFF6E6; color: #E6A23C; }
+        .status-dispensed { background: #F0F9EB; color: #67C23A; }
+        .status-cancelled { background: #F4F4F5; color: #909399; }
+        .info-row {
+            display: flex;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { width: 100px; font-weight: 600; color: #606266; }
+        .info-value { flex: 1; color: #303133; }
+        .patient-rx-detail .table-wrap { margin-top: 16px; overflow-x: auto; }
+        .patient-rx-detail table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .patient-rx-detail th, .patient-rx-detail td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .patient-rx-detail th { background: #F5F7FA; color: #606266; font-weight: 600; }
+        .patient-rx-detail tbody tr:hover { background: #F9FAFB; }
+        .total-row { font-weight: 600; font-size: 14px; background: #F5F7FA; }
+        .collect-form { margin-top: 20px; padding: 16px; background: #F5F7FA; border-radius: 6px; }
+        .collect-form h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .collect-form p { font-size: 12px; color: #606266; margin-bottom: 12px; }
+        .collect-form input {
+            padding: 8px 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        .collect-form input:focus {
+            outline: none;
+            border-color: #409EFF;
+            box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15);
+        }
+        .btn {
+            padding: 8px 16px;
+            background: #409EFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { background: #66b1ff; }
+        .btn.secondary { background: #909399; }
+        .btn.secondary:hover { background: #7A7E87; }
+        .btn:disabled { background: #C0C4CC; cursor: not-allowed; }
+        .empty { text-align: center; color: #C0C4CC; padding: 40px 10px; font-size: 14px; }
+    </style>
+</head>
+<body class="patient-ui patient-rx-detail theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub(${returnTo != null ? returnTo : '/patient/prescriptions'}, '处方详情', '药品明细与确认')}"></div>
+
+<main class="page">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="card">
+            <div class="prescription-header">
+                <div class="prescription-number">处方号：<span th:text="${prescription.prescriptionNumber}"></span></div>
+                <div class="u-mt-8">
+                    <span th:if="${prescription.status != null}"
+                          class="status-badge"
+                          th:classappend="${prescription.status.name() == 'PENDING' ? ' status-pending' : (prescription.status.name() == 'DISPENSED' ? ' status-dispensed' : ' status-cancelled')}"
+                          th:text="${prescription.status.patientChineseName}">-</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">开方医生</div>
+                <div class="info-value" th:text="${doctorUser != null ? doctorUser.realName : '未知'}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">开方时间</div>
+                <div class="info-value" th:text="${prescription.createdAt != null ? #temporals.format(prescription.createdAt, 'yyyy-MM-dd HH:mm') : '-'}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">付款状态</div>
+                <div class="info-value">
+                    <span th:if="${prescription.paid != null and prescription.paid}" class="u-text-success">已付款</span>
+                    <span th:if="${prescription.paid == null or !prescription.paid}" class="u-note-warning-strong">未付款</span>
+                    <span th:if="${prescription.paidAt != null}" class="u-ml-8-muted"
+                          th:text="${#temporals.format(prescription.paidAt, 'yyyy-MM-dd HH:mm')}"></span>
+                </div>
+            </div>
+            <div th:if="${prescription.collectedAt != null}" class="info-row">
+                <div class="info-label">取药确认</div>
+                <div class="info-value" th:text="${#temporals.format(prescription.collectedAt, 'yyyy-MM-dd HH:mm')}"></div>
+            </div>
+            <div th:if="${prescription.dispensedAt != null}" class="info-row">
+                <div class="info-label">发药完成</div>
+                <div class="info-value" th:text="${#temporals.format(prescription.dispensedAt, 'yyyy-MM-dd HH:mm')}"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">处方明细</div>
+            <div class="card-sub">处方药品明细</div>
+
+            <div class="table-wrap" th:if="${!items.isEmpty()}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>药品名称</th>
+                            <th>规格</th>
+                            <th>数量</th>
+                            <th>用法用量</th>
+                            <th>单价</th>
+                            <th>总价</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td th:text="${item.medicineName}"></td>
+                            <td th:text="${item.specification}"></td>
+                            <td>
+                                <span th:text="${item.quantity != null ? item.quantity : '-'}">-</span>
+                                <span th:if="${item.unit != null and !#strings.isEmpty(item.unit)}"
+                                      th:text="${' ' + item.unit}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${item.dosage != null and item.dosage != ''}" th:text="${item.dosage}"></span>
+                                <span th:if="${item.frequency != null and item.frequency != '' and item.dosage != null and item.dosage != ''}" th:text="${'，' + item.frequency}"></span>
+                                <span th:if="${item.frequency != null and item.frequency != '' and (item.dosage == null or item.dosage == '')}" th:text="${item.frequency}"></span>
+                                <span th:if="${item.usage != null and item.usage != '' and ((item.dosage != null and item.dosage != '') or (item.frequency != null and item.frequency != ''))}" th:text="${'，' + item.usage}"></span>
+                                <span th:if="${item.usage != null and item.usage != '' and (item.dosage == null or item.dosage == '') and (item.frequency == null or item.frequency == '')}" th:text="${item.usage}"></span>
+                                <span th:if="${(item.dosage == null or item.dosage == '') and (item.frequency == null or item.frequency == '') and (item.usage == null or item.usage == '')}">-</span>
+                            </td>
+                            <td>¥<span th:text="${item.price != null ? item.price : '0.00'}"></span></td>
+                            <td>¥<span th:text="${item.totalPrice != null ? item.totalPrice : '0.00'}"></span></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="5" class="u-text-right">合计：</td>
+                            <td>¥<span th:text="${totalAmount != null ? totalAmount : '0.00'}"></span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div th:if="${items.isEmpty()}" class="empty">
+                暂无药品明细
+            </div>
+        </div>
+
+        <div class="card" th:if="${prescription.status.name() == 'PENDING'}">
+            <div class="card-title">确认取药</div>
+            <div class="card-sub">付款后可到药房取药</div>
+
+            <div class="collect-form">
+                <div class="u-flex-wrap-gap10">
+                    <a th:if="${prescription.paid == null or !prescription.paid}"
+                       th:href="@{/patient/payments/prescription/{id}/alipay(id=${prescription.id})}"
+                       class="btn secondary">
+                        模拟支付宝付款
+                    </a>
+                    <button th:if="${prescription.paid != null and prescription.paid}"
+                            type="button"
+                            class="btn secondary"
+                            disabled>
+                        已付款
+                    </button>
+
+                    <form th:action="@{/patient/prescriptions/{id}/collect(id=${prescription.id})}" method="post">
+                        <input type="text"
+                               name="signature"
+                               placeholder="请输入您的姓名确认"
+                               required
+                               th:disabled="${(prescription.paid == null or !prescription.paid) or (prescription.patientSignature != null and prescription.patientSignature != '')}">
+                        <button type="submit"
+                                class="btn"
+                                th:disabled="${(prescription.paid == null or !prescription.paid) or (prescription.patientSignature != null and prescription.patientSignature != '')}"
+                                th:text="${prescription.patientSignature != null and prescription.patientSignature != '' ? '已确认取药' : (prescription.paid != null and prescription.paid ? '确认取药' : '请先付款')}">
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+</main>
+</body>
+</html>

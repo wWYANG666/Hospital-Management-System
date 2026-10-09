@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告单详情</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-report-detail .page { max-width: 900px; }
+        .patient-report-detail .card { padding: 24px 26px; }
+        .report-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #EBEEF5;
+            padding-bottom: 14px;
+        }
+        .report-header h1 { color: #409EFF; font-size: 22px; margin-bottom: 4px; }
+        .report-header span { font-size: 12px; color: #909399; }
+        .report-info { margin-bottom: 16px; }
+        .report-info table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .report-info td { padding: 8px 4px; border-bottom: 1px solid #F2F2F2; }
+        .report-info td:first-child { width: 120px; font-weight: 600; color: #606266; }
+        .report-content {
+            margin-top: 16px;
+            padding: 12px;
+            background: #F5F7FA;
+            border-radius: 6px;
+            min-height: 120px;
+            font-size: 13px;
+            color: #606266;
+        }
+        .doctor-note {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 6px;
+            background: #ECF5FF;
+            font-size: 13px;
+            color: #303133;
+        }
+        .doctor-note-title { font-weight: 600; margin-bottom: 4px; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending { background: #FFF6E6; color: #E6A23C; }
+        .status-completed { background: #F0F9EB; color: #67C23A; }
+        .btn-group { margin-top: 20px; text-align: center; }
+        .btn {
+            padding: 8px 18px;
+            border-radius: 18px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 0 6px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn.primary { background: #409EFF; color: #fff; }
+        .btn.danger { background: #F56C6C; color: #fff; }
+        @media print {
+            .topbar, .btn-group { display: none; }
+            .card { box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="patient-ui patient-report-detail theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub(${backUrl != null ? backUrl : '/patient/reports'}, '报告单详情', '查看并下载报告')}"></div>
+
+<main class="page">
+        <div class="card" th:if="${report}">
+            <div class="report-header">
+                <h1>医院报告单</h1>
+                <span th:text="${report.reportDate != null ? #temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss') : ''}"></span>
+            </div>
+
+            <div class="report-info">
+                <table>
+                    <tr>
+                        <td>报告名称</td>
+                        <td th:text="${examination != null ? examination.name : (report.reportType != null ? report.reportType : '未知')}"></td>
+                    </tr>
+                    <tr>
+                        <td>报告类型</td>
+                        <td th:text="${examination != null ? (examination.type != null ? examination.type : '检查') : '检查'}"></td>
+                    </tr>
+                    <tr th:if="${patientUser != null}">
+                        <td>患者姓名</td>
+                        <td th:text="${patientUser.realName}"></td>
+                    </tr>
+                    <tr th:if="${doctorUser != null}">
+                        <td>医生姓名</td>
+                        <td th:text="${doctorUser.realName}"></td>
+                    </tr>
+                    <tr>
+                        <td>报告状态</td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${report.status.name() == 'COMPLETED' ? ' status-completed' : ' status-pending'}"
+                                  th:text="${report.status != null ? report.status.chineseName : '未知'}"></span>
+                        </td>
+                    </tr>
+                    <tr th:if="${report.reportDate != null}">
+                        <td>报告日期</td>
+                        <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="report-content">
+                <div class="u-title-mini">报告内容</div>
+                <div th:if="${report.reportContent != null and !report.reportContent.isEmpty()}"
+                     class="u-pre-wrap-16"
+                     th:text="${report.reportContent}"></div>
+                <div th:if="${report.reportContent == null or report.reportContent.isEmpty()}"
+                     class="u-muted-italic">
+                    暂无内容
+                </div>
+            </div>
+
+            <div class="doctor-note">
+                <div class="doctor-note-title">医生建议</div>
+                <div class="u-text-xs-secondary">
+                    如有疑问，请咨询医生。
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a th:href="@{/patient/reports/{id}/download(id=${report.id})}" class="btn danger">下载 PDF</a>
+                <button type="button" onclick="window.print()" class="btn primary">打印报告</button>
+            </div>
+        </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,867 @@
+body.app-theme {
+    --theme-primary: #0f8a74;
+    --theme-primary-deep: #0a5f52;
+    --theme-primary-soft: #eaf7f3;
+    --theme-accent: #f2c46f;
+    --theme-text: #17312b;
+    --theme-muted: #68827b;
+    --theme-line: rgba(16, 79, 68, 0.12);
+    --theme-surface: rgba(255, 255, 255, 0.82);
+    --theme-surface-strong: rgba(255, 255, 255, 0.94);
+    --theme-shadow: 0 18px 48px rgba(17, 70, 61, 0.12);
+    --theme-shadow-soft: 0 10px 24px rgba(17, 70, 61, 0.08);
+    margin: 0;
+    color: var(--theme-text);
+    background: #f5f7f7;
+    min-height: 100vh;
+}
+
+body.app-theme.role-admin {
+    --theme-primary: #0c8a72;
+    --theme-primary-deep: #0a5d4f;
+    --theme-primary-soft: #e7f7f2;
+    --theme-accent: #f3c878;
+}
+
+body.app-theme.role-doctor {`r`n    --theme-primary: #0f8a74;`r`n    --theme-primary-deep: #0a5f52;`r`n    --theme-primary-soft: #eaf7f3;`r`n    --theme-accent: #f2c46f;`r`n}
+
+body.app-theme.role-patient,
+body.app-theme.role-auth {
+    --theme-primary: #0f8a74;
+    --theme-primary-deep: #0a5f52;
+    --theme-primary-soft: #eaf7f3;
+    --theme-accent: #f2c46f;
+}
+
+body.app-theme.role-error {
+    --theme-primary: #c47b16;
+    --theme-primary-deep: #8f5708;
+    --theme-primary-soft: #fff4e3;
+    --theme-accent: #ffd78b;
+    --theme-shadow: 0 20px 52px rgba(143, 87, 8, 0.14);
+}
+
+body.app-theme a {
+    color: var(--theme-primary);
+}
+
+body.app-theme a:hover {
+    text-decoration-color: currentColor;
+}
+
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.app-theme .page,
+body.app-theme .container {
+    position: relative;
+    z-index: 1;
+}
+
+body.app-theme .page {
+    width: min(1200px, calc(100% - 28px));
+    margin: 24px auto 36px;
+}
+
+body.app-theme .container {
+    width: min(1200px, calc(100% - 28px));
+    margin: 24px auto 36px;
+    padding: 0;
+}
+
+body.app-theme .topbar {
+    background: #ffffff;`r`n    border-bottom: 1px solid var(--theme-line);`r`n    box-shadow: none;
+    padding: 16px 20px;
+}
+
+body.app-theme .topbar-left,
+body.app-theme .topbar-right {
+    align-items: center;
+    gap: 12px;
+}
+
+body.app-theme .top-title-main {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--theme-text);
+}
+
+body.app-theme .top-title-sub {
+    font-size: 12px;
+    color: var(--theme-muted);
+}
+
+body.app-theme .logo,
+body.app-theme .avatar,
+body.app-theme .avatar-admin {
+    border-radius: 12px;`r`n    background: var(--theme-primary);`r`n    color: #fff;
+}
+
+body.app-theme .avatar,
+body.app-theme .avatar-admin {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;`r`n    font-size: 15px;
+}
+
+body.app-theme .back-btn,
+body.app-theme .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: var(--theme-primary-soft);
+    color: var(--theme-primary);
+    box-shadow: none;
+}
+
+body.app-theme .back-btn:hover,`r`nbody.app-theme .icon-btn:hover {`r`n    background: var(--theme-primary-soft);`r`n}
+
+body.app-theme .badge-dot {
+    width: 9px;
+    height: 9px;
+    top: 6px;
+    right: 6px;
+    background: #ff6f61;
+    box-shadow: 0 0 0 4px rgba(255, 111, 97, 0.12);
+}
+
+body.app-theme .card,
+body.app-theme .patient-banner,
+body.app-theme .panel {
+    background: #ffffff;`r`n    border: 1px solid var(--theme-line);`r`n    border-radius: 14px;`r`n    box-shadow: none;
+    }
+
+body.app-theme .card,
+body.app-theme .patient-banner {
+    padding: 22px 24px;
+}
+
+body.app-theme .card-head,
+body.app-theme .toolbar {
+    background: transparent;
+    border-bottom-color: var(--theme-line);
+}
+
+body.app-theme .card-head {
+    padding: 0 0 18px 0;
+    margin-bottom: 18px;
+}
+
+body.app-theme .toolbar {
+    margin: 0 -24px 18px;
+    padding: 0 24px 18px;
+}
+
+body.app-theme .card-title,
+body.app-theme .title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--theme-text);
+    letter-spacing: -0.02em;
+}
+
+body.app-theme .card-sub,
+body.app-theme .sub,
+body.app-theme .meta,
+body.app-theme .patient-line-sub,
+body.app-theme .service-label,
+body.app-theme .metric-label,
+body.app-theme .stat-label,
+body.app-theme .item-meta {
+    color: var(--theme-muted);
+}
+
+body.app-theme .metrics,
+body.app-theme .stats-grid,
+body.app-theme .quick-actions,
+body.app-theme .department-grid {
+    gap: 14px;
+}
+
+body.app-theme .metric-card,
+body.app-theme .stat-card,
+body.app-theme .quick-btn,
+body.app-theme .department-card,
+body.app-theme .step,
+body.app-theme .todo-item,
+body.app-theme .item,
+body.app-theme .timeline-item,
+body.app-theme .panel,
+body.app-theme .medicine-list,
+body.app-theme .msg,
+body.app-theme .intro-item,
+body.app-theme .stat-block {
+    background: #ffffff;`r`n    border: 1px solid var(--theme-line);`r`n    border-radius: 12px;`r`n    box-shadow: none;
+}
+
+body.app-theme .metric-card,
+body.app-theme .stat-card,
+body.app-theme .quick-btn,
+body.app-theme .department-card,
+body.app-theme .step,
+body.app-theme .todo-item,
+body.app-theme .item,
+body.app-theme .timeline-item,
+body.app-theme .stat-block {
+    padding: 16px 18px;
+}
+
+body.app-theme .quick-btn,
+body.app-theme .department-card,
+body.app-theme .stat-card,
+body.app-theme .metric-card {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+body.app-theme .quick-btn:hover,
+body.app-theme .department-card:hover,
+body.app-theme .stat-card:hover,
+body.app-theme .metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 34px color-mix(in srgb, var(--theme-primary) 12%, transparent);
+    border-color: color-mix(in srgb, var(--theme-primary) 25%, white);
+}
+
+body.app-theme .metric-value,
+body.app-theme .metric-number,
+body.app-theme .stat-number,
+body.app-theme .stat-value {
+    color: var(--theme-primary-deep);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+body.app-theme .quick-btn,
+body.app-theme .department-card {
+    text-decoration: none;
+    color: var(--theme-text);
+}
+
+body.app-theme .quick-btn .icon,
+body.app-theme .quick-icon,
+body.app-theme .item-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--theme-primary-soft);
+    color: var(--theme-primary);
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+body.app-theme .table-wrap,
+body.app-theme .scrollable-container,
+body.app-theme .timeline {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(113, 137, 130, 0.6) transparent;
+}
+
+body.app-theme .scrollable-container::-webkit-scrollbar,
+body.app-theme .timeline::-webkit-scrollbar,
+body.app-theme .table-wrap::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body.app-theme .scrollable-container::-webkit-scrollbar-thumb,
+body.app-theme .timeline::-webkit-scrollbar-thumb,
+body.app-theme .table-wrap::-webkit-scrollbar-thumb {
+    background: rgba(113, 137, 130, 0.55);
+    border-radius: 999px;
+}
+
+body.app-theme table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 18px;
+}
+
+body.app-theme th,
+body.app-theme td {
+    border-bottom: 1px solid var(--theme-line);
+    padding: 14px 12px;
+}
+
+body.app-theme th {
+    background: rgba(243, 248, 246, 0.95);
+    color: #4b665f;
+    font-weight: 700;
+}
+
+body.app-theme tbody tr:hover {
+    background: rgba(255, 255, 255, 0.66);
+}
+
+body.app-theme label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #274740;
+}
+
+body.app-theme input,
+body.app-theme select,
+body.app-theme textarea {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(16, 79, 68, 0.14);
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--theme-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+body.app-theme input:focus,
+body.app-theme select:focus,
+body.app-theme textarea:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--theme-primary) 60%, white);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--theme-primary) 12%, transparent);
+    transform: translateY(-1px);
+}
+
+body.app-theme textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+body.app-theme .btn,
+body.app-theme button,
+body.app-theme input[type="submit"],
+body.app-theme .btn-primary,
+body.app-theme .primary,
+body.app-theme .todo-link,
+body.app-theme .exam-btn,
+body.app-theme .btn-cancel,
+body.app-theme .btn-secondary-link,
+body.app-theme .link-btn,
+body.app-theme .btn-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 999px;
+    padding: 11px 18px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+body.app-theme .btn,
+body.app-theme button,
+body.app-theme input[type="submit"],
+body.app-theme .btn-primary,
+body.app-theme .primary,
+body.app-theme .todo-link,
+body.app-theme .exam-btn.all {
+    color: #fff;
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-deep) 100%);
+    box-shadow: 0 16px 32px color-mix(in srgb, var(--theme-primary) 22%, transparent);
+}
+
+body.app-theme .btn:hover,
+body.app-theme button:hover,
+body.app-theme input[type="submit"]:hover,
+body.app-theme .btn-primary:hover,
+body.app-theme .primary:hover,
+body.app-theme .todo-link:hover,
+body.app-theme .exam-btn:hover,
+body.app-theme .btn-cancel:hover,
+body.app-theme .btn-secondary-link:hover,
+body.app-theme .link-btn:hover,
+body.app-theme .btn-link:hover {
+    transform: translateY(-2px);
+}
+
+body.app-theme .btn.ghost,
+body.app-theme .ghost,
+body.app-theme .btn-link,
+body.app-theme .link-btn,
+body.app-theme .btn-secondary-link,
+body.app-theme .exam-btn.none {
+    color: var(--theme-primary-deep);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(16, 79, 68, 0.14);
+    box-shadow: none;
+}
+
+body.app-theme .btn.success {
+    background: linear-gradient(135deg, #1fb876 0%, #14985f 100%);
+    color: #fff;
+}
+
+body.app-theme .btn-cancel {
+    background: linear-gradient(135deg, #ef6461 0%, #d64845 100%);
+    color: #fff;
+}
+
+body.app-theme .actions,
+body.app-theme .actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+body.app-theme .actions-bar {
+    justify-content: flex-end;
+    margin-top: 22px;
+}
+
+body.app-theme .steps {
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+body.app-theme .step {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--theme-muted);
+    font-weight: 700;
+}
+
+body.app-theme .step.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-deep) 100%);
+}
+
+body.app-theme .pill,
+body.app-theme .tag,
+body.app-theme .tag-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+body.app-theme .pill,
+body.app-theme .tag,
+body.app-theme .tag-confirmed,
+body.app-theme .tag-apt {
+    background: var(--theme-primary-soft);
+    color: var(--theme-primary-deep);
+}
+
+body.app-theme .tag-pending {
+    background: #fff5e8;
+    color: #bf7a13;
+}
+
+body.app-theme .tag-completed,
+body.app-theme .tag-hosp {
+    background: #edf8ef;
+    color: #398454;
+}
+
+body.app-theme .tag-cancelled,
+body.app-theme .tag-report {
+    background: #fff0f0;
+    color: #bc5454;
+}
+
+body.app-theme .msg.error,
+body.app-theme .error {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #fff2f2;
+    border: 1px solid rgba(216, 86, 86, 0.14);
+    color: #c34747;
+}
+
+body.app-theme .empty,
+body.app-theme .exam-empty {
+    padding: 28px 16px;
+    border-radius: 20px;
+    border: 1px dashed rgba(16, 79, 68, 0.14);
+    background: rgba(249, 252, 251, 0.9);
+    color: #96a9a3;
+    text-align: center;
+}
+
+body.app-theme .footer,
+body.app-theme .footer-note {
+    color: var(--theme-muted);
+}
+
+body.app-theme.role-auth {
+    display: block;
+    padding: 18px;
+}
+
+body.app-theme.role-auth .login-container,
+body.app-theme.role-auth .container {
+    max-width: 860px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    border-radius: 30px;
+    box-shadow: var(--theme-shadow);
+    padding: 28px;
+}
+
+body.app-theme.role-auth .card {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px;
+    border-radius: 30px;
+}
+
+body.app-theme.role-auth h1 {
+    font-size: 34px;
+    margin-bottom: 12px;
+    letter-spacing: -0.03em;
+}
+
+body.app-theme.role-auth h1,
+body.app-theme.role-auth p,
+body.app-theme.role-auth .subtitle,
+body.app-theme.role-auth .tips {
+    position: relative;
+    z-index: 1;
+}
+
+body.app-theme.role-auth .subtitle,
+body.app-theme.role-auth .tips,
+body.app-theme.role-auth .back-link,
+body.app-theme.role-auth .register-link {
+    color: var(--theme-muted);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+body.app-theme.role-auth .login-container {
+    width: min(460px, 100%);
+    position: relative;
+    z-index: 1;
+}
+body.app-theme.role-auth .container,
+body.app-theme.role-auth .login-container,
+body.app-theme.role-auth .card {
+    position: relative;
+}
+
+body.app-theme.role-auth .grid {
+    gap: 16px;
+}
+
+body.app-theme.role-auth .form-group {
+    margin-bottom: 18px;
+}
+
+body.app-theme.role-auth .actions {
+    margin-top: 20px;
+}
+
+body.app-theme.role-auth .warning,
+body.app-theme.role-auth .msg,
+body.app-theme.role-auth .register-link,
+body.app-theme.role-auth .back-link {
+    position: relative;
+    z-index: 1;
+}
+
+body.app-theme.role-auth .warning {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255, 246, 226, 0.96), rgba(255, 239, 213, 0.92));
+    border: 1px solid rgba(214, 152, 37, 0.14);
+    color: #9d6a17;
+    line-height: 1.7;
+    font-size: 13px;
+}
+
+body.app-theme.role-auth .register-link,
+body.app-theme.role-auth .back-link {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(16, 79, 68, 0.08);
+    text-align: center;
+}
+
+body.app-theme.role-auth .options {
+    gap: 16px;
+}
+
+body.app-theme.role-auth .option {
+    border-radius: 24px;
+    border: 1px solid rgba(16, 79, 68, 0.08);
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: var(--theme-shadow-soft);
+    padding: 18px 16px;
+}
+
+body.app-theme.role-auth .option .icon {
+    border-radius: 14px;
+}
+
+body.app-theme.role-auth .option .title {
+    font-size: 16px;
+    color: var(--theme-text);
+}
+
+body.app-theme.role-auth .option .desc {
+    color: var(--theme-muted);
+    line-height: 1.7;
+}
+
+body.app-theme.role-auth .option .cta {
+    border-radius: 999px;
+    padding: 8px 12px;
+}
+
+body.app-theme .patient-banner {
+    padding: 18px 20px;
+}
+
+body.app-theme .patient-line-main {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--theme-text);
+    margin-bottom: 6px;
+}
+
+body.app-theme .item,
+body.app-theme .timeline-item {
+    padding: 16px 18px;
+    border-radius: 22px;
+    border: 1px solid rgba(16, 79, 68, 0.08);
+}
+
+body.app-theme .item {
+    margin-bottom: 12px;
+}
+
+body.app-theme .timeline-item {
+    border-bottom: none;
+}
+
+body.app-theme .checkbox-group {
+    gap: 10px;
+}
+
+body.app-theme .checkbox-item {
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(16, 79, 68, 0.08);
+}
+
+body.app-theme .medicine-list {
+    padding: 10px 12px;
+    border-radius: 22px;
+}
+
+body.app-theme .med-row {
+    padding: 12px 6px;
+}
+
+body.app-theme .department-grid,
+body.app-theme .quick-actions,
+body.app-theme .stats-grid,
+body.app-theme .metrics {
+    margin-top: 8px;
+}
+
+body.app-theme .department-card {
+    padding: 18px 16px;
+}
+
+body.app-theme .dept-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--theme-text);
+    margin-bottom: 6px;
+}
+
+body.app-theme .dept-desc {
+    color: var(--theme-muted);
+    line-height: 1.7;
+}
+
+body.app-theme .spacer {
+    height: 18px;
+}
+
+body.app-theme.role-error {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+body.app-theme.role-error .card {
+    width: min(760px, 100%);
+    padding: 30px;
+}
+
+body.app-theme.role-error h1 {
+    font-size: 28px;
+    margin-bottom: 12px;
+}
+
+body.app-theme.role-error .panel {
+    padding: 16px 18px;
+    border-radius: 20px;
+}
+
+body.app-theme.role-error code {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 10px;
+    border: 1px solid rgba(16, 79, 68, 0.08);
+}
+
+@media (max-width: 920px) {
+    body.app-theme .topbar {
+        padding: 14px 16px;
+    }
+
+    body.app-theme .page,
+    body.app-theme .container {
+        width: min(100% - 20px, 1200px);
+        margin: 18px auto 28px;
+    }
+
+    body.app-theme .card,
+    body.app-theme .patient-banner {
+        border-radius: 22px;
+        padding: 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    body.app-theme .top-title-main {
+        font-size: 18px;
+    }
+
+    body.app-theme .toolbar,
+    body.app-theme .actions,
+    body.app-theme .actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    body.app-theme .btn,
+    body.app-theme button,
+    body.app-theme input[type="submit"],
+    body.app-theme .btn-primary,
+    body.app-theme .primary,
+    body.app-theme .btn-link,
+    body.app-theme .link-btn,
+    body.app-theme .btn-secondary-link {
+        width: 100%;
+    }
+
+    body.app-theme.role-auth {
+        padding: 12px;
+    }
+
+    body.app-theme.role-auth .login-container,
+    body.app-theme.role-auth .container {
+        padding: 22px;
+        border-radius: 24px;
+    }
+
+    body.app-theme.role-auth .card {
+        padding: 22px;
+        border-radius: 24px;
+    }
+}
+
+/* 2026-04 app-theme typography + switchable palette layer */
+/* Usage: add `theme-business` or `theme-medical` on body.app-theme */
+body.app-theme {
+    --ui-font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", Arial, sans-serif;
+    --ui-fs-xs: 12px;
+    --ui-fs-sm: 13px;
+    --ui-fs-md: 14px;
+    --ui-fs-lg: 16px;
+    --ui-fs-xl: 18px;
+    --ui-fs-xxl: 22px;
+    font-family: var(--ui-font-family);
+}
+
+body.app-theme.theme-business:not(.role-error) {
+    --theme-primary: #2f74d0;
+    --theme-primary-deep: #2359a3;
+    --theme-primary-soft: #ebf3ff;
+    --theme-text: #1f2f46;
+    --theme-muted: #657893;
+    --theme-line: rgba(47, 116, 208, 0.18);
+    --theme-accent: #f3c878;
+}
+
+body.app-theme.theme-medical:not(.role-error) {
+    --theme-primary: #0f8a74;
+    --theme-primary-deep: #0a6455;
+    --theme-primary-soft: #e9f7f3;
+    --theme-text: #1c3a34;
+    --theme-muted: #5f7f79;
+    --theme-line: rgba(15, 138, 116, 0.18);
+    --theme-accent: #f2c46f;
+}
+
+body.app-theme,
+body.app-theme input,
+body.app-theme select,
+body.app-theme textarea,
+body.app-theme button {
+    font-family: var(--ui-font-family);
+}
+
+body.app-theme .top-title-main,
+body.app-theme .card-title,
+body.app-theme .title {
+    letter-spacing: 0.01em;
+}
+
+body.app-theme .top-title-main {
+    font-size: var(--ui-fs-xxl);
+}
+
+body.app-theme .top-title-sub,
+body.app-theme .card-sub,
+body.app-theme .sub,
+body.app-theme .meta,
+body.app-theme .footer-note {
+    font-size: var(--ui-fs-sm);
+    color: var(--theme-muted);
+}
+
+body.app-theme .card-title,
+body.app-theme .title {
+    font-size: var(--ui-fs-xl);
+}
+
+body.app-theme {
+    background:
+        radial-gradient(circle at 4% -6%, color-mix(in srgb, var(--theme-primary) 16%, transparent) 0%, transparent 40%),
+        radial-gradient(circle at 94% 108%, color-mix(in srgb, var(--theme-accent) 18%, transparent) 0%, transparent 36%),
+        #f5f7f7;
+}
+
+body.app-theme .btn,
+body.app-theme button,
+body.app-theme input[type="submit"],
+body.app-theme .btn-primary,
+body.app-theme .primary,
+body.app-theme .todo-link,
+body.app-theme .exam-btn.all {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-deep) 100%);
+    box-shadow: 0 16px 30px color-mix(in srgb, var(--theme-primary) 24%, transparent);
+}

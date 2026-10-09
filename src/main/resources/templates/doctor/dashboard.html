@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生工作台</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="doctor-dashboard theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarDashboard}"></div>
+
+    <div class="page">
+        <div class="card">
+            <div class="card-title">
+                <span>今日待处理</span>
+            </div>
+            <div class="card-sub">今日重点任务</div>
+
+            <div class="todo-item">
+                <div class="todo-label">
+                    待诊患者：
+                    <strong th:text="${#lists.size(todayPendingAppointments)}">0</strong> 人
+                </div>
+                <a href="/doctor/diagnose" class="todo-action">立即处理 →</a>
+            </div>
+            <div class="todo-item">
+                <div class="todo-label">
+                    住院相关待处理：
+                    <strong th:text="${totalPendingHospTasks != null ? totalPendingHospTasks : 0}">0</strong> 项
+                </div>
+                <a href="/doctor/hospitalizations" class="todo-action">去处理 →</a>
+            </div>
+            <div class="todo-item">
+                <div class="todo-label">
+                    新报告待审：
+                    <strong th:text="${pendingReports != null ? #lists.size(pendingReports) : 0}">0</strong> 份
+                </div>
+                <a href="/doctor/reports" class="todo-action">查看详情 →</a>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">
+                    <span>今日门诊安排</span>
+                </div>
+                <div class="card-sub">时段安排</div>
+
+                <div th:if="${scheduleSummaryList.isEmpty()}" class="empty">
+                    今日暂无排班安排
+                </div>
+                <div class="scrollable-container" th:if="${!scheduleSummaryList.isEmpty()}">
+                    <div th:each="summary : ${scheduleSummaryList}" class="timeline-item doctor-schedule-group">
+                        <div class="doctor-schedule-title">
+                            <span th:text="${summary.workTimeName}"></span>
+                            <span class="doctor-schedule-meta">
+                                (<span th:text="${summary.totalUsed}"></span>/<span th:text="${summary.totalMax}"></span>)
+                            </span>
+                        </div>
+                        <div th:if="${summary.appointments.isEmpty()}" class="doctor-schedule-empty">
+                            该时段暂无预约
+                        </div>
+                        <div th:each="apt : ${summary.appointments}" class="doctor-schedule-apt">
+                            <span th:text="${allTimeSlotMap.containsKey(apt.id) ? allTimeSlotMap[apt.id] : (apt.appointmentTime != null ? apt.appointmentTime : '时间未定')}"></span>
+                            <span class="doctor-schedule-patient" th:text="${userMapForDashboard.containsKey(apt.patientId) ? userMapForDashboard[apt.patientId].realName : '患者'}"></span>
+                            <a th:href="@{/doctor/diagnose/{id}(id=${apt.id})}"
+                               th:if="${apt.status == T(xmu.edu.yiyuan.entity.Appointment.AppointmentStatus).PENDING or apt.status == T(xmu.edu.yiyuan.entity.Appointment.AppointmentStatus).CONFIRMED}"
+                               class="todo-action doctor-inline-link-gap">诊断</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>近期患者动态</span>
+                </div>
+                <div class="card-sub">最近病历</div>
+
+                <div th:if="${recentCompletedAppointments.isEmpty()}" class="empty">
+                    暂无近期患者病历记录
+                </div>
+                <div class="scrollable-container" th:if="${!recentCompletedAppointments.isEmpty()}">
+                    <div th:each="apt : ${recentCompletedAppointments}" class="timeline-item">
+                        <div class="doctor-visit-main">
+                            <span th:text="${apt.appointmentDate}"></span>
+                            <span class="doctor-visit-time" th:text="${apt.appointmentTime}"></span>
+                            <span class="doctor-visit-patient"
+                                  th:text="${recentUserMap.containsKey(apt.patientId) ? recentUserMap[apt.patientId].realName : '患者'}"></span>
+                        </div>
+                        <div class="doctor-visit-detail">
+                            主诉：<span th:text="${apt.symptoms != null ? apt.symptoms : '-'}"></span>
+                            <a th:href="@{/doctor/appointments/{id}/record(id=${apt.id})}"
+                               class="todo-action doctor-inline-link-gap">查看病历</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>快捷入口</span>
+            </div>
+            <div class="card-sub">常用入口</div>
+            <div class="quick-actions">
+                <a href="/doctor/diagnose" class="quick-btn">
+                    <div class="icon">📋</div>
+                    <div>患者诊断</div>
+                </a>
+                <a href="/doctor/appointments" class="quick-btn">
+                    <div class="icon">📅</div>
+                    <div>历史挂号</div>
+                </a>
+                <a href="/doctor/reports" class="quick-btn">
+                    <div class="icon">📄</div>
+                    <div>报告单</div>
+                </a>
+                <a href="/doctor/hospitalizations" class="quick-btn">
+                    <div class="icon">🏥</div>
+                    <div>住院申请</div>
+                </a>
+            </div>
+            <div class="footer-note">
+                您今日共有 <span th:text="${#lists.size(todayPendingAppointments)}">0</span> 位待诊患者。
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生个人信息</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/dashboard', '个人信息', '执业档案与简介')}"></div>
+
+    <main class="page">
+        <div th:if="${param.success}" class="profile-success-banner">个人信息已更新。</div>
+
+        <section class="profile-hero-grid">
+            <div class="card">
+                <h1 class="section-title u-title-clamp-hero">维护医生档案信息</h1>
+                <p class="section-sub u-max640-line18">
+                    用于展示执业信息与排班状态。
+                </p>
+                <div class="profile-stat-grid">
+                    <div class="profile-stat-box">
+                        <div class="lbl">今日状态</div>
+                        <div class="val" th:text="${onDutyToday == true ? '在岗' : '休息'}">在岗</div>
+                    </div>
+                    <div class="profile-stat-box">
+                        <div class="lbl">当前科室</div>
+                        <div class="val" th:text="${doctor?.department ?: '未设置'}">内科</div>
+                    </div>
+                    <div class="profile-stat-box">
+                        <div class="lbl">当前职称</div>
+                        <div class="val" th:text="${doctor?.title ?: '未设置'}">主治</div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="card profile-identity">
+                <div class="profile-avatar-lg"
+                     th:text="${user != null && user.realName != null && !user.realName.isEmpty() ? user.realName.substring(0,1) : '医'}">医</div>
+                <div>
+                    <div class="profile-name" th:text="${user?.realName ?: user?.username}">医生姓名</div>
+                    <div class="profile-meta">
+                        <div th:text="${doctor?.doctorCode != null ? '工号：' + doctor.doctorCode : '工号待维护'}">工号：D001</div>
+                        <div th:text="${doctor?.specialty != null ? '擅长：' + doctor.specialty : '擅长方向待填写'}">擅长：心血管疾患</div>
+                    </div>
+                </div>
+                <div class="badge-row">
+                    <span class="badge badge-primary" th:text="${doctor?.department ?: '科室未设置'}">内科</span>
+                    <span class="badge badge-success" th:text="${onDutyToday == true ? '今日在岗' : '今日无排班'}">今日在岗</span>
+                </div>
+                <a href="/logout" class="logout-btn">退出当前账号</a>
+            </aside>
+        </section>
+
+        <section class="profile-content-grid">
+            <section class="card">
+                <div class="section-title">执业信息总览</div>
+                <div class="section-sub">请核对信息</div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">工号</span>
+                        <div class="info-value" th:text="${doctor?.doctorCode ?: '未设置'}">D001</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">所属科室</span>
+                        <div class="info-value" th:text="${doctor?.department ?: '未设置'}">内科</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">职称</span>
+                        <div class="info-value" th:text="${doctor?.title ?: '未设置'}">主治医师</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">专业特长</span>
+                        <div class="info-value" th:text="${doctor?.specialty ?: '未填写'}">高血压、冠心病</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">当前简介</span>
+                        <div class="info-value" th:text="${doctor?.introduction ?: '暂未填写个人简介'}">简介内容</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="section-title">编辑可维护信息</div>
+                <div class="section-sub">请核对信息</div>
+                <form th:action="@{/doctor/profile}" method="post">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="department">科室</label>
+                            <input id="department" type="text" name="department" th:value="${doctor?.department}" placeholder="例如：内科">
+                        </div>
+                        <div class="form-group">
+                            <label for="title">职称</label>
+                            <input id="title" type="text" name="title" th:value="${doctor?.title}" placeholder="例如：主治医师">
+                        </div>
+                        <div class="form-group full">
+                            <label for="introduction">个人简介</label>
+                            <textarea id="introduction" name="introduction" th:text="${doctor?.introduction}" placeholder="可介绍您的临床经验、主攻方向和门诊风格"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <div class="footer-tip">建议补充擅长与简介</div>
+                        <button class="submit-btn" type="submit">保存修改</button>
+                    </div>
+                </form>
+            </section>
+        </section>
+
+        <div class="footer-note">仅用于院内与就诊展示</div>
+    </main>
+</body>
+</html>

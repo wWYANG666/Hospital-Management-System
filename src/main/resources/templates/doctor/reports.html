@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告单管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical doctor-page-reports">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/dashboard', '报告单管理', '报告查询与填写')}"></div>
+
+    <div class="page">
+        <div th:if="${error != null}" class="u-alert-danger-soft" th:text="${error}"></div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>待您审阅的报告</span>
+                <span class="badge-count"
+                      th:text="|${pendingReviewableCount} 份|">0 份</span>
+            </div>
+            <div class="card-sub">待完成报告</div>
+
+            <div th:if="${reports.?[status.name() == 'PENDING'].isEmpty()}" class="empty">
+                当前暂无待审阅的报告
+            </div>
+
+            <div th:each="report : ${reports}"
+                 th:if="${report.status.name() == 'PENDING'}"
+                 class="pending-card">
+                <div class="u-flex-between-wrap-8">
+                    <div>
+                        <strong th:text="${userMap.containsKey(report.patientId) ? userMap[report.patientId].realName : report.patientId}"></strong>
+                        <span class="u-ml6-sm-secondary"
+                              th:text="${examinationMap.containsKey(report.id) ? examinationMap[report.id].name : report.reportType}"></span>
+                        <span class="u-ml8-xs-muted"
+                              th:text="${report.reportDate != null ? #temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm') : ''}"></span>
+                    </div>
+                    <span th:if="${reportNeedsPayment.get(report.id)}"
+                          class="u-pill-warning-soft">待患者缴费</span>
+                    <a th:if="${not reportNeedsPayment.get(report.id)}"
+                       th:href="@{/doctor/reports/{id}/edit(id=${report.id})}" class="btn btn-edit">立即审阅</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>全部报告列表</span>
+            </div>
+            <div class="card-sub">历史报告查询</div>
+
+            <div th:if="${reports.isEmpty()}" class="empty">
+                暂无报告单
+            </div>
+
+            <div class="table-wrap" th:if="${!reports.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>报告名称</th>
+                        <th>患者姓名</th>
+                        <th>生成时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="report : ${reports}">
+                        <td>
+                            <span th:text="${examinationMap.containsKey(report.id) ? examinationMap[report.id].name : report.reportType}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${userMap.containsKey(report.patientId) ? userMap[report.patientId].realName : report.patientId}"></span>
+                        </td>
+                        <td th:text="${report.reportDate != null ? #temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                        <td>
+                            <span class="doctor-report-status"
+                                  th:classappend="${' doctor-report-status--' + report.status.name()}"
+                                  th:text="${report.status.chineseName}"></span>
+                        </td>
+                        <td>
+                            <span th:if="${report.status.name() == 'PENDING' and reportNeedsPayment.get(report.id)}" class="u-meta-muted">待患者缴费</span>
+                            <a th:href="@{/doctor/reports/{id}/edit(id=${report.id})}"
+                               class="btn btn-edit"
+                               th:if="${report.status.name() == 'PENDING' and not reportNeedsPayment.get(report.id)}">填写报告</a>
+                            <a th:href="@{/doctor/reports/{id}/preview(id=${report.id})}"
+                               class="btn btn-view"
+                               th:if="${report.status.name() == 'COMPLETED'}">查看</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

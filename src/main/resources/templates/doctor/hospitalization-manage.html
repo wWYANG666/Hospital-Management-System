@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>住院管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .page { max-width: 1100px; margin: 16px auto 32px; padding: 0 16px; }
+
+        .section {
+            background: white;
+            padding: 16px 18px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            margin-bottom: 14px;
+        }
+        .patient-info {
+            background:#ffffff;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            font-size:13px;
+            border: 1px solid #EBEEF5;
+        }
+        .patient-header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:6px;
+        }
+        .patient-title {
+            font-size:15px;
+            font-weight:600;
+            color:#303133;
+        }
+        .patient-tag {
+            font-size:11px;
+            padding:3px 8px;
+            border-radius:999px;
+            background:#ECF5FF;
+            color:#409EFF;
+        }
+        .risk-tags {
+            margin-top:4px;
+            display:flex;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .risk-tag {
+            font-size:11px;
+            padding:2px 8px;
+            border-radius:999px;
+            background:#FDE2E2;
+            color:#F56C6C;
+        }
+        .risk-tag.warn {
+            background:#FFF6E6;
+            color:#E6A23C;
+        }
+        .info-row { display: flex; gap: 24px; margin: 4px 0; flex-wrap:wrap; }
+        .info-item { flex: 1; min-width:180px; font-size:13px; color:#606266; }
+        .info-label { color:#909399; margin-right:4px; }
+        .info-value { font-weight:500; color:#303133; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; font-size:13px; }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea { min-height: 100px; resize: vertical; }
+        button {
+            padding: 8px 18px;
+            background: #409EFF;
+            color: white;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn {
+            padding: 6px 14px;
+            background: #409EFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 18px;
+            display: inline-block;
+            font-size:12px;
+        }
+        .btn.green { background: #67C23A; }
+        .btn.orange { background: #E6A23C; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size:13px; }
+        th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #EBEEF5; }
+        th { background: #F5F7FA; color: #606266; }
+
+        .tabs { display: flex; gap: 10px; margin: 8px 0 12px; border-bottom: 1px solid #EBEEF5; }
+        .tab {
+            padding: 8px 14px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size:13px;
+        }
+        .tab.active { border-bottom-color: #409EFF; color: #409EFF; font-weight:bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+            .hosp-cost-note { font-size:11px; color:#909399; margin-left:4px; }
+        .hosp-full-line { flex:1 1 100%; min-width:100%; }
+        .hosp-qty-input { max-width:120px; padding:8px 10px; border:1px solid #dcdfe6; border-radius:4px; font-size:14px; }
+        .hosp-inline-note { font-size:12px; color:#909399; margin-left:8px; }
+        .hosp-mt-30 { margin-top:30px; }
+        .hosp-qty-badge { color:#409EFF; font-size:12px; margin-left:4px; }
+        .hosp-empty { text-align:center; padding:40px; color:#999; }
+        .hosp-content-plain { color:#303133; }
+        .hosp-condition-highlight { color:#1976d2; font-weight:500; }
+    </style>
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/hospitalizations', '住院管理', '医嘱与病情更新')}"></div>
+    <div class="page">
+        <div th:if="${success}" class="alert alert-success"><span th:text="${success}">操作成功</span></div>
+        <div th:if="${error}" class="alert alert-error"><span th:text="${error}">操作失败</span></div>
+
+        <div class="section">
+            <div class="patient-info">
+                <div class="patient-header">
+                    <div class="patient-title">患者信息</div>
+                    <div class="patient-tag">
+                        预计住院
+                        <span th:text="${stayDays != null ? stayDays : hospitalization.expectedDays}"></span> 天
+                    </div>
+                </div>
+                <!-- 依据诊断内容显示的风险标签（与 displayDiagnosis 一致，含病历/挂号兜底） -->
+                <div class="risk-tags" th:if="${displayDiagnosis != null and displayDiagnosis != '暂无诊断'}">
+                    <span class="risk-tag"
+                          th:if="${#strings.contains(displayDiagnosis, '发烧') or #strings.contains(displayDiagnosis, '发热')}">
+                        发热
+                    </span>
+                    <span class="risk-tag warn"
+                          th:if="${#strings.contains(displayDiagnosis, '肺炎')}">
+                        肺炎
+                    </span>
+                    <span class="risk-tag"
+                          th:if="${#strings.contains(displayDiagnosis, '危重') or #strings.contains(displayDiagnosis, '重症')}">
+                        重症/危重
+                    </span>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">姓名：</span>
+                        <span class="info-value" th:text="${patientUser?.realName}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">床位号：</span>
+                        <span class="info-value" th:text="${bed?.bedNumber ?: '未分配'}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">入院日期：</span>
+                        <span class="info-value" th:text="${#temporals.format(hospitalization.admissionDate, 'yyyy-MM-dd')}"></span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">医嘱参照科室：</span>
+                        <span class="info-value" th:text="${manageDepartmentName != null ? manageDepartmentName : '未指定（仅全院通用项目）'}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">用药与检查累计：</span>
+                        <span class="info-value">
+                            <span th:text="${hospitalization.totalCost != null ? #numbers.formatDecimal(hospitalization.totalCost, 1, 2) : '0.00'}">0.00</span> 元
+                        </span>
+                        <span class="hosp-cost-note">（出院结算时另加床位费）</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item hosp-full-line">
+                        <span class="info-label">诊断：</span>
+                        <span class="info-value" th:text="${displayDiagnosis}">暂无诊断</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('orders')">医嘱管理</div>
+                <div class="tab" onclick="showTab('condition')">病情更新</div>
+                <div class="tab" onclick="showTab('records')">病历记录</div>
+            </div>
+
+            <!-- 医嘱管理 -->
+            <div id="orders" class="tab-content active">
+                <h3>添加医嘱</h3>
+                <form th:action="@{/doctor/hospitalizations/{id}/orders(id=${hospitalization.id})}" method="post">
+                    <div class="form-group">
+                        <label>医嘱类型 *</label>
+                        <select name="orderType" id="orderTypeSelect" required>
+                            <option value="MEDICATION">用药</option>
+                            <option value="EXAMINATION">检查</option>
+                            <option value="NURSING">护理</option>
+                            <option value="OTHER">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>医嘱内容 *</label>
+                        <textarea name="orderContent" required placeholder="请输入医嘱内容（可补充说明；选药品/检查后会按单价计入上方累计费用）"></textarea>
+                    </div>
+                    <div class="form-group u-hidden" id="medicineGroup">
+                        <label>选择药品（当前科室在库，单价将计入住院费用）</label>
+                        <p th:if="${medicines == null or medicines.isEmpty()}" class="u-note-warning">暂无可用药品，请先维护库存。</p>
+                        <select name="medicineId" id="medicineIdSelect">
+                            <option value="">请选择</option>
+                            <option th:each="med : ${medicines}" th:value="${med.id}"
+                                    th:text="${med.name + (med.price != null ? ' ¥' + #numbers.formatDecimal(med.price, 1, 2) : '')}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group u-hidden" id="medicineQtyGroup">
+                        <label>药品数量 *</label>
+                        <input type="number" name="medicineQuantity" id="medicineQuantityInput" min="1" max="9999" value="1"
+                               class="hosp-qty-input">
+                        <span class="hosp-inline-note">费用按「单价 × 数量」累计到上方住院费用</span>
+                    </div>
+                    <div class="form-group u-hidden" id="examinationGroup">
+                        <label>选择检查项目（当前科室检查，单价将计入住院费用）</label>
+                        <p th:if="${examinations == null or examinations.isEmpty()}" class="u-note-warning">暂无可用检查项目，请先维护项目。</p>
+                        <select name="examinationId">
+                            <option value="">请选择</option>
+                            <option th:each="exam : ${examinations}" th:value="${exam.id}"
+                                    th:text="${exam.name + (exam.price != null ? ' ¥' + #numbers.formatDecimal(exam.price, 1, 2) : '')}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group u-hidden" id="dosageGroup">
+                        <label>用法用量</label>
+                        <input type="text" name="dosage" placeholder="如：每次2片，每日3次">
+                    </div>
+                    <div class="form-group u-hidden" id="frequencyGroup">
+                        <label>频次</label>
+                        <input type="text" name="frequency" placeholder="如：每日3次">
+                    </div>
+                    <button type="submit">添加医嘱</button>
+                </form>
+
+                <h3 class="hosp-mt-30">医嘱列表</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>内容</th>
+                            <th>创建时间</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.orderType != null ? order.orderType.chineseName : '-'}"></td>
+                            <td>
+                                <span th:text="${order.orderContent}"></span>
+                                <span th:if="${order.orderType.name() == 'MEDICATION' and order.quantity != null}"
+                                      class="hosp-qty-badge"
+                                      th:text="|（数量 ${order.quantity}）|"></span>
+                            </td>
+                            <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="${order.status != null ? order.status.chineseName : '-'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 病情更新 -->
+            <div id="condition" class="tab-content">
+                <h3>更新病情</h3>
+                <form th:action="@{/doctor/hospitalizations/{id}/update-condition(id=${hospitalization.id})}" method="post">
+                    <div class="form-group">
+                        <label>病情更新 *</label>
+                        <textarea name="conditionUpdate" required placeholder="请输入病情变化情况"></textarea>
+                    </div>
+                    <button type="submit">提交更新</button>
+                </form>
+            </div>
+
+            <!-- 病历记录 -->
+            <div id="records" class="tab-content">
+                <h3>病历记录</h3>
+                <div th:if="${records == null or records.isEmpty()}" class="hosp-empty">
+                    <p>暂无病历记录</p>
+                </div>
+                <table th:if="${records != null and !records.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>内容</th>
+                            <th>病情更新</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="record : ${records}">
+                            <td th:text="${#temporals.format(record.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <div th:if="${record.medicalRecordContent != null and !record.medicalRecordContent.isEmpty()}" th:text="${record.medicalRecordContent}"></div>
+                                <div th:if="${(record.medicalRecordContent == null or record.medicalRecordContent.isEmpty()) and record.conditionUpdate != null and !record.conditionUpdate.isEmpty()}"
+                                     th:text="${record.conditionUpdate}" class="hosp-content-plain"></div>
+                                <div th:if="${(record.medicalRecordContent == null or record.medicalRecordContent.isEmpty()) and (record.conditionUpdate == null or record.conditionUpdate.isEmpty())}"
+                                     class="u-muted-italic">无内容</div>
+                            </td>
+                            <td>
+                                <div th:if="${record.conditionUpdate != null and !record.conditionUpdate.isEmpty()}" th:text="${record.conditionUpdate}" class="hosp-condition-highlight"></div>
+                                <div th:if="${record.conditionUpdate == null or record.conditionUpdate.isEmpty()}" class="u-muted-italic">无病情更新</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            function syncOrderTypePanels() {
+                var sel = document.getElementById('orderTypeSelect');
+                if (!sel) return;
+                var type = sel.value;
+                document.getElementById('medicineGroup').style.display = type === 'MEDICATION' ? 'block' : 'none';
+                document.getElementById('medicineQtyGroup').style.display = type === 'MEDICATION' ? 'block' : 'none';
+                document.getElementById('examinationGroup').style.display = type === 'EXAMINATION' ? 'block' : 'none';
+                document.getElementById('dosageGroup').style.display = type === 'MEDICATION' ? 'block' : 'none';
+                document.getElementById('frequencyGroup').style.display = type === 'MEDICATION' ? 'block' : 'none';
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                var sel = document.getElementById('orderTypeSelect');
+                if (sel) {
+                    sel.addEventListener('change', syncOrderTypePanels);
+                    syncOrderTypePanels();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

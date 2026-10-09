@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${department.id == null ? '新增科室' : '编辑科室'}">科室表单</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+<th:block th:with="deptFormTitle=${department.id == null ? '新增科室' : '编辑科室'}">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/departments', ${deptFormTitle}, '维护科室与医生')}"></div>
+</th:block>
+
+<main class="page dept-form-main"
+      th:classappend="${department.id == null} ? 'dept-form-main--create' : 'dept-form-main--edit'">
+
+    <div th:if="${success}" class="admin-msg-success"><span th:text="${success}">操作成功</span></div>
+    <div th:if="${error}" class="admin-msg-error"><span th:text="${error}">操作失败</span></div>
+
+    <div th:class="${department.id == null} ? 'dept-form-create-wrap' : 'dept-edit-grid'">
+        <section class="card dept-form-card">
+            <header th:if="${department.id == null}" class="dept-form-header">
+                <div class="dept-form-header-icon" aria-hidden="true">科</div>
+                <div class="dept-form-header-text">
+                    <h1 class="dept-form-title">新建科室</h1>
+                    <p class="dept-form-sub">填写科室名称与描述后保存即可，后续可在列表中管理医生与排班。</p>
+                </div>
+            </header>
+            <div th:if="${department.id != null}" class="admin-panel-head dept-form-panel-head">
+                <div>
+                    <div class="admin-panel-title">科室信息</div>
+                    <div class="admin-panel-sub">修改名称与描述后保存生效</div>
+                </div>
+            </div>
+            <form class="dept-form-fields"
+                  th:action="${department.id == null} ? @{/admin/departments} : @{/admin/departments/{id}(id=${department.id})}"
+                  method="post" th:object="${department}">
+                <div class="form-group">
+                    <label class="form-label" for="dept-name">科室名称</label>
+                    <input id="dept-name" type="text" th:field="*{name}" required class="u-input-basic"
+                           placeholder="如：内科、口腔科" autocomplete="organization">
+                </div>
+                <div class="form-group u-mt-12">
+                    <label class="form-label" for="dept-desc">科室描述</label>
+                    <textarea id="dept-desc" rows="6" th:field="*{description}"
+                              placeholder="可填写科室职责、服务范围、就诊特点等"
+                              class="u-textarea-base"></textarea>
+                </div>
+                <div class="dept-form-actions">
+                    <button type="submit" class="btn btn-primary">保存科室信息</button>
+                    <a class="btn ghost" href="/admin/departments">返回列表</a>
+                </div>
+            </form>
+            <p th:if="${department.id == null}" class="dept-form-footnote">
+                保存后将进入科室列表，您可随时返回编辑。
+            </p>
+        </section>
+
+        <section th:if="${department.id != null}" class="card dept-doctors-card">
+            <div class="admin-panel-head dept-doctors-head">
+                <div>
+                    <div class="admin-panel-title">本科室医生</div>
+                    <div class="admin-panel-sub">审核、排班与账号管理</div>
+                </div>
+            </div>
+
+            <div class="table-wrap dept-doctors-table" th:if="${departmentDoctors != null and !departmentDoctors.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>工号</th>
+                        <th>用户名</th>
+                        <th>职称</th>
+                        <th>专长</th>
+                        <th class="dept-col-actions">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="doctor : ${departmentDoctors}">
+                        <td>
+                            <div class="u-fw600" th:text="${doctorUserMap.containsKey(doctor.id) ? doctorUserMap[doctor.id].realName : '未知'}"></div>
+                            <div class="u-text-xs-muted" th:text="${doctor.department}"></div>
+                        </td>
+                        <td th:text="${doctor.doctorCode}"></td>
+                        <td th:text="${doctorUserMap.containsKey(doctor.id) ? doctorUserMap[doctor.id].username : '未知'}"></td>
+                        <td th:text="${doctor.title ?: '-'}"></td>
+                        <td th:text="${doctor.specialty ?: '-'}"></td>
+                        <td class="dept-actions-cell">
+                            <form th:if="${doctorUserMap.containsKey(doctor.id) and (doctorUserMap[doctor.id].status == null or doctorUserMap[doctor.id].status != 1)}"
+                                  th:action="@{/admin/doctors/{doctorId}/approve(doctorId=${doctor.id})}" method="post" class="u-inline">
+                                <input type="hidden" name="departmentId" th:value="${department.id}">
+                                <button type="submit" class="btn btn-primary u-chip-xs">审核通过</button>
+                            </form>
+                            <a class="btn ghost u-chip-xs-ml4"
+                               th:href="@{/admin/departments/{departmentId}/doctors/{doctorId}/schedules(departmentId=${department.id}, doctorId=${doctor.id})}">查看排班</a>
+                            <a th:if="${doctorUserMap.containsKey(doctor.id)}" class="btn ghost u-chip-xs-ml4"
+                               th:href="@{/admin/users/{id}/change-password(id=${doctorUserMap[doctor.id].id}, departmentId=${department.id})}">修改密码</a>
+                            <form th:action="@{/admin/doctors/{doctorId}/delete(doctorId=${doctor.id}, departmentId=${department.id})}" method="post" class="u-inline"
+                                  onsubmit="return confirm('确认删除该医生及其账号和排班吗？此操作不可恢复！');">
+                                <button type="submit" class="btn-cancel u-chip-xs-ml4">删除</button>
+                            </form>
+                            <span th:if="${!doctorUserMap.containsKey(doctor.id)}" class="u-fs12-muted">无用户账号</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${departmentDoctors == null or departmentDoctors.isEmpty()}" class="empty dept-doctors-empty">
+                暂无关联医生，请先在「医生管理」中为本科室添加医生。
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "hospital-portal",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode patient --host 127.0.0.1",
+    "dev:patient": "vite --mode patient --host 127.0.0.1",
+    "dev:staff": "vite --mode staff --host 127.0.0.1",
+    "typecheck": "vue-tsc --noEmit",
+    "build": "vue-tsc --noEmit && vite build --mode patient && vite build --mode staff",
+    "build:patient": "vue-tsc --noEmit && vite build --mode patient",
+    "build:staff": "vue-tsc --noEmit && vite build --mode staff",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "vue": "^3.5.43",
+    "vue-router": "^4.6.0",
+    "@lucide/vue": "^1.53.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.9",
+    "vite": "^8.3.3",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.3.12",
+    "@types/node": "^24.0.0"
+  }
+}

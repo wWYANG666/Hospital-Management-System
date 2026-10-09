@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生排班管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/departments', '医生排班管理', '查看医生排班')}"></div>
+
+<main class="page">
+    <section class="card">
+        <h1 class="admin-hero-title">医生排班总览</h1>
+        <p class="admin-hero-text">查看班次与状态</p>
+        <div class="admin-hero-meta">
+            <div class="admin-meta-card">
+                <div class="lbl">科室</div>
+                <div class="val" th:text="${department.name}">科室</div>
+            </div>
+            <div class="admin-meta-card">
+                <div class="lbl">医生</div>
+                <div class="val" th:text="${doctorUser != null ? doctorUser.realName : '未知'}">医生</div>
+            </div>
+            <div class="admin-meta-card">
+                <div class="lbl">工号</div>
+                <div class="val" th:text="${doctor.doctorCode}">-</div>
+            </div>
+            <div class="admin-meta-card">
+                <div class="lbl">职称</div>
+                <div class="val" th:text="${doctor.title != null ? doctor.title : '待补充'}">待补充</div>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${success}" class="admin-msg-success" th:text="${success}"></div>
+    <div th:if="${error}" class="admin-msg-error" th:text="${error}"></div>
+
+    <section class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">排班列表</div>
+                <div class="admin-panel-sub">支持审核与维护</div>
+            </div>
+        </div>
+
+        <div class="admin-toolbar">
+            <a th:href="@{/admin/schedules/new(doctorId=${doctor.id}, departmentId=${department.id})}" class="btn btn-primary">新增排班</a>
+            <form id="bulkDeleteDoctorSchedulesForm"
+                  th:action="@{/admin/schedules/bulk-delete(departmentId=${department.id}, doctorId=${doctor.id})}"
+                  method="post" onsubmit="return confirmBulkDeleteDoctorSchedules()" class="u-inline"></form>
+            <button class="btn-cancel u-pill-btn" type="submit" form="bulkDeleteDoctorSchedulesForm">批量删除</button>
+        </div>
+
+        <div th:if="${schedules.isEmpty()}" class="empty">该医生暂无排班记录。</div>
+
+        <div class="table-wrap" th:if="${!schedules.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th class="u-w40"><input type="checkbox" onclick="toggleAllDoctorSchedules(this)"></th>
+                    <th>日期</th>
+                    <th>班次</th>
+                    <th>门诊类型</th>
+                    <th>号源</th>
+                    <th>已预约</th>
+                    <th>剩余号源</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${schedules}">
+                    <td><input type="checkbox" name="ids" th:value="${s.id}" form="bulkDeleteDoctorSchedulesForm"></td>
+                    <td th:text="${s.workDate != null ? #temporals.format(s.workDate, 'yyyy-MM-dd') : ''}"></td>
+                    <td>
+                        <span class="tag-inline tag-male" th:if="${s.workTime.name() == 'MORNING'}">上午</span>
+                        <span class="tag-inline tag-female" th:if="${s.workTime.name() == 'AFTERNOON'}">下午</span>
+                        <span class="tag-inline tag-male" th:if="${s.workTime.name() == 'EVENING'}">晚上</span>
+                    </td>
+                    <td th:text="${s.scheduleType != null and s.scheduleType.name() == 'EXPERT' ? '专家号' : '普通门诊'}"></td>
+                    <td th:text="${s.maxAppointments != null ? s.maxAppointments : 0}"></td>
+                    <td th:text="${s.currentAppointments != null ? s.currentAppointments : 0}"></td>
+                    <td th:text="${(s.maxAppointments != null ? s.maxAppointments : 0) - (s.currentAppointments != null ? s.currentAppointments : 0)}"></td>
+                    <td>
+                        <span th:if="${s.status != null and s.status == 1}" class="u-text-success">启用</span>
+                        <span th:if="${s.status != null and s.status == 0}" class="u-text-muted">停用</span>
+                        <span th:if="${s.status != null and s.status == 2}" class="u-note-warning-strong">请假待审批</span>
+                    </td>
+                    <td>
+                        <form th:if="${s.status != null and s.status == 2}" th:action="@{/admin/schedules/{id}/approve-leave(id=${s.id})}" method="post" class="u-inline">
+                            <input type="hidden" name="departmentId" th:value="${department.id}">
+                            <input type="hidden" name="doctorId" th:value="${doctor.id}">
+                            <button type="submit" class="btn btn-primary u-chip-xs">同意请假</button>
+                        </form>
+                        <form th:if="${s.status != null and s.status == 2}" th:action="@{/admin/schedules/{id}/reject-leave(id=${s.id})}" method="post" class="u-inline">
+                            <input type="hidden" name="departmentId" th:value="${department.id}">
+                            <input type="hidden" name="doctorId" th:value="${doctor.id}">
+                            <button type="submit" class="btn ghost u-chip-xs">驳回请假</button>
+                        </form>
+                        <form th:if="${s.status != null and s.status == 0}" th:action="@{/admin/schedules/{id}/restore(id=${s.id})}" method="post" class="u-inline">
+                            <input type="hidden" name="departmentId" th:value="${department.id}">
+                            <input type="hidden" name="doctorId" th:value="${doctor.id}">
+                            <button type="submit" class="btn ghost u-chip-xs">复工</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+    function toggleAllDoctorSchedules(source) {
+        document.querySelectorAll('input[name="ids"]').forEach(function (cb) { cb.checked = source.checked; });
+    }
+    function confirmBulkDeleteDoctorSchedules() {
+        var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+        if (checked === 0) {
+            alert('请先勾选要删除的排班');
+            return false;
+        }
+        return confirm('确定删除已勾选的 ' + checked + ' 条排班吗？此操作不可恢复。');
+    }
+</script>
+</body>
+</html>

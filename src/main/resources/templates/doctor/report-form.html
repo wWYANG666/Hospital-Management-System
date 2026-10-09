@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>填写报告单</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .page {
+            max-width: 1100px;
+            margin: 16px auto 32px;
+            padding: 0 16px;
+        }
+
+        .hero,
+        .panel {
+            border-radius: 16px;
+        }
+
+        .hero {
+            padding: 28px;
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            z-index: 1;
+            margin-top: 18px;
+            font-size: clamp(30px, 4vw, 42px);
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-text {
+            z-index: 1;
+            margin-top: 14px;
+            max-width: 720px;
+            line-height: 1.85;
+            font-size: 15px;
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .panel-sub {
+            font-size: 13px;
+            color: #909399;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .info-box {
+            padding: 16px 18px;
+            border-radius: 8px;
+            background: #F5F7FA;
+        }
+
+        .info-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #909399;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #303133;
+            line-height: 1.7;
+        }
+
+        textarea {
+            min-height: 280px;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 760px) {
+            .page {
+                width: min(100% - 20px, 1080px);
+                margin: 18px auto 28px;
+            }
+
+            .hero,
+            .panel {
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/reports', '填写报告单', '录入检查结果')}"></div>
+
+    <main class="page" th:if="${report}">
+        <section class="hero card">
+            <h1 class="hero-title">报告填写</h1>
+            <p class="hero-text">
+                按结果、判断、建议填写。
+            </p>
+        </section>
+
+        <section class="panel card">
+            <div class="panel-head">
+                <div>
+                    <div class="panel-title">报告单信息</div>
+                    <div class="panel-sub">填写结果与建议</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box item">
+                    <span class="info-label">报告名称</span>
+                    <div class="info-value" th:text="${examination != null ? examination.name : report.reportType}">检查项目</div>
+                </div>
+                <div class="info-box item">
+                    <span class="info-label">报告类型</span>
+                    <div class="info-value" th:text="${examination != null ? (examination.type != null ? examination.type : '检查') : '检查'}">检查</div>
+                </div>
+                <div class="info-box item">
+                    <span class="info-label">患者姓名</span>
+                    <div class="info-value" th:text="${patientUser != null ? patientUser.realName : '未知'}">张三</div>
+                </div>
+                <div class="info-box item">
+                    <span class="info-label">当前状态</span>
+                    <div class="info-value" th:text="${report.status.chineseName}">待完成</div>
+                </div>
+            </div>
+
+            <form th:action="@{/doctor/reports/{id}(id=${report.id})}" method="post">
+                <div class="form-group">
+                    <label>AI 报告草稿（仅供参考）</label>
+                    <div class="u-flex-wrap-gap8">
+                        <button type="button" class="btn btn-primary" onclick="loadAiReportSuggestion()">生成报告草稿</button>
+                        <span class="u-text-xs-muted">基于检查项目与当前输入内容生成结构化草稿。</span>
+                    </div>
+                    <textarea id="aiReportSuggestion"
+                              readonly
+                              class="u-box-dashed-soft"
+                              placeholder="点击「生成报告草稿」后，此处会出现 AI 建议，可复制到下方正式报告中。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportContent">报告内容 *</label>
+                    <textarea id="reportContent" name="reportContent" required
+                              placeholder="请填写检查结果与建议。"
+                              th:text="${report.reportContent}"></textarea>
+                    <button type="button"
+                            class="btn ghost u-mt-6 u-chip-xs"
+                            onclick="appendAiToReport()">
+                        将 AI 草稿追加到报告内容
+                    </button>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">保存并完成报告</button>
+                    <a href="/doctor/reports" class="btn ghost">取消</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        async function loadAiReportSuggestion() {
+            var examinationId = '';
+            try {
+                var examIdEl = document.querySelector('[name="examinationId"]');
+                if (examIdEl && examIdEl.value) examinationId = examIdEl.value;
+            } catch (e) {
+                examinationId = '';
+            }
+            var rawResult = document.getElementById('reportContent') ? document.getElementById('reportContent').value : '';
+            var clinicalNote = '';
+
+            var params = new URLSearchParams();
+            if (examinationId) params.append('examinationId', examinationId);
+            if (rawResult) params.append('rawResult', rawResult);
+            if (clinicalNote) params.append('clinicalNote', clinicalNote);
+
+            var output = document.getElementById('aiReportSuggestion');
+            if (output) output.value = '生成中…';
+
+            try {
+                var resp = await fetch('/doctor/ai/report-suggestion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                    body: params.toString()
+                });
+                var text = await resp.text();
+                if (output) output.value = (text && text.trim()) ? text : '当前信息不足，无法生成合适草稿。';
+            } catch (e) {
+                if (output) output.value = '生成草稿失败，请稍后重试。';
+                console.error(e);
+            }
+        }
+
+        function appendAiToReport() {
+            var aiText = document.getElementById('aiReportSuggestion') ? document.getElementById('aiReportSuggestion').value : '';
+            var reportField = document.getElementById('reportContent');
+            if (!reportField) return;
+            if (!aiText || !aiText.trim()) return;
+            var current = reportField.value || '';
+            reportField.value = current ? (current.trim() + '\n\n---\n' + aiText) : aiText;
+            reportField.focus();
+        }
+    </script>
+</body>
+</html>

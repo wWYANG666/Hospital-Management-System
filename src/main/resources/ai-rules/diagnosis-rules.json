@@ -1,0 +1,31 @@
+{
+  "symptomDirections": [
+    {
+      "keywords": ["头痛", "眩晕"],
+      "advice": "注意评估血压、神经系统体征，排除颅内急症及高血压相关问题。"
+    },
+    {
+      "keywords": ["胸痛", "胸闷", "呼吸困难", "心慌"],
+      "advice": "需警惕急性冠脉综合征、心律失常等心血管事件，必要时尽早完善心电图及心肌标志物检查。"
+    },
+    {
+      "keywords": ["发热", "咳嗽"],
+      "advice": "考虑呼吸道感染可能，结合血常规及影像学检查判断是否存在细菌/病毒感染。"
+    }
+  ],
+  "contextFragments": {
+    "ageElderly": "老年患者：注意多病共存、跌倒与用药相互作用。",
+    "ageChild": "儿童/青少年：注意按体重给药与脱水风险。",
+    "genderMale": "男性：结合吸烟、饮酒等危险因素分层。",
+    "genderFemale": "女性：结合内分泌/生理周期等鉴别。",
+    "historyPrefix": "既往要点：%s",
+    "departmentPrefix": "科室：%s"
+  },
+  "fixedFragments": {
+    "symptomSummaryPrefix": "【主诉】%s（须结合查体与病史核实）。",
+    "existingDiagnosisPrefix": "【当前诊断参考】%s（可按病情变化调整）。",
+    "medicinePrefix": "【用药】%s：核对过敏史、肝肾功能与相互作用，说明用法与不良反应。",
+    "examPrefix": "【检查】%s：按需选择，避免重复；结合临床解读结果。",
+    "followup": "【随访】说明复诊与危险信号，加重时及时就医。"
+  }
+}

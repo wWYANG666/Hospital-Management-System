@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约挂号 - 选择医生</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .apt-wizard .page { max-width: 900px; }
+        .steps { display: flex; margin-bottom: 16px; gap: 8px; }
+        .step {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 999px;
+            font-size: 12px;
+            text-align: center;
+            background: #E4E7ED;
+            color: #606266;
+        }
+        .step.active { background: #409EFF; color: #fff; }
+
+        .card {
+            background:#fff;
+            border-radius:8px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.04);
+            padding:18px 20px;
+        }
+        .card-title {
+            font-size:16px;
+            font-weight:600;
+            margin-bottom:4px;
+        }
+        .card-sub {
+            font-size:12px;
+            color:#909399;
+            margin-bottom:16px;
+        }
+
+        .doctor-card {
+            background:#F9FAFB;
+            border-radius:8px;
+            padding:14px 12px;
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+            cursor:pointer;
+            border:1px solid #E4E7ED;
+            transition:all .2s;
+            margin-bottom:10px;
+        }
+        .doctor-card:hover {
+            border-color:#409EFF;
+            box-shadow:0 6px 16px rgba(0,0,0,0.06);
+            transform:translateY(-1px);
+        }
+        .doctor-avatar {
+            width:44px;
+            height:44px;
+            border-radius:50%;
+            background:#409EFF;
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:22px;
+        }
+        .doctor-info { flex:1; font-size:14px; }
+        .doctor-info h3 { margin:0 0 4px; font-size:15px; }
+        .doctor-meta { font-size:12px; color:#909399; margin-bottom:4px; }
+        .doctor-intro { font-size:13px; color:#606266; }
+        .empty {
+            text-align:center;
+            color:#C0C4CC;
+            padding:24px 10px;
+            font-size:14px;
+        }
+    </style>
+</head>
+<body class="patient-ui apt-wizard theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/appointments/new', '预约挂号', '步骤二：选择医生')}"></div>
+
+    <main class="page">
+        <div class="steps">
+            <div class="step">1. 选择科室</div>
+            <div class="step active">2. 选择医生</div>
+            <div class="step">3. 选择时间</div>
+            <div class="step">4. 确认挂号</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">请选择医生</div>
+            <div class="card-sub">
+                科室：<strong th:text="${department?.name}"></strong>
+            </div>
+
+            <div th:if="${doctors.isEmpty()}" class="empty">
+                该科室暂无可预约医生。
+            </div>
+
+            <div th:each="doctor : ${doctors}" class="doctor-card"
+                 th:onclick="'window.location.href=\'/patient/appointments/new/step3?doctorId=' + ${doctor.id} + '\''">
+                <div class="doctor-avatar">👨‍⚕️</div>
+                <div class="doctor-info">
+                    <h3 th:text="${userMap[doctor.id] != null ? userMap[doctor.id].realName : doctor.doctorCode}"></h3>
+                    <div class="doctor-meta">
+                        <span th:text="'工号：' + ${doctor.doctorCode}"></span>
+                        <span th:if="${doctor.title}" th:text="' ｜ 职称：' + ${doctor.title}"></span>
+                        <span th:if="${doctor.specialty}" th:text="' ｜ 专长：' + ${doctor.specialty}"></span>
+                    </div>
+                    <div class="doctor-intro" th:if="${doctor.introduction}" th:text="${doctor.introduction}"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

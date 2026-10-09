@@ -1,0 +1,450 @@
+.hospital-home {
+  color: #18394f;
+  background: #fff;
+}
+
+.hospital-home-container {
+  width: min(1160px, calc(100% - 64px));
+  margin-inline: auto;
+}
+
+.hospital-home-hero {
+  position: relative;
+  min-height: 560px;
+  width: min(1440px, calc(100% - 40px));
+  margin: 24px auto 0;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 12px;
+  background: #e7f1f5;
+}
+
+.hospital-home-hero-image,
+.hospital-home-hero-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hospital-home-hero-image {
+  object-fit: cover;
+  object-position: 63% 48%;
+  z-index: -2;
+}
+
+.hospital-home-hero-shade {
+  background: linear-gradient(90deg, #f1f7fbf5 0%, #edf5f9ed 25%, #edf5f99e 45%, #edf5f908 72%);
+  z-index: -1;
+}
+
+.hospital-home-hero-content {
+  width: min(1160px, calc(100% - 64px));
+  margin-inline: auto;
+  padding: 112px 0 95px;
+}
+
+.hospital-home-eyebrow {
+  display: inline-block;
+  color: #2b7b88;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.8;
+}
+
+.hospital-home-hero h1 {
+  margin: 19px 0 22px;
+  color: #133e5a;
+  font-size: clamp(44px, 4.5vw, 66px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+}
+
+.hospital-home-tagline {
+  max-width: 420px;
+  margin: 0;
+  color: #21516a;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.hospital-home-hero-description {
+  max-width: 420px;
+  margin: 18px 0 0;
+  color: #526d7e;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.hospital-home-hero-principles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+  margin-top: 35px;
+  color: #3d6878;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.hospital-home-hero-principles span + span {
+  border-left: 1px solid #7599a45c;
+  padding-left: 15px;
+}
+
+.hospital-home-image-caption {
+  position: absolute;
+  bottom: 20px;
+  right: 25px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  color: #fff;
+  background: #14394b99;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.hospital-home-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 90px;
+  padding-block: 78px;
+}
+
+.hospital-home-section-heading h2 {
+  margin: 11px 0 16px;
+  color: #1d4056;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.45;
+}
+
+.hospital-home-section-heading > p {
+  margin: 0;
+  color: #758692;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.hospital-home-introduction {
+  margin: 0;
+  color: #526c7b;
+  font-size: 16px;
+  line-height: 2.1;
+}
+
+.hospital-home-overview-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  margin-top: 23px;
+  padding-top: 24px;
+  border-top: 1px solid #e2ecef;
+  color: #28808b;
+}
+
+.hospital-home-overview-note > .ui-icon {
+  flex: none;
+  margin-top: 3px;
+}
+
+.hospital-home-overview-note h3 {
+  margin: 0 0 6px;
+  color: #30566a;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hospital-home-overview-note p {
+  margin: 0;
+  color: #788c96;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.hospital-home-departments {
+  padding-block: 58px 80px;
+  border-top: 1px solid #e5ecef;
+}
+
+.hospital-home-department-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 36px;
+  margin-top: 35px;
+}
+
+.hospital-home-department {
+  min-width: 0;
+  padding-top: 24px;
+  border-top: 2px solid #d9e9ee;
+}
+
+.hospital-home-department-symbol {
+  display: inline-flex;
+  color: #377f92;
+  margin-bottom: 16px;
+}
+
+.hospital-home-department h3 {
+  margin: 0 0 12px;
+  color: #244c62;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.hospital-home-department p {
+  margin: 0;
+  color: #738793;
+  font-size: 13px;
+  line-height: 1.95;
+  overflow-wrap: anywhere;
+}
+
+.hospital-home-department-state {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 110px;
+  margin: 30px 0 0;
+  border-top: 1px solid #e5ecef;
+  color: #738793;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.hospital-home-department-error p {
+  flex: 1;
+  margin: 0;
+}
+
+.hospital-home-department-error .button {
+  font-size: 13px;
+}
+
+.hospital-home-care {
+  background: #edf5f6;
+}
+
+.hospital-home-care-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.7fr);
+  gap: 75px;
+  padding-block: 62px 68px;
+}
+
+.hospital-home-care-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  padding-top: 10px;
+}
+
+.hospital-home-care-list article {
+  min-width: 0;
+}
+
+.hospital-home-care-list .ui-icon {
+  color: #397c89;
+}
+
+.hospital-home-care-list h3 {
+  margin: 17px 0 10px;
+  color: #305565;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.hospital-home-care-list p {
+  margin: 0;
+  color: #71858e;
+  font-size: 13px;
+  line-height: 1.95;
+}
+
+#hospital-overview,
+#hospital-departments {
+  scroll-margin-top: 100px;
+}
+
+#hospital-overview:focus-visible,
+#hospital-departments:focus-visible {
+  outline: 2px solid #83b2c1;
+  outline-offset: 8px;
+}
+
+@media (max-width: 1050px) {
+  .hospital-home-hero {
+    min-height: 500px;
+  }
+
+  .hospital-home-hero-content {
+    padding-block: 90px 80px;
+  }
+
+  .hospital-home-overview {
+    gap: 45px;
+  }
+
+  .hospital-home-department-list {
+    gap: 25px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 36px;
+  }
+
+  .hospital-home-care-inner {
+    gap: 35px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .hospital-home-container {
+    width: calc(100% - 40px);
+  }
+
+  .hospital-home-hero {
+    width: 100%;
+    min-height: 560px;
+    margin-top: 0;
+    border-radius: 0;
+  }
+
+  .hospital-home-hero-image {
+    object-position: 58% 75%;
+  }
+
+  .hospital-home-hero-shade {
+    background: linear-gradient(180deg, #f0f7fcfa 0%, #edf5f9f0 21%, #edf5f99c 40%, #e9f3f408 72%);
+  }
+
+  .hospital-home-hero-content {
+    width: calc(100% - 40px);
+    padding: 38px 0 260px;
+  }
+
+  .hospital-home-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+
+  .hospital-home-hero h1 {
+    font-size: 42px;
+    margin: 12px 0 17px;
+  }
+
+  .hospital-home-tagline {
+    max-width: 320px;
+    font-size: 21px;
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+
+  .hospital-home-hero-description {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .hospital-home-hero-principles {
+    margin-top: 20px;
+    font-size: 11px;
+    gap: 12px;
+  }
+
+  .hospital-home-hero-principles span + span {
+    padding-left: 12px;
+  }
+
+  .hospital-home-image-caption {
+    right: 17px;
+    bottom: 15px;
+  }
+
+  .hospital-home-overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 25px;
+    padding-block: 44px;
+  }
+
+  .hospital-home-section-heading h2 {
+    font-size: 25px;
+    margin: 9px 0 11px;
+  }
+
+  .hospital-home-section-heading > p {
+    font-size: 13px;
+  }
+
+  .hospital-home-introduction {
+    font-size: 14px;
+  }
+
+  .hospital-home-overview-note {
+    gap: 13px;
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+
+  .hospital-home-departments {
+    padding-block: 39px 44px;
+  }
+
+  .hospital-home-department-list {
+    gap: 29px 22px;
+    margin-top: 26px;
+  }
+
+  .hospital-home-department {
+    padding-top: 19px;
+  }
+
+  .hospital-home-department-symbol {
+    margin-bottom: 12px;
+  }
+
+  .hospital-home-department h3 {
+    font-size: 17px;
+    margin-bottom: 9px;
+  }
+
+  .hospital-home-department p {
+    font-size: 12px;
+    line-height: 1.9;
+  }
+
+  .hospital-home-care-inner {
+    gap: 26px;
+    padding-block: 42px 45px;
+  }
+
+  .hospital-home-care-list {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 0;
+    gap: 23px;
+  }
+
+  .hospital-home-care-list article {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 14px;
+  }
+
+  .hospital-home-care-list .ui-icon {
+    grid-row: span 2;
+    margin-top: 2px;
+  }
+
+  .hospital-home-care-list h3 {
+    margin: 0 0 7px;
+    font-size: 15px;
+  }
+
+  .hospital-home-care-list p {
+    font-size: 12px;
+  }
+}

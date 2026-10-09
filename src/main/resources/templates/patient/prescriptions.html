@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购药取药</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-rx .card-title { margin-bottom: 6px; }
+        .patient-rx .card-sub { font-size: 13px; color: #909399; margin-bottom: 14px; }
+        .alert-success { background: #f0f9eb; color: #67c23a; border-color: #e1f3d8; }
+        .alert-error { background: #fef0f0; color: #f56c6c; border-color: #fde2e2; }
+        .prescription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        .prescription-number { font-weight: 600; color: #409EFF; }
+        .status-badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .status-pending { background: #fdf6ec; color: #e6a23c; }
+        .status-dispensed { background: #f0f9eb; color: #67c23a; }
+        .status-cancelled { background: #f4f4f5; color: #909399; }
+        .prescription-info { color: #606266; margin: 6px 0; font-size: 14px; line-height: 1.5; }
+        .section-title { font-size: 15px; font-weight: 600; margin: 12px 0 8px; }
+    </style>
+</head>
+<body class="patient-ui patient-rx theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '处方与取药', '待处理与历史处方')}"></div>
+
+<main class="page patient-rx">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="card" th:if="${examReportsPendingPay != null and !examReportsPendingPay.isEmpty()}">
+            <div class="card-title">待付费检查 / 检验</div>
+            <div class="card-sub">待付费检查项目</div>
+            <div th:each="rep : ${examReportsPendingPay}" class="prescription-card">
+                <div class="prescription-header">
+                    <div class="prescription-number">
+                        项目：<span th:text="${examReportExaminationMap.containsKey(rep.id) ? examReportExaminationMap[rep.id].name : rep.reportType}">检查</span>
+                    </div>
+                    <div>
+                        <span class="status-badge status-pending">待付费</span>
+                    </div>
+                </div>
+                <div class="prescription-info">
+                    <strong>金额：</strong>
+                    ¥<span th:text="${examReportExaminationMap.containsKey(rep.id) and examReportExaminationMap[rep.id] != null and examReportExaminationMap[rep.id].price != null ? examReportExaminationMap[rep.id].price : '0.00'}">0</span>
+                </div>
+                <div class="prescription-info">
+                    <strong>开单时间：</strong>
+                    <span th:text="${rep.reportDate != null ? #temporals.format(rep.reportDate, 'yyyy-MM-dd HH:mm') : ''}"></span>
+                </div>
+                <a th:href="@{/patient/payments/report/{id}/alipay(id=${rep.id})}" class="btn">去支付</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">待取药处方</div>
+            <div class="card-sub">待取药处方</div>
+
+            <div th:if="${prescriptions.isEmpty()}" class="empty">
+                当前暂无处方记录
+            </div>
+
+            <div th:each="prescription : ${prescriptions}"
+                 th:if="${prescription.status.name() == 'PENDING'}"
+                 class="prescription-card">
+                <div class="prescription-header">
+                    <div class="prescription-number">
+                        处方号：<span th:text="${prescription.prescriptionNumber}"></span>
+                    </div>
+                    <div>
+                        <span class="status-badge status-pending" th:text="${prescription.status != null ? prescription.status.patientChineseName : '-'}">待取药</span>
+                    </div>
+                </div>
+                <div class="prescription-info">
+                    <strong>开方医生：</strong>
+                    <span th:if="${prescription.doctorId != null and userMap[prescription.doctorId] != null}" th:text="${userMap[prescription.doctorId].realName}"></span>
+                    <span th:if="${prescription.doctorId == null or userMap[prescription.doctorId] == null}">未知</span>
+                </div>
+                <div class="prescription-info">
+                    <strong>开方时间：</strong>
+                    <span th:text="${prescription.createdAt != null ? #temporals.format(prescription.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></span>
+                </div>
+                <div class="prescription-info">
+                    <strong>取药地点：</strong>门诊药房窗口（示意）
+                </div>
+                <a th:href="@{/patient/prescriptions/{id}(id=${prescription.id})}" class="btn">查看详情</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">历史处方记录</div>
+            <div class="card-sub">历史处方与检查记录</div>
+
+            <div th:if="${prescriptions.?[status.name() != 'PENDING'].isEmpty() and (examReportsPaidHistory == null or examReportsPaidHistory.isEmpty())}" class="empty">
+                暂无历史处方记录
+            </div>
+
+            <div class="section-title" th:if="${!prescriptions.?[status.name() != 'PENDING'].isEmpty()}">处方</div>
+            <div th:each="prescription : ${prescriptions}"
+                 th:if="${prescription.status.name() != 'PENDING'}"
+                 class="prescription-card">
+                <div class="prescription-header">
+                    <div class="prescription-number">
+                        处方号：<span th:text="${prescription.prescriptionNumber}"></span>
+                    </div>
+                    <div>
+                        <span th:if="${prescription.status != null}"
+                              class="status-badge"
+                              th:classappend="${prescription.status.name() == 'DISPENSED' ? ' status-dispensed' : ' status-cancelled'}"
+                              th:text="${prescription.status.patientChineseName}">-</span>
+                    </div>
+                </div>
+                <div class="prescription-info">
+                    <strong>开方时间：</strong>
+                    <span th:text="${prescription.createdAt != null ? #temporals.format(prescription.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></span>
+                </div>
+                <div class="prescription-info" th:if="${prescription.dispensedAt != null}">
+                    <strong>取药时间：</strong>
+                    <span th:text="${#temporals.format(prescription.dispensedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                </div>
+                <a th:href="@{/patient/prescriptions/{id}(id=${prescription.id})}" class="btn">查看详情</a>
+            </div>
+
+            <div class="section-title u-mt-12" th:if="${examReportsPaidHistory != null and !examReportsPaidHistory.isEmpty()}">检查 / 检验已付费</div>
+            <div th:each="rep : ${examReportsPaidHistory}" class="prescription-card">
+                <div class="prescription-header">
+                    <div class="prescription-number">
+                        单号：<span th:text="|CK-${rep.id}|">CK-0</span>
+                    </div>
+                    <div>
+                        <span th:if="${rep.status.name() == 'PENDING'}" class="status-badge status-pending">已付费待报告</span>
+                        <span th:if="${rep.status.name() == 'COMPLETED'}" class="status-badge status-dispensed">报告已出</span>
+                    </div>
+                </div>
+                <div class="prescription-info">
+                    <strong>项目：</strong>
+                    <span th:text="${examReportExaminationMap.containsKey(rep.id) ? examReportExaminationMap[rep.id].name : rep.reportType}"></span>
+                </div>
+                <div class="prescription-info">
+                    <strong>金额：</strong>
+                    ¥<span th:text="${examReportExaminationMap.containsKey(rep.id) and examReportExaminationMap[rep.id] != null and examReportExaminationMap[rep.id].price != null ? examReportExaminationMap[rep.id].price : '0.00'}">0</span>
+                </div>
+                <div class="prescription-info">
+                    <strong>付费时间：</strong>
+                    <span th:text="${rep.paidAt != null ? #temporals.format(rep.paidAt, 'yyyy-MM-dd HH:mm') : ''}"></span>
+                </div>
+                <a th:href="@{/patient/reports/{id}(id=${rep.id},from=prescriptions)}" class="btn">查看报告单</a>
+            </div>
+        </div>
+</main>
+</body>
+</html>

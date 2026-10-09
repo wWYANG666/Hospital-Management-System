@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>服务器错误 - 医院管理系统</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+        .card {
+            width: min(720px, 100%);
+            background: rgba(255,255,255,0.96);
+            border-radius: 16px;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+            padding: 28px 26px;
+        }
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #ffebee;
+            color: #d32f2f;
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+        }
+        h1 { font-size: 20px; color: #303133; }
+        .meta { color: #606266; font-size: 13px; margin-bottom: 14px; }
+        .panel {
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #303133;
+            font-size: 13px;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .row { margin: 8px 0; }
+        .label { color: #909399; margin-right: 8px; }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        a.btn {
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 10px 26px rgba(102,126,234,0.45);
+        }
+        .ghost {
+            border: 1px solid #e4e7ed;
+            color: #303133;
+            background: #fff;
+        }
+        .hint {
+            margin-top: 10px;
+            color: #909399;
+            font-size: 12px;
+        }
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background: #ffffff;
+            border: 1px solid #eef2f7;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/app-theme.css">
+</head>
+<body class="app-theme role-error theme-medical">
+<div class="card">
+    <div class="title">
+        <div class="badge">!</div>
+        <div>
+            <h1>服务暂时不可用（500）</h1>
+            <div class="meta">请稍后重试。如问题持续存在，请记录下方时间与访问地址并联系管理员。</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="row"><span class="label">时间</span><span th:text="${timestamp}">timestamp</span></div>
+        <div class="row"><span class="label">路径</span><code th:text="${path}">/path</code></div>
+        <div class="row"><span class="label">状态码</span><span th:text="${status}">500</span> <span th:text="${error}">Internal Server Error</span></div>
+        <div class="row" th:if="${message != null and !#strings.isEmpty(message)}">
+            <span class="label">消息</span><span th:text="${message}">message</span>
+        </div>
+        <div class="row" th:if="${exception != null}">
+            <span class="label">异常</span><code th:text="${exception}">exception</code>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a class="btn primary" href="/">返回首页</a>
+        <a class="btn ghost" href="/login">去登录</a>
+        <a class="btn ghost" th:href="${path}">重试当前页面</a>
+    </div>
+
+    <div class="hint">请保留当前页面信息，便于管理员定位问题。</div>
+</div>
+</body>
+</html>

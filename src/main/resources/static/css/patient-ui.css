@@ -1,0 +1,5 @@
+/* Entry stylesheet: patient modules */
+@import url('/css/patient-shared.css');
+@import url('/css/patient-wizard.css');
+/* 在患者专用样式之后再次应用三端统一布局，保证页宽与顶栏不被 patient-shared 覆盖 */
+@import url('/css/unified-portal.css');

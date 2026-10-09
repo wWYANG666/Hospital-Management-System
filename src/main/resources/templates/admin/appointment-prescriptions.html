@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者处方</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .info-section { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #EBEEF5; }
+        .info-row { display: flex; margin: 6px 0; font-size: 13px; }
+        .info-label { width: 100px; font-weight: 600; color: #606266; flex-shrink: 0; }
+        .info-value { flex: 1; color: #303133; }
+        .rx-card {
+            border: 1px solid #EBEEF5; border-radius: 8px; padding: 16px; margin-bottom: 16px;
+            background: #FAFAFA; border-left: 4px solid #67C23A;
+        }
+        .rx-head { border-bottom: 1px solid #EBEEF5; padding-bottom: 10px; margin-bottom: 12px; }
+        .rx-no { font-size: 17px; font-weight: 600; color: #409EFF; }
+        .status-badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; display: inline-block; }
+        .status-pending { background: #FFF6E6; color: #E6A23C; }
+        .status-dispensed { background: #F0F9EB; color: #67C23A; }
+        .status-cancelled { background: #F4F4F5; color: #909399; }
+        .dispense-box { margin-top: 14px; padding: 14px; background: #fff; border-radius: 8px; border: 1px solid #EBEEF5; }
+        .dispense-box input { padding: 8px 10px; border: 1px solid #dcdfe6; border-radius: 4px; width: 200px; margin-right: 10px; font-size: 13px; }
+            .rx-empty { padding:32px; }
+        .rx-section-title { margin:16px 0 8px; font-size:14px; }
+        .rx-items-empty { text-align:center; color:#909399; padding:16px; }
+        .rx-total-row { font-weight:600; background:#F5F7FA; }
+        .rx-dispense-title { margin-bottom:8px; font-size:14px; }
+        .rx-dispense-sub { color:#606266; margin-bottom:10px; font-size:12px; }
+        .rx-toolbar { margin-top:8px; padding:0; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/patients', '患者处方', '处方明细与发药')}"></div>
+
+<main class="page">
+    <div class="card">
+        <div th:if="${success}" class="admin-msg-success" th:text="${success}"></div>
+        <div th:if="${error}" class="admin-msg-error" th:text="${error}"></div>
+
+        <h2 class="admin-panel-title u-mb-10">挂号信息</h2>
+        <div class="info-section">
+            <div class="info-row">
+                <div class="info-label">患者</div>
+                <div class="info-value" th:text="${patientUser != null ? patientUser.realName : '未知'}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">医生</div>
+                <div class="info-value" th:text="${doctorUser != null ? doctorUser.realName : '未知'}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">预约日期</div>
+                <div class="info-value" th:text="${appointment.appointmentDate}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">预约时间</div>
+                <div class="info-value" th:text="${appointment.appointmentTime}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">症状</div>
+                <div class="info-value" th:text="${appointment.symptoms != null ? appointment.symptoms : '无'}"></div>
+            </div>
+        </div>
+
+        <h2 class="admin-panel-title u-mt-8">处方列表</h2>
+        <div th:if="${prescriptions.isEmpty()}" class="empty rx-empty">该挂号暂无处方</div>
+
+        <div th:each="prescription : ${prescriptions}" class="rx-card">
+            <div class="rx-head">
+                <div class="rx-no">处方号：<span th:text="${prescription.prescriptionNumber}"></span></div>
+                <div class="u-mt-8">
+                    <span th:if="${prescription.status != null}"
+                          class="status-badge"
+                          th:classappend="${prescription.status.name() == 'PENDING' ? ' status-pending' : (prescription.status.name() == 'DISPENSED' ? ' status-dispensed' : ' status-cancelled')}"
+                          th:text="${prescription.status.chineseName}">-</span>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">开方时间</div>
+                <div class="info-value" th:text="${prescription.createdAt != null ? #temporals.format(prescription.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></div>
+            </div>
+            <div th:if="${prescription.dispensedAt != null}" class="info-row">
+                <div class="info-label">发药时间</div>
+                <div class="info-value" th:text="${#temporals.format(prescription.dispensedAt, 'yyyy-MM-dd HH:mm')}"></div>
+            </div>
+            <div th:if="${prescription.patientSignature != null and prescription.patientSignature != ''}" class="info-row">
+                <div class="info-label">患者签字</div>
+                <div class="info-value" th:text="${prescription.patientSignature}"></div>
+            </div>
+
+            <h3 class="rx-section-title">处方明细</h3>
+            <div th:if="${itemsMap.get(prescription.id).isEmpty()}" class="rx-items-empty">暂无药品明细</div>
+            <div class="table-wrap" th:if="${!itemsMap.get(prescription.id).isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>药品名称</th>
+                        <th>规格</th>
+                        <th>数量</th>
+                        <th>用法用量</th>
+                        <th>单价</th>
+                        <th>总价</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${itemsMap.get(prescription.id)}">
+                        <td th:text="${item.medicineName}"></td>
+                        <td th:text="${item.specification}"></td>
+                        <td>
+                            <span th:text="${item.quantity != null ? item.quantity : '-'}"></span>
+                            <span th:if="${item.unit != null and !#strings.isEmpty(item.unit)}" th:text="${' ' + item.unit}"></span>
+                        </td>
+                        <td>
+                            <span th:if="${item.dosage != null and item.dosage != ''}" th:text="${item.dosage}"></span>
+                            <span th:if="${item.frequency != null and item.frequency != '' and item.dosage != null and item.dosage != ''}" th:text="|，${item.frequency}|"></span>
+                            <span th:if="${item.frequency != null and item.frequency != '' and (item.dosage == null or item.dosage == '')}" th:text="${item.frequency}"></span>
+                            <span th:if="${item.usage != null and item.usage != '' and ((item.dosage != null and item.dosage != '') or (item.frequency != null and item.frequency != ''))}" th:text="|，${item.usage}|"></span>
+                            <span th:if="${item.usage != null and item.usage != '' and (item.dosage == null or item.dosage == '') and (item.frequency == null or item.frequency == '')}" th:text="${item.usage}"></span>
+                            <span th:if="${(item.dosage == null or item.dosage == '') and (item.frequency == null or item.frequency == '') and (item.usage == null or item.usage == '')}">-</span>
+                        </td>
+                        <td>¥<span th:text="${item.price != null ? item.price : '0.00'}"></span></td>
+                        <td>¥<span th:text="${item.totalPrice != null ? item.totalPrice : '0.00'}"></span></td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr class="rx-total-row">
+                        <td colspan="5" class="u-text-right">合计</td>
+                        <td>¥<span th:text="${totalAmountMap.get(prescription.id) != null ? totalAmountMap.get(prescription.id) : '0.00'}"></span></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div th:if="${prescription.status.name() == 'PENDING'}" class="dispense-box">
+                <h4 class="rx-dispense-title">确认发药</h4>
+                <p class="rx-dispense-sub">核对后发药。</p>
+                <form th:action="@{/admin/pharmacy/{id}/dispense(id=${prescription.id})}" method="post">
+                    <input type="text" name="signature" placeholder="患者签字（可选）">
+                    <button type="submit" class="btn btn-primary u-tag-success">确认发药</button>
+                </form>
+            </div>
+            <div class="u-mt-12">
+                <a th:href="@{/admin/pharmacy/{id}(id=${prescription.id}, returnPatientId=${appointment.patientId})}" class="btn ghost">查看详情</a>
+            </div>
+        </div>
+
+        <div class="admin-toolbar rx-toolbar">
+            <a href="javascript:history.back();" class="btn ghost">返回上一页</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

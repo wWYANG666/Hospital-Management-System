@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待诊患者</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/dashboard', '待诊患者', '今日待诊队列')}"></div>
+
+    <div class="page">
+        <div class="card">
+            <div class="card-title">
+                <span>今日待诊概览</span>
+                <span class="badge-count" th:text="|${#lists.size(appointments)} 人|">0 人</span>
+            </div>
+            <div class="card-sub">按预约顺序进入诊断</div>
+            <div class="stats-grid">
+                <div class="stat-card item">
+                    <div class="stat-label">待诊患者总数</div>
+                    <div class="stat-number" th:text="${#lists.size(appointments)}">0</div>
+                </div>
+                <div class="stat-card item">
+                    <div class="stat-label">当前诊断入口</div>
+                    <div class="stat-number u-fs16">已就绪</div>
+                </div>
+                <div class="stat-card item">
+                    <div class="stat-label">建议操作</div>
+                    <div class="stat-number u-fs16">按序接诊</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>今日待诊列表</span>
+            </div>
+            <div class="card-sub">今日预约概览</div>
+
+            <div th:if="${appointments.isEmpty()}" class="empty">
+                今日暂无待诊患者。
+            </div>
+
+            <div class="table-wrap" th:if="${!appointments.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>患者姓名</th>
+                        <th>预约时间</th>
+                        <th>状态</th>
+                        <th>主诉</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="apt, iterStat : ${appointments}">
+                        <td th:text="${iterStat.count}">1</td>
+                        <td th:text="${apt.patientId != null and userMap[apt.patientId] != null ? userMap[apt.patientId].realName : apt.patientId}">—</td>
+                        <td th:text="${apt.appointmentDate + ' ' + apt.appointmentTime}">—</td>
+                        <td>
+                            <span class="status-tag status-pending-tag" th:text="${apt.status.chineseName}">待诊</span>
+                        </td>
+                        <td th:text="${apt.symptoms != null and !apt.symptoms.isEmpty() ? apt.symptoms : '暂无主诉记录'}">—</td>
+                        <td>
+                            <a th:href="@{/doctor/diagnose/{id}(id=${apt.id})}" class="btn btn-edit">开始诊断</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

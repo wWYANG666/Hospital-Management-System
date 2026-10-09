@@ -1,0 +1,232 @@
+/* Doctor-only UI module */
+.doctor-schedule-group {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ui-border, #dce7f6);
+}
+
+.doctor-schedule-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.doctor-schedule-meta {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ui-muted, #657893);
+}
+
+.doctor-schedule-empty {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #a6b2c3;
+}
+
+.doctor-schedule-apt {
+    margin-top: 4px;
+    padding-left: 8px;
+    font-size: 12px;
+    color: #53657f;
+}
+
+.doctor-schedule-patient {
+    margin-left: 6px;
+}
+
+.doctor-inline-link-gap {
+    margin-left: 8px;
+}
+
+.doctor-visit-main {
+    font-size: 14px;
+}
+
+.doctor-visit-time {
+    margin-left: 4px;
+}
+
+.doctor-visit-patient {
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--ui-muted, #657893);
+}
+
+.doctor-visit-detail {
+    margin-top: 2px;
+    font-size: 13px;
+    color: #53657f;
+}
+
+/* 历史挂号：挂号状态 / 病历状态（高对比、易读） */
+body.doctor-page-appointments-history .doctor-apt-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+body.doctor-page-appointments-history .doctor-apt-status--PENDING {
+    background: #fff4e0;
+    color: #9a4b00;
+    border-color: rgba(180, 83, 9, 0.45);
+}
+
+body.doctor-page-appointments-history .doctor-apt-status--CONFIRMED {
+    background: #e6f4ff;
+    color: #0b4f8a;
+    border-color: rgba(11, 79, 138, 0.35);
+}
+
+body.doctor-page-appointments-history .doctor-apt-status--COMPLETED {
+    background: #dff7ea;
+    color: #0d5c36;
+    border-color: rgba(12, 122, 75, 0.4);
+}
+
+body.doctor-page-appointments-history .doctor-apt-status--CANCELLED {
+    background: #f1f2f4;
+    color: #4a4f55;
+    border-color: rgba(74, 79, 85, 0.35);
+}
+
+body.doctor-page-appointments-history .doctor-apt-record-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+body.doctor-page-appointments-history .doctor-apt-record-badge--done {
+    background: #dff7ea;
+    color: #0d5c36;
+    border-color: rgba(12, 122, 75, 0.35);
+}
+
+body.doctor-page-appointments-history .doctor-apt-record-badge--none {
+    background: #fff8e6;
+    color: #8a5a00;
+    border-color: rgba(180, 83, 9, 0.4);
+}
+
+/* 报告单管理：全部报告列表状态（与历史挂号状态徽章同风格） */
+body.doctor-page-reports .doctor-report-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+body.doctor-page-reports .doctor-report-status--PENDING {
+    background: #fff4e0;
+    color: #9a4b00;
+    border-color: rgba(180, 83, 9, 0.45);
+}
+
+body.doctor-page-reports .doctor-report-status--COMPLETED {
+    background: #dff7ea;
+    color: #0d5c36;
+    border-color: rgba(12, 122, 75, 0.4);
+}
+
+/* 住院申请管理：操作区与状态标签（与医生端列表、医疗主题一致） */
+body.doctor-page-hospitalizations .doctor-hosp-status-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    max-width: 320px;
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-tag--pending {
+    background: #fff4e0;
+    color: #9a4b00;
+    border-color: rgba(180, 83, 9, 0.45);
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-tag--assigned {
+    background: #e6f4ff;
+    color: #0b4f8a;
+    border-color: rgba(11, 79, 138, 0.35);
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-tag--admitted {
+    background: #dff7ea;
+    color: #0d5c36;
+    border-color: rgba(12, 122, 75, 0.4);
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-tag--discharged {
+    background: #f1f2f4;
+    color: #4a4f55;
+    border-color: rgba(74, 79, 85, 0.35);
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-tag--discharge-req {
+    background: #fdecef;
+    color: #b42318;
+    border-color: rgba(180, 36, 24, 0.35);
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-actions {
+    justify-content: flex-start;
+    min-width: 140px;
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-actions .btn {
+    margin: 0;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-decoration: none;
+    box-shadow: none;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-actions .btn:hover {
+    opacity: 1;
+    filter: none;
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-btn.doctor-hosp-btn--discharge {
+    background: #fff8f0;
+    color: #b45309;
+    border: 1px solid rgba(180, 83, 9, 0.55);
+}
+
+body.doctor-page-hospitalizations .doctor-hosp-btn.doctor-hosp-btn--discharge:hover {
+    background: #fff0e0;
+    color: #92400e;
+    border-color: rgba(146, 64, 14, 0.65);
+}

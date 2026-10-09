@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${medicine.id == null ? '新增药品' : '编辑药品'}">药品表单</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .admin-form-grid label { display:block; margin-bottom:6px; font-weight:600; font-size:14px; color:#303133; }
+        .admin-form-grid input, .admin-form-grid textarea, .admin-form-grid select { width:100%; padding:8px 10px; border:1px solid #dcdfe6; border-radius:4px; font-size:13px; }
+        .admin-form-grid .form-group { margin-bottom:12px; }
+        .admin-form-grid small { display:block; margin-top:4px; font-size:12px; color:#909399; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/medicines', ${medicine.id == null ? '新增药品' : '编辑药品'}, '维护药品信息')}"></div>
+
+<main class="page">
+    <div class="card admin-form-grid u-max-720-center">
+        <form th:action="${medicine.id == null} ? @{/admin/medicines} : @{/admin/medicines/{id}(id=${medicine.id})}"
+              method="post" th:object="${medicine}">
+            <input type="hidden" th:field="*{id}" th:if="${medicine.id != null}">
+            <div class="form-group">
+                <label>名称 *</label>
+                <input type="text" th:field="*{name}" required>
+            </div>
+            <div class="form-group">
+                <label>编码</label>
+                <input type="text" th:field="*{code}">
+            </div>
+            <div class="form-group">
+                <label>药品分类 *</label>
+                <select th:field="*{type}" required>
+                    <option value="">请选择</option>
+                    <option value="西药">西药</option>
+                    <option value="中成药">中成药</option>
+                    <option value="中药饮片">中药饮片</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>规格 *</label>
+                <input type="text" th:field="*{specification}" placeholder="如：0.25g×24片/盒" required>
+            </div>
+            <div class="form-group">
+                <label>生产厂家</label>
+                <input type="text" th:field="*{manufacturer}">
+            </div>
+            <div class="form-group">
+                <label>批准文号</label>
+                <input type="text" th:field="*{approvalNumber}" placeholder="如：国药准字H…">
+            </div>
+            <div class="form-group">
+                <label>医保类别</label>
+                <select th:field="*{insuranceCategory}">
+                    <option value="">请选择</option>
+                    <option value="甲类">甲类</option>
+                    <option value="乙类">乙类</option>
+                    <option value="自费">自费</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>所属科室（可选，留空表示全院通用）</label>
+                <select name="departmentId">
+                    <option value="">全院通用</option>
+                    <option th:each="d : ${departments}"
+                            th:value="${d.id}"
+                            th:text="${d.name}"
+                            th:selected="${medicine != null and medicine.departmentId != null and medicine.departmentId == d.id}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>单位 *</label>
+                <select th:field="*{unit}" required>
+                    <option value="">请选择</option>
+                    <option value="盒">盒</option>
+                    <option value="瓶">瓶</option>
+                    <option value="支">支</option>
+                    <option value="片">片</option>
+                    <option value="粒">粒</option>
+                    <option value="袋">袋</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>零售价（元） *</label>
+                <input type="number" step="0.01" th:field="*{price}" required>
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea rows="4" th:field="*{description}"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

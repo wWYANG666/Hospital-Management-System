@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的报告单</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .tag-status { display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+        .tag-pending { background:#FFF6E6; color:#E6A23C; }
+        .tag-completed { background:#F0F9EB; color:#67C23A; }
+    </style>
+</head>
+<body class="patient-ui theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '检查报告', '查看检查报告')}"></div>
+
+<main class="page">
+        <div class="card">
+            <div class="card-title">报告单列表</div>
+            <div class="card-sub">最新报告优先显示</div>
+
+            <div th:if="${reports.isEmpty()}" class="empty">暂无报告单</div>
+
+            <div class="table-wrap" th:if="${!reports.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>报告名称</th>
+                        <th>生成时间</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="report : ${reports}">
+                        <td th:text="${examinationMap.containsKey(report.id) ? examinationMap[report.id].name : report.reportType}"></td>
+                        <td th:text="${report.reportDate != null ? #temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                        <td th:text="${examinationMap.containsKey(report.id) ? (examinationMap[report.id].type != null ? examinationMap[report.id].type : '检查') : '检查'}"></td>
+                        <td>
+                            <span class="tag-status"
+                                  th:classappend="${report.status.name() == 'COMPLETED' ? ' tag-completed' : ' tag-pending'}"
+                                  th:text="${report.status.chineseName}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/patient/reports/{id}(id=${report.id},from=reports)}" class="btn-view">查看详情</a>
+                            <a th:href="@{/patient/reports/{id}/download(id=${report.id})}" class="btn-download">下载PDF</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</main>
+</body>
+</html>

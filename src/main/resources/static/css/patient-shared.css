@@ -1,0 +1,1054 @@
+/* 患者端 UI：在 doctor-shell + unified-portal 之上做列表、表单等细节；顶栏由 unified-portal 与 fragments 统一 */
+body.patient-ui {
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 主内容区与 unified-portal 一致（若调整页宽请改 unified-portal.css 变量） */
+body.patient-ui .page {
+    max-width: 1180px;
+    margin: 24px auto 42px;
+    padding: 0 20px 8px;
+}
+
+@media (max-width: 480px) {
+    body.patient-ui .page {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* 首页链接：与医疗主题一致（顶栏尺寸见 unified-portal） */
+body.patient-ui .portal-topbar .top-link-home {
+    background: color-mix(in srgb, var(--ui-primary-soft, #e9f7f3) 92%, #ffffff);
+}
+body.patient-ui .portal-topbar .top-link-home:hover {
+    text-decoration: none;
+    background: color-mix(in srgb, var(--ui-primary-soft, #e9f7f3) 78%, #ffffff);
+}
+
+/* 鈥斺€?鍗＄墖 鈥斺€?*/
+body.patient-ui .card {
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+    padding: 20px 22px;
+    margin-bottom: 18px;
+}
+body.patient-ui .card-title {
+    font-size: 17px;
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+}
+body.patient-ui .card-sub {
+    font-size: 13px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+/* 鈥斺€?绛涢€夋潯 鈥斺€?*/
+body.patient-ui .filter-card {
+    border-radius: 12px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    font-size: 14px;
+    background: #fff;
+}
+body.patient-ui .filter-label {
+    font-size: 14px;
+    color: #606266;
+    font-weight: 500;
+}
+body.patient-ui .filter-select,
+body.patient-ui .filter select {
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+}
+body.patient-ui .filter-btn,
+body.patient-ui .filter button[type="submit"] {
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: none;
+    background: #409eff;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+body.patient-ui .filter-btn:hover,
+body.patient-ui .filter button[type="submit"]:hover {
+    background: #66b1ff;
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.35);
+}
+body.patient-ui .filter-reset,
+body.patient-ui .filter a:not(.btn) {
+    font-size: 13px;
+    padding: 8px 10px;
+    color: #909399;
+    text-decoration: none;
+    border-radius: 6px;
+}
+body.patient-ui .filter-reset:hover,
+body.patient-ui .filter a:not(.btn):hover {
+    color: #409eff;
+    background: #f5f7fa;
+}
+body.patient-ui .filter {
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #f5f9ff;
+    border: 1px solid #e8f0fe;
+    margin-bottom: 16px;
+}
+
+/* 鈥斺€?鎿嶄綔鎸夐挳锛堥摼鎺?鎸夐挳缁熶竴楂樺害锛?鈥斺€?*/
+body.patient-ui .btn-view,
+body.patient-ui .btn-download {
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    margin: 4px 4px 4px 0;
+    transition: transform 0.12s, box-shadow 0.12s;
+}
+body.patient-ui .btn-view {
+    background: #409eff;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(64, 158, 255, 0.25);
+}
+body.patient-ui .btn-view:hover {
+    background: #66b1ff;
+    transform: translateY(-1px);
+}
+body.patient-ui .btn-download {
+    background: #f56c6c;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(245, 108, 108, 0.25);
+}
+body.patient-ui .btn-download:hover {
+    background: #f78989;
+    transform: translateY(-1px);
+}
+
+body.patient-ui .prescription-card .btn,
+body.patient-ui main a.btn {
+    min-height: 40px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+body.patient-ui .prescription-card .btn:hover,
+body.patient-ui main a.btn:hover {
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+body.patient-ui .btn-cancel {
+    min-height: 36px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+body.patient-ui .btn-link {
+    min-height: 34px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* 鏀粯瀹?/ 琛ㄥ崟涓绘寜閽?*/
+body.patient-ui .btn-primary,
+body.patient-ui .alipay-page .btn-primary,
+body.patient-ui button.btn-primary {
+    min-height: 44px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+}
+body.patient-ui .btn-secondary {
+    min-height: 44px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* 棰勭害鍚戝涓绘寜閽?*/
+/* 鈥斺€?琛ㄦ牸 鈥斺€?*/
+body.patient-ui .table-wrap {
+    border-radius: 10px;
+    border: 1px solid #ebeef5;
+    overflow: hidden;
+}
+body.patient-ui .table-wrap table {
+    font-size: 14px;
+}
+body.patient-ui .table-wrap thead th {
+    padding: 12px 14px;
+    background: #f5f7fa;
+    font-weight: 600;
+    color: #606266;
+}
+body.patient-ui .table-wrap tbody td {
+    padding: 12px 14px;
+    vertical-align: middle;
+}
+body.patient-ui .table-wrap tbody tr:hover {
+    background: #fafcff;
+}
+
+/* 鈥斺€?棣栭〉 dashboard 鈥斺€?*/
+body.patient-ui .patient-dash .welcome-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+body.patient-ui .patient-dash .welcome-main {
+    margin-bottom: 14px;
+}
+body.patient-ui .patient-dash .welcome-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #303133;
+    letter-spacing: 0.02em;
+}
+body.patient-ui .patient-dash .welcome-sub {
+    font-size: 15px;
+    color: #909399;
+}
+body.patient-ui .patient-dash .welcome-image {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+body.patient-ui .patient-dash .welcome-image img {
+    width: 100%;
+    display: block;
+    vertical-align: middle;
+}
+body.patient-ui .patient-dash .todo-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #fff8f0 0%, #fff3e6 100%);
+    color: #e6a23c;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 12px;
+    border: 1px solid #fdebd0;
+}
+body.patient-ui .patient-dash .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+body.patient-ui .patient-dash .quick-btn {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    text-decoration: none;
+    color: #303133;
+    border: 1px solid #ebeef5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+}
+body.patient-ui .patient-dash .quick-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(64, 158, 255, 0.15);
+    border-color: #c6e2ff;
+}
+body.patient-ui .patient-dash .quick-btn .icon {
+    font-size: 26px;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+body.patient-ui .patient-dash .grid-2 {
+    display: grid;
+    grid-template-columns: 2.2fr 1.8fr;
+    gap: 18px;
+    margin-top: 4px;
+}
+@media (max-width: 900px) {
+    body.patient-ui .patient-dash .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+body.patient-ui .patient-dash .grid-2 .card {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+body.patient-ui .patient-dash .grid-2 .card .card-title {
+    flex-shrink: 0;
+}
+body.patient-ui .patient-dash .grid-2 .card .scrollable-container,
+body.patient-ui .patient-dash .grid-2 .card .empty {
+    flex: 1;
+    min-height: 0;
+    max-height: 128px;
+}
+body.patient-ui .patient-dash .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+body.patient-ui .patient-dash .card-title span.sub {
+    font-size: 12px;
+    color: #909399;
+    font-weight: normal;
+}
+body.patient-ui .patient-dash .empty {
+    text-align: center;
+    color: #c0c4cc;
+    padding: 28px 12px;
+    font-size: 14px;
+}
+body.patient-ui .patient-dash .timeline-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #ebeef5;
+}
+body.patient-ui .patient-dash .timeline-item:last-child {
+    border-bottom: none;
+}
+body.patient-ui .patient-dash .scrollable-container {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+}
+body.patient-ui .patient-dash .scrollable-container::-webkit-scrollbar {
+    width: 6px;
+}
+body.patient-ui .patient-dash .scrollable-container::-webkit-scrollbar-track {
+    background: #f5f7fa;
+    border-radius: 3px;
+}
+body.patient-ui .patient-dash .scrollable-container::-webkit-scrollbar-thumb {
+    background: #c0c4cc;
+    border-radius: 3px;
+}
+body.patient-ui .patient-dash .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+body.patient-ui .patient-dash .tag-apt {
+    background: #ecf5ff;
+    color: #409eff;
+}
+body.patient-ui .patient-dash .tag-report {
+    background: #fef0f0;
+    color: #f56c6c;
+}
+body.patient-ui .patient-dash .tag-hosp {
+    background: #f0f9eb;
+    color: #67c23a;
+}
+body.patient-ui .patient-dash .link {
+    color: #409eff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+body.patient-ui .patient-dash .link:hover {
+    text-decoration: none;
+    background: #ecf5ff;
+}
+body.patient-ui .patient-dash .footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ebeef5;
+    font-size: 12px;
+    color: #909399;
+    text-align: center;
+    line-height: 1.7;
+}
+
+/* 鈥斺€?棰勭害姝ラ鏉?鈥斺€?*/
+/* 鈥斺€?涓汉璧勬枡 鈥斺€?*/
+body.patient-ui.patient-profile button[type="submit"] {
+    min-height: 44px;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+}
+body.patient-ui.patient-profile .logout-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* 鈥斺€?璐﹀崟椤?鈥斺€?*/
+body.patient-ui.patient-pay .pay-total-card .amount {
+    letter-spacing: 0.02em;
+}
+body.patient-ui.patient-pay .btn-detail {
+    min-height: 36px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* 鈥斺€?鏀粯瀹濋〉鎸夐挳缁?鈥斺€?*/
+body.patient-ui.alipay-page .btn-row {
+    gap: 14px;
+    margin-top: 24px;
+}
+body.patient-ui.alipay-page .btn-row form {
+    display: inline-block;
+    margin: 0;
+}
+body.patient-ui.alipay-page .btn {
+    min-height: 44px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* 鈥斺€?浣忛櫌鍒楄〃鎿嶄綔鎸夐挳 鈥斺€?*/
+body.patient-ui.patient-hosp .action-row .btn {
+    min-height: 38px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 鈥斺€?绌虹姸鎬?鈥斺€?*/
+body.patient-ui .empty {
+    padding: 32px 16px;
+    border-radius: 10px;
+    background: #fafafa;
+    border: 1px dashed #e4e7ed;
+}
+
+/* 鈥斺€?澶勬柟鍒楄〃椤?鈥斺€?*/
+body.patient-ui .prescription-card {
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    border: 1px solid #ebeef5;
+    background: #fff;
+    transition: box-shadow 0.2s ease, border-color 0.2s;
+}
+body.patient-ui .prescription-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border-color: #d9ecff;
+}
+body.patient-ui .prescription-number {
+    font-size: 16px;
+}
+body.patient-ui .alert {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    border: 1px solid transparent;
+}
+
+/* 鈥斺€?琛ㄥ崟椤垫彁浜?鈥斺€?*/
+body.patient-ui .btn-submit {
+    min-height: 44px;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    background: #409eff;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+body.patient-ui .btn-submit:hover {
+    background: #66b1ff;
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+/* 鈥斺€?鐥呭巻椤靛簳閮ㄦ寜閽?鈥斺€?*/
+body.patient-ui.patient-mr .actions {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+body.patient-ui.patient-mr .btn-primary,
+body.patient-ui.patient-mr .btn-secondary {
+    min-height: 42px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+body.patient-ui .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    margin-top: 4px;
+    color: #606266;
+}
+
+/* 2026-04 patient polish layer: layout-only overrides */
+body.patient-ui {
+    background:
+        radial-gradient(circle at 12% -10%, rgba(64, 158, 255, 0.16), rgba(64, 158, 255, 0) 36%),
+        radial-gradient(circle at 88% 110%, rgba(103, 194, 58, 0.14), rgba(103, 194, 58, 0) 34%),
+        #f4f8fd;
+}
+
+body.patient-ui .topbar {
+    border-bottom: 1px solid rgba(64, 158, 255, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+body.patient-ui .page {
+    max-width: 1180px;
+    margin: 24px auto 42px;
+    padding: 0 18px 8px;
+}
+
+body.patient-ui .card,
+body.patient-ui .filter-card,
+body.patient-ui .prescription-card,
+body.patient-ui .table-wrap {
+    border: 1px solid #e5edf7;
+    box-shadow: 0 12px 28px rgba(15, 45, 98, 0.06);
+}
+
+body.patient-ui .card-title {
+    font-size: 18px;
+}
+
+body.patient-ui .card-sub,
+body.patient-ui .welcome-sub {
+    line-height: 1.7;
+}
+
+body.patient-ui .patient-dash .welcome-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    grid-template-areas:
+        "main image"
+        "actions actions";
+    gap: 18px;
+    padding: 24px 24px 22px;
+}
+
+body.patient-ui .patient-dash .welcome-main {
+    grid-area: main;
+    margin-bottom: 0;
+}
+
+body.patient-ui .patient-dash .welcome-image {
+    grid-area: image;
+    margin-bottom: 0;
+    min-height: 210px;
+}
+
+body.patient-ui .patient-dash .welcome-image img {
+    height: 100%;
+    object-fit: cover;
+}
+
+body.patient-ui .patient-dash .quick-actions {
+    grid-area: actions;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body.patient-ui .patient-dash .quick-btn {
+    padding: 14px 12px;
+    border-radius: 12px;
+}
+
+body.patient-ui .patient-dash .quick-btn .icon {
+    margin-bottom: 10px;
+}
+
+body.patient-ui .patient-dash .grid-2 .card {
+    min-height: 248px;
+}
+
+body.patient-ui .patient-dash .grid-2 .card .scrollable-container,
+body.patient-ui .patient-dash .grid-2 .card .empty {
+    max-height: 170px;
+}
+
+body.patient-ui .patient-dash .timeline-item {
+    border-radius: 10px;
+    border: 1px solid #e8eef7;
+    background: #fbfdff;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+}
+
+body.patient-ui .patient-dash .timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+body.patient-ui .table-wrap table {
+    font-size: 13px;
+}
+
+body.patient-ui .table-wrap thead th,
+body.patient-ui .table-wrap tbody td {
+    padding: 11px 12px;
+}
+
+body.patient-ui .btn-primary,
+body.patient-ui .alipay-page .btn-primary,
+body.patient-ui button.btn-primary,
+body.patient-ui .btn-submit {
+    background: linear-gradient(135deg, #3f90ff 0%, #3176d8 100%);
+    box-shadow: 0 8px 18px rgba(64, 158, 255, 0.24);
+}
+
+body.patient-ui .btn-view {
+    background: linear-gradient(135deg, #3f90ff 0%, #3176d8 100%);
+}
+
+body.patient-ui .btn-download {
+    background: linear-gradient(135deg, #ff6b6b 0%, #e35353 100%);
+}
+
+body.patient-ui .empty {
+    background: #f8fbff;
+    border: 1px dashed #d9e5f4;
+}
+
+@media (max-width: 980px) {
+    body.patient-ui .patient-dash .welcome-card {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "main"
+            "image"
+            "actions";
+    }
+
+    body.patient-ui .patient-dash .quick-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    body.patient-ui .page {
+        margin-top: 18px;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    body.patient-ui .patient-dash .welcome-card {
+        padding: 18px;
+    }
+
+    body.patient-ui .patient-dash .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 2026-04 patient typography + theme binding */
+body.patient-ui {
+    font-family: var(--ui-font-family, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", Arial, sans-serif);
+    color: var(--ui-text, #1f2f46);
+    background:
+        radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--ui-primary, #2f74d0) 16%, transparent), transparent 38%),
+        radial-gradient(circle at 88% 110%, color-mix(in srgb, var(--ui-success, #2c9d63) 13%, transparent), transparent 34%),
+        var(--ui-bg, #f3f7fd);
+}
+
+body.patient-ui .top-title-main,
+body.patient-ui .welcome-title {
+    font-size: var(--ui-fs-xxl, 22px);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+body.patient-ui .top-title-sub,
+body.patient-ui .welcome-sub,
+body.patient-ui .card-sub,
+body.patient-ui .footer {
+    font-size: var(--ui-fs-sm, 13px);
+    color: var(--ui-muted, #657893);
+}
+
+body.patient-ui .card-title {
+    font-size: var(--ui-fs-xl, 18px);
+    color: var(--ui-text, #1f2f46);
+}
+
+body.patient-ui .topbar {
+    border-bottom-color: color-mix(in srgb, var(--ui-primary, #2f74d0) 24%, #fff);
+}
+
+body.patient-ui .logo,
+body.patient-ui .avatar {
+    background: linear-gradient(135deg, var(--ui-primary, #2f74d0) 0%, var(--ui-primary-deep, #2359a3) 100%);
+}
+
+body.patient-ui .top-link-home,
+body.patient-ui .back-btn {
+    color: var(--ui-primary, #2f74d0);
+    background: var(--ui-primary-soft, #ebf3ff);
+}
+
+body.patient-ui .card,
+body.patient-ui .filter-card,
+body.patient-ui .prescription-card,
+body.patient-ui .table-wrap,
+body.patient-ui .patient-dash .timeline-item {
+    border-color: var(--ui-border, #dce7f6);
+}
+
+body.patient-ui .patient-dash .welcome-card,
+body.patient-ui .patient-dash .quick-btn {
+    border-color: var(--ui-border, #dce7f6);
+}
+
+body.patient-ui .patient-dash .quick-btn:hover {
+    border-color: color-mix(in srgb, var(--ui-primary, #2f74d0) 36%, #fff);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--ui-primary, #2f74d0) 24%, transparent);
+}
+
+body.patient-ui .patient-dash .quick-btn .icon {
+    color: var(--ui-primary, #2f74d0);
+}
+
+body.patient-ui .todo-pill,
+body.patient-ui .tag-apt {
+    color: var(--ui-primary, #2f74d0);
+    background: var(--ui-primary-soft, #ebf3ff);
+    border-color: color-mix(in srgb, var(--ui-primary, #2f74d0) 24%, #fff);
+}
+
+body.patient-ui .tag-hosp {
+    background: color-mix(in srgb, var(--ui-success, #2c9d63) 14%, #fff);
+    color: color-mix(in srgb, var(--ui-success, #2c9d63) 84%, #1f2f46);
+}
+
+body.patient-ui .tag-report {
+    background: color-mix(in srgb, var(--ui-danger, #e35353) 12%, #fff);
+    color: color-mix(in srgb, var(--ui-danger, #e35353) 84%, #1f2f46);
+}
+
+body.patient-ui .link {
+    color: var(--ui-primary, #2f74d0);
+}
+
+body.patient-ui .btn-primary,
+body.patient-ui .alipay-page .btn-primary,
+body.patient-ui button.btn-primary,
+body.patient-ui .btn-submit,
+body.patient-ui .btn-view {
+    background: linear-gradient(135deg, var(--ui-primary, #2f74d0) 0%, var(--ui-primary-deep, #2359a3) 100%);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--ui-primary, #2f74d0) 26%, transparent);
+}
+
+body.patient-ui .btn-download {
+    background: linear-gradient(135deg, var(--ui-danger, #e35353) 0%, color-mix(in srgb, var(--ui-danger, #e35353) 72%, #000) 100%);
+}
+
+/* 2026-04 patient refinement layer */
+body.patient-ui .page {
+    width: min(1180px, calc(100% - 24px));
+    margin: 24px auto 42px;
+}
+
+body.patient-ui .welcome-card {
+    border-radius: 16px;
+    border: 1px solid var(--ui-border, #dce7f6);
+    background:
+        linear-gradient(145deg, color-mix(in srgb, #ffffff 86%, var(--ui-primary-soft, #ebf3ff)) 0%, #ffffff 62%),
+        #ffffff;
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--ui-primary, #2f74d0) 13%, transparent);
+}
+
+body.patient-ui .welcome-title {
+    line-height: 1.35;
+    margin-bottom: 8px;
+}
+
+body.patient-ui .todo-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 6px 12px;
+    border: 1px solid color-mix(in srgb, var(--ui-primary, #2f74d0) 26%, #ffffff);
+    font-weight: 600;
+}
+
+body.patient-ui .welcome-image img {
+    border-radius: 12px;
+    box-shadow: 0 10px 22px rgba(22, 53, 112, 0.12);
+}
+
+body.patient-ui .patient-dash .quick-actions {
+    gap: 12px;
+}
+
+body.patient-ui .patient-dash .quick-btn {
+    border: 1px solid var(--ui-border, #dce7f6);
+    border-radius: 12px;
+    min-height: 112px;
+    padding: 14px 12px;
+    background: color-mix(in srgb, #ffffff 92%, var(--ui-primary-soft, #ebf3ff));
+    text-decoration: none;
+}
+
+body.patient-ui .patient-dash .quick-btn .icon {
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 10px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--ui-primary-soft, #ebf3ff);
+}
+
+body.patient-ui .grid-2 .card {
+    border-radius: 14px;
+}
+
+body.patient-ui .timeline-item {
+    border-radius: 10px;
+    border: 1px solid var(--ui-border, #dce7f6);
+    background: color-mix(in srgb, #ffffff 84%, var(--ui-primary-soft, #ebf3ff));
+}
+
+body.patient-ui .link {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+body.patient-ui .link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+body.patient-ui .table-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+body.patient-ui .table-wrap thead th {
+    background: color-mix(in srgb, var(--ui-primary-soft, #ebf3ff) 76%, #ffffff);
+}
+
+body.patient-ui .table-wrap tbody tr:nth-child(2n) {
+    background: color-mix(in srgb, var(--ui-primary-soft, #ebf3ff) 28%, #ffffff);
+}
+
+body.patient-ui .table-wrap tbody tr:hover {
+    background: color-mix(in srgb, var(--ui-primary-soft, #ebf3ff) 58%, #ffffff);
+}
+
+body.patient-ui .btn-primary,
+body.patient-ui .btn-view,
+body.patient-ui .btn-download,
+body.patient-ui .btn-cancel,
+body.patient-ui .btn-link {
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+body.patient-ui .footer {
+    margin-top: 14px;
+    padding: 10px 4px;
+    text-align: center;
+}
+
+@media (max-width: 980px) {
+    body.patient-ui .page {
+        width: min(1180px, calc(100% - 20px));
+    }
+
+    body.patient-ui .patient-dash .quick-btn {
+        min-height: 98px;
+    }
+}
+
+@media (max-width: 640px) {
+    body.patient-ui .page {
+        width: min(1180px, calc(100% - 16px));
+        margin-top: 18px;
+    }
+
+    body.patient-ui .welcome-card {
+        border-radius: 14px;
+    }
+
+    body.patient-ui .patient-dash .quick-btn {
+        min-height: auto;
+        padding: 12px 10px;
+    }
+}
+
+/* patient dashboard inline-style extraction */
+body.patient-ui .patient-page-wide {
+    max-width: 1200px;
+}
+
+body.patient-ui .inline-gap-xs {
+    margin: 0 4px;
+}
+
+body.patient-ui .patient-line-main {
+    font-size: 14px;
+}
+
+body.patient-ui .patient-inline-time {
+    margin-left: 4px;
+}
+
+body.patient-ui .patient-line-detail {
+    margin-top: 2px;
+    font-size: 13px;
+    color: #606266;
+}
+
+body.patient-ui .patient-inline-link-gap,
+body.patient-ui .patient-inline-label-gap {
+    margin-left: 8px;
+}
+
+body.patient-ui .footer-mini-note {
+    margin-top: 4px;
+}
+
+/* 2026-04 Patient Elegance Layer */
+@keyframes patientFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes patientSoftIn {
+    from {
+        opacity: 0;
+        transform: translateY(9px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes patientPulseSoft {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(15, 138, 116, 0.16); }
+    50% { box-shadow: 0 0 0 7px rgba(15, 138, 116, 0); }
+}
+
+body.patient-ui .welcome-card,
+body.patient-ui .card,
+body.patient-ui .filter-card {
+    animation: patientSoftIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body.patient-ui .grid-2 .card:nth-child(2) {
+    animation-delay: 70ms;
+}
+
+body.patient-ui .patient-dash .quick-btn {
+    animation: patientSoftIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body.patient-ui .patient-dash .quick-btn:nth-child(1) { animation-delay: 90ms; }
+body.patient-ui .patient-dash .quick-btn:nth-child(2) { animation-delay: 110ms; }
+body.patient-ui .patient-dash .quick-btn:nth-child(3) { animation-delay: 130ms; }
+body.patient-ui .patient-dash .quick-btn:nth-child(4) { animation-delay: 150ms; }
+body.patient-ui .patient-dash .quick-btn:nth-child(5) { animation-delay: 170ms; }
+body.patient-ui .patient-dash .quick-btn:nth-child(6) { animation-delay: 190ms; }
+
+body.patient-ui .patient-dash .quick-btn {
+    transition:
+        transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 180ms ease,
+        background-color 180ms ease;
+}
+
+body.patient-ui .patient-dash .quick-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 13px 24px color-mix(in srgb, var(--ui-primary, #2f74d0) 16%, transparent);
+}
+
+body.patient-ui .patient-dash .quick-btn .icon {
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease;
+}
+
+body.patient-ui .patient-dash .quick-btn:hover .icon {
+    transform: scale(1.045) translateY(-1px);
+}
+
+body.patient-ui .todo-pill {
+    animation: patientPulseSoft 2.4s ease-in-out infinite;
+}
+
+body.patient-ui .table-wrap tbody tr {
+    transition: transform 180ms ease, background-color 180ms ease;
+}
+
+body.patient-ui .table-wrap tbody tr:hover {
+    transform: translateX(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.patient-ui .welcome-card,
+    body.patient-ui .card,
+    body.patient-ui .filter-card,
+    body.patient-ui .todo-pill,
+    body.patient-ui .patient-dash .quick-btn {
+        animation: none !important;
+    }
+
+    body.patient-ui .patient-dash .quick-btn:hover,
+    body.patient-ui .table-wrap tbody tr:hover {
+        transform: none;
+    }
+}

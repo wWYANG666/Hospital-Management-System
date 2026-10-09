@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="医院管理系统：覆盖患者服务、医生工作台与医院运营管理。"
+    />
+    <title>医联云 · 医院管理系统</title>
+    <link rel="stylesheet" href="/css/landing.css" />
+  </head>
+  <body class="landing-page">
+    <header class="landing-nav">
+      <a class="landing-brand" href="/" aria-label="返回首页">
+        <span class="landing-brand-mark">医</span>
+        <span><strong>医联云</strong><small>医院管理系统</small></span>
+      </a>
+      <nav class="landing-nav-links" aria-label="主导航">
+        <a href="#capabilities">核心能力</a>
+        <a href="#workflow">业务闭环</a>
+        <a href="#roles">角色入口</a>
+      </nav>
+      <a class="landing-nav-cta" href="/login"
+        >进入系统 <span aria-hidden="true">↗</span></a
+      >
+    </header>
+
+    <main>
+      <section class="landing-hero">
+        <div class="landing-hero-copy">
+          <div class="landing-eyebrow"><span></span> 医疗服务数字化工作台</div>
+          <h1>让就医协作，<em>清晰可追踪</em></h1>
+          <p class="landing-hero-lead">
+            从预约挂号、诊疗记录到住院与药品管理，医联云将患者、医生和运营人员连接在同一条业务链路上。
+          </p>
+          <div class="landing-hero-actions">
+            <a class="landing-btn landing-btn-primary" href="/login"
+              >立即进入系统 <span aria-hidden="true">→</span></a
+            >
+            <a class="landing-btn landing-btn-quiet" href="#capabilities"
+              >了解核心能力 <span aria-hidden="true">↓</span></a
+            >
+          </div>
+          <div class="landing-proof-row" aria-label="系统特性">
+            <span><b>3</b> 类业务角色</span><span><b>20+</b> 项业务页面</span
+            ><span><b>AI</b> 辅助决策</span>
+          </div>
+        </div>
+        <div class="landing-hero-visual">
+          <div class="landing-visual-glow"></div>
+          <div class="landing-visual-card landing-visual-card-main">
+            <div class="landing-visual-toolbar">
+              <span></span><span></span><span></span
+              ><span class="landing-preview-label"
+                >运营看板 · 界面示意，非实时数据</span
+              >
+            </div>
+            <div class="landing-visual-kpi-row">
+              <div>
+                <small>今日门诊</small><strong>128</strong><i>+12.6%</i>
+              </div>
+              <div><small>在院人数</small><strong>64</strong><i>+4.2%</i></div>
+            </div>
+            <div class="landing-visual-chart" aria-hidden="true">
+              <span style="height: 32%"></span><span style="height: 48%"></span
+              ><span style="height: 40%"></span><span style="height: 62%"></span
+              ><span style="height: 56%"></span><span style="height: 78%"></span
+              ><span style="height: 70%"></span>
+            </div>
+            <div class="landing-visual-list">
+              <div>
+                <span class="status-dot status-dot-green"></span
+                ><span>门诊排班已同步</span><b>完成</b>
+              </div>
+              <div>
+                <span class="status-dot status-dot-amber"></span
+                ><span>低库存药品预警</span><b>3 项</b>
+              </div>
+            </div>
+          </div>
+          <div class="landing-visual-card landing-visual-card-float">
+            <span class="landing-float-icon">✦</span>
+            <div>
+              <small>AI 辅助摘要</small><strong>今日运营洞察已生成</strong>
+            </div>
+          </div>
+          <div class="landing-hero-image">
+            <img src="/images/hospital-outpatient.png" alt="医院插画" />
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-section" id="capabilities">
+        <div class="landing-section-head">
+          <div>
+            <div class="landing-kicker">CORE CAPABILITIES</div>
+            <h2>围绕真实流程设计的系统能力</h2>
+          </div>
+          <p>让关键数据在正确的角色之间流动，让每个动作都有结果、有记录。</p>
+        </div>
+        <div class="landing-capability-grid">
+          <article class="landing-capability-card">
+            <span class="landing-capability-index">01</span>
+            <div class="landing-capability-icon landing-icon-teal">⌁</div>
+            <h3>三端协同</h3>
+            <p>
+              患者、医生、管理员按角色进入独立工作台，权限边界清晰，业务路径互相衔接。
+            </p>
+            <a href="/login">查看入口 <span>→</span></a>
+          </article>
+          <article class="landing-capability-card">
+            <span class="landing-capability-index">02</span>
+            <div class="landing-capability-icon landing-icon-blue">＋</div>
+            <h3>就医全流程</h3>
+            <p>
+              从预约、接诊、报告到住院、处方与缴费，关键节点集中管理，减少重复录入。
+            </p>
+            <a href="/login">探索流程 <span>→</span></a>
+          </article>
+          <article class="landing-capability-card">
+            <span class="landing-capability-index">03</span>
+            <div class="landing-capability-icon landing-icon-amber">✦</div>
+            <h3>AI 辅助决策</h3>
+            <p>
+              导诊建议、诊疗建议和运营摘要辅助日常判断，并保留生成记录方便审计追溯。
+            </p>
+            <a href="/login">了解 AI 能力 <span>→</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="landing-section landing-workflow" id="workflow">
+        <div class="landing-section-head">
+          <div>
+            <div class="landing-kicker">ONE COMPLETE LOOP</div>
+            <h2>从患者发起，到医院完成服务</h2>
+          </div>
+        </div>
+        <div class="landing-flow">
+          <div class="landing-flow-line"></div>
+          <div class="landing-flow-step">
+            <span>01</span><strong>预约</strong><small>选择科室与时段</small>
+          </div>
+          <div class="landing-flow-step">
+            <span>02</span><strong>诊疗</strong><small>接诊并沉淀病历</small>
+          </div>
+          <div class="landing-flow-step">
+            <span>03</span><strong>处置</strong><small>处方、检查与住院</small>
+          </div>
+          <div class="landing-flow-step">
+            <span>04</span><strong>追踪</strong
+            ><small>报告、账单与住院状态</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-section landing-role-section" id="roles">
+        <div class="landing-role-panel">
+          <div>
+            <div class="landing-kicker">START FROM YOUR ROLE</div>
+            <h2>选择角色，进入对应工作台</h2>
+            <p>系统会根据账号权限展示相应的功能与数据。</p>
+          </div>
+          <div class="landing-role-actions">
+            <a href="/login/user" class="landing-role-link"
+              ><span class="landing-role-symbol">患</span
+              ><span
+                ><strong>患者端</strong><small>预约、报告与账单</small></span
+              ><b>→</b></a
+            ><a href="/login/doctor" class="landing-role-link"
+              ><span class="landing-role-symbol">医</span
+              ><span
+                ><strong>医生端</strong><small>诊疗、排班与住院</small></span
+              ><b>→</b></a
+            ><a
+              href="/login/admin"
+              class="landing-role-link landing-role-link-admin"
+              ><span class="landing-role-symbol">管</span
+              ><span
+                ><strong>管理端</strong><small>运营、库存与审计</small></span
+              ><b>→</b></a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="landing-footer">
+      <span>医联云 · 医院管理系统</span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科室管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '科室管理', '科室与排班入口')}"></div>
+
+<main class="page">
+    <section class="card">
+        <h1 class="admin-hero-title">科室信息总览</h1>
+        <p class="admin-hero-text">科室维护与医生入口</p>
+        <div class="admin-hero-stats">
+            <div class="admin-hero-stat">
+                <div class="lbl">科室总数</div>
+                <div class="val" th:text="${departments.size()}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">关联医生数</div>
+                <div class="val" th:text="${totalDepartmentDoctors}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">待维护描述</div>
+                <div class="val" th:text="${departments.?[description == null or description.isEmpty()].size()}">0</div>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${success}" class="admin-msg-success"><span th:text="${success}">操作成功</span></div>
+    <div th:if="${error}" class="admin-msg-error"><span th:text="${error}">操作失败</span></div>
+    <div th:if="${param.error}" class="admin-msg-error">科室名称不能为空。</div>
+
+    <section class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">科室列表</div>
+                <div class="admin-panel-sub">支持新增与批量操作</div>
+            </div>
+        </div>
+
+        <div class="admin-toolbar">
+            <a class="btn btn-primary" href="/admin/departments/new">新增科室</a>
+            <form id="bulkDeleteDepartmentsForm" th:action="@{/admin/departments/bulk-delete}" method="post" onsubmit="return confirmBulkDeleteDepartments()" class="u-inline">
+                <button class="btn-cancel u-pill-btn" type="submit">批量删除</button>
+            </form>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th class="u-w44"><input type="checkbox" onclick="toggleAllDepartments(this)"></th>
+                    <th class="u-w80">ID</th>
+                    <th>科室名称</th>
+                    <th>描述</th>
+                    <th class="u-w120">医生数量</th>
+                    <th class="u-w120">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${departments}">
+                    <td onclick="event.stopPropagation();"><input type="checkbox" name="ids" th:value="${d.id}" form="bulkDeleteDepartmentsForm"></td>
+                    <td th:text="${d.id}"></td>
+                    <td th:text="${d.name}"></td>
+                    <td th:text="${d.description != null and !d.description.isEmpty() ? d.description : '暂无描述'}"></td>
+                    <td>
+                        <span class="tag-inline tag-male" th:text="|${departmentDoctorCountMap.containsKey(d.id) ? departmentDoctorCountMap[d.id] : 0} 人|">0 人</span>
+                    </td>
+                    <td onclick="event.stopPropagation();">
+                        <a class="btn ghost u-chip-xs-wide" th:href="@{/admin/departments/{id}/edit(id=${d.id})}">管理</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="u-xs-muted-mt12">勾选后可批量操作</p>
+    </section>
+</main>
+
+<script>
+    function toggleAllDepartments(source) {
+        document.querySelectorAll('input[name="ids"]').forEach(function (cb) { cb.checked = source.checked; });
+    }
+    function confirmBulkDeleteDepartments() {
+        var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+        if (checked === 0) {
+            alert('请先勾选要删除的科室');
+            return false;
+        }
+        return confirm('确定删除已勾选的 ' + checked + ' 个科室吗？此操作不可恢复。');
+    }
+</script>
+</body>
+</html>

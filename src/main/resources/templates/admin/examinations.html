@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检查项目管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <script>
+        function toggleAllExaminations(source) {
+            document.querySelectorAll('input[name="ids"]').forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeleteExaminations() {
+            var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的检查项');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 个检查项吗？此操作不可恢复。');
+        }
+    </script>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '检查项目管理', '检查项目维护')}"></div>
+
+<main class="page">
+    <div class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">检查项目列表</div>
+                <div class="admin-panel-sub">按类型维护项目</div>
+            </div>
+            <div class="admin-toolbar u-m0">
+                <a class="btn btn-primary" href="/admin/examinations/new">新增项目</a>
+                <form id="bulkDeleteExaminationsForm" th:action="@{/admin/examinations/bulk-delete}" method="post" onsubmit="return confirmBulkDeleteExaminations()" class="u-inline">
+                    <button class="btn-cancel u-pill-btn" type="submit">删除选中</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th class="u-w40"><input type="checkbox" onclick="toggleAllExaminations(this)"></th>
+                    <th>ID</th>
+                    <th>名称</th>
+                    <th>类型</th>
+                    <th>价格</th>
+                    <th>描述</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${examinations}">
+                    <td><input type="checkbox" name="ids" th:value="${e.id}" form="bulkDeleteExaminationsForm"></td>
+                    <td th:text="${e.id}"></td>
+                    <td th:text="${e.name}"></td>
+                    <td th:text="${e.type}"></td>
+                    <td th:text="${e.price}"></td>
+                    <td th:text="${e.description}"></td>
+                    <td>
+                        <a class="btn btn-primary u-chip-xs" th:href="@{/admin/examinations/{id}/edit(id=${e.id})}">编辑</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

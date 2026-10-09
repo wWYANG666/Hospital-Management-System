@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药品管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .stock-low { color: #F56C6C; font-weight: 600; }
+    </style>
+    <script>
+        function toggleAllMedicines(source) {
+            document.querySelectorAll('input[name="ids"]').forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeleteMedicines() {
+            var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的药品');
+                return false;
+            }
+            return confirm('确定删除已勾选的 ' + checked + ' 个药品吗？此操作不可恢复。');
+        }
+    </script>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '药品管理', '库存与预警维护')}"></div>
+
+<main class="page">
+    <div class="card">
+        <div th:if="${success}" class="admin-msg-success" th:text="${success}"></div>
+        <div th:if="${error}" class="admin-msg-error" th:text="${error}"></div>
+
+        <div class="admin-toolbar">
+            <a class="btn btn-primary" href="/admin/medicines/new">新增药品</a>
+            <a class="btn btn-primary u-tag-success" href="/admin/medicines/inbounds">入库记录</a>
+            <form id="bulkDeleteMedicinesForm" th:action="@{/admin/medicines/bulk-delete}" method="post" onsubmit="return confirmBulkDeleteMedicines()" class="u-inline">
+                <button class="btn-cancel u-pill-btn" type="submit">删除选中</button>
+            </form>
+        </div>
+        <p class="admin-panel-sub u-mb-12">药品信息与库存</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th class="u-w40"><input type="checkbox" onclick="toggleAllMedicines(this)"></th>
+                    <th>ID</th>
+                    <th>名称</th>
+                    <th>规格</th>
+                    <th>单位</th>
+                    <th>价格</th>
+                    <th>库存</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${medicines}">
+                    <td><input type="checkbox" name="ids" th:value="${m.id}" form="bulkDeleteMedicinesForm"></td>
+                    <td th:text="${m.id}"></td>
+                    <td th:text="${m.name}"></td>
+                    <td th:text="${m.specification}"></td>
+                    <td th:text="${m.unit}"></td>
+                    <td th:text="${m.price}"></td>
+                    <td th:class="${m.stock != null && m.stock < 10 ? 'stock-low' : ''}" th:text="${m.stock}"></td>
+                    <td>
+                        <a class="btn btn-primary u-tag-success-chip" th:href="@{/admin/medicines/{id}/inbound(id=${m.id})}">入库</a>
+                        <a class="btn btn-primary u-chip-xs" th:href="@{/admin/medicines/{id}/edit(id=${m.id})}">编辑</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

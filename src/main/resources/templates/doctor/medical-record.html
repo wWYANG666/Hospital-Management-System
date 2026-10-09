@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子病历</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .page {
+            max-width: 1100px;
+            margin: 16px auto 32px;
+            padding: 0 16px;
+        }
+
+        .record-card {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .record-header-left h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: #303133;
+        }
+
+        .record-header-left p {
+            font-size: 13px;
+            color: #909399;
+            line-height: 1.8;
+        }
+
+        .record-meta {
+            font-size: 12px;
+            color: #606266;
+            text-align: right;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #ECF5FF;
+        }
+
+        .record-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .record-block {
+            padding: 14px 16px;
+            border-radius: 8px;
+            background: #F5F7FA;
+        }
+
+        .record-label {
+            font-size: 14px;
+            font-weight: 800;
+            color: #303133;
+            margin-bottom: 8px;
+        }
+
+        .record-content {
+            font-size: 14px;
+            color: #4b665f;
+            white-space: pre-wrap;
+            line-height: 1.9;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 760px) {
+            .page {
+                width: min(100% - 20px, 1020px);
+                margin: 18px auto 28px;
+            }
+
+            .record-card {
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .record-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .record-meta {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/appointments', '电子病历', '诊断处方与病程')}"></div>
+
+    <main class="page">
+        <section class="record-card card" th:if="${record}">
+            <div class="record-header">
+                <div class="record-header-left">
+                    <h2>本次就诊记录</h2>
+                    <p>本次就诊完整病历</p>
+                </div>
+                <div class="record-meta">
+                    创建时间：
+                    <span th:text="${record.createdAt}">2026-04-05T10:00</span>
+                </div>
+            </div>
+
+            <div class="record-grid">
+                <div class="record-block item">
+                    <div class="record-label">诊断结果</div>
+                    <div class="record-content" th:text="${record.diagnosis != null and !record.diagnosis.isEmpty() ? record.diagnosis : '暂无诊断结果'}">暂无诊断结果</div>
+                </div>
+
+                <div class="record-block item">
+                    <div class="record-label">处方</div>
+                    <div class="record-content" th:text="${record.prescription != null and !record.prescription.isEmpty() ? record.prescription : '暂无处方'}">暂无处方</div>
+                </div>
+
+                <div class="record-block item" th:if="${record.examinationItems}">
+                    <div class="record-label">检查项目</div>
+                    <div class="record-content" th:text="${record.examinationItems}"></div>
+                </div>
+
+                <div class="record-block item">
+                    <div class="record-label">病历内容</div>
+                    <div class="record-content" th:text="${record.medicalRecordContent != null and !record.medicalRecordContent.isEmpty() ? record.medicalRecordContent : '暂无病历内容'}">暂无病历内容</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/doctor/appointments" class="btn ghost">返回列表</a>
+                <button type="button" class="btn btn-primary" onclick="window.print()">打印病历</button>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

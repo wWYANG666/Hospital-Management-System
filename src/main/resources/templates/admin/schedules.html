@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班信息管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <script>
+        function toggleAllSchedules(source) {
+            document.querySelectorAll('input[name="ids"]').forEach(function (cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeleteSchedules() {
+            var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的排班');
+                return false;
+            }
+            return confirm('确定删除已勾选的 ' + checked + ' 条排班吗？此操作不可恢复。');
+        }
+    </script>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '排班信息管理', '全院排班维护')}"></div>
+
+<main class="page">
+    <section class="card">
+        <div class="admin-toolbar">
+            <a class="btn btn-primary" href="/admin/schedules/new">新增排班</a>
+            <form id="bulkDeleteSchedulesForm" th:action="@{/admin/schedules/bulk-delete}" method="post" onsubmit="return confirmBulkDeleteSchedules()" class="u-inline">
+                <button class="btn ghost" type="submit">批量删除</button>
+            </form>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th class="u-w40"><input type="checkbox" onclick="toggleAllSchedules(this)"></th>
+                    <th>ID</th>
+                    <th>医生ID</th>
+                    <th>科室ID</th>
+                    <th>日期</th>
+                    <th>班次</th>
+                    <th>门诊类型</th>
+                    <th>号源</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${schedules}">
+                    <td><input type="checkbox" name="ids" th:value="${s.id}" form="bulkDeleteSchedulesForm"></td>
+                    <td th:text="${s.id}"></td>
+                    <td th:text="${s.doctorId}"></td>
+                    <td th:text="${s.departmentId}"></td>
+                    <td th:text="${s.workDate}"></td>
+                    <td th:text="${s.workTime != null ? s.workTime.chineseName : '-'}"></td>
+                    <td th:text="${s.scheduleType != null and s.scheduleType.name() == 'EXPERT' ? '专家号' : '普通门诊'}"></td>
+                    <td th:text="${s.currentAppointments + '/' + s.maxAppointments}"></td>
+                    <td th:text="${s.statusChineseName}"></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+            <p class="u-xs-muted-mt12">当前支持逐条新增</p>
+    </section>
+</main>
+</body>
+</html>

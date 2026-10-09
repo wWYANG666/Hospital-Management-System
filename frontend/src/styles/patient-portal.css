@@ -1,0 +1,736 @@
+.patient-public-app {
+  min-height: 100vh;
+  background: #f6f9fc;
+}
+
+.patient-public-app .public-header-inner {
+  min-height: 84px;
+}
+
+.patient-public-app .public-header nav a {
+  height: 84px;
+}
+
+.patient-public-app .hospital-brand strong {
+  font-size: 19px;
+}
+
+.patient-public-app .hospital-brand small {
+  color: #748ca5;
+  letter-spacing: 1.15px;
+}
+
+.patient-portal-home {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 42px 0 48px;
+}
+
+.patient-home-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.patient-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #447a9c;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.patient-eyebrow > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #208a93;
+}
+
+.patient-home-heading h1 {
+  margin: 12px 0 14px;
+  color: #173652;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.patient-home-heading > p {
+  margin: 0;
+  color: #586f86;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.patient-login-intro > p {
+  color: #61778f;
+  font-size: 14px;
+  line-height: 1.95;
+}
+
+.patient-home-service-note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 23px;
+  color: #5b7c97;
+  font-size: 13px;
+}
+
+.patient-hospital-figure {
+  position: relative;
+  min-width: 0;
+  height: 176px;
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #dcebf5;
+}
+
+.patient-hospital-figure > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.patient-hospital-figure figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 20px 15px 10px;
+  background: linear-gradient(transparent, #163553b3);
+  color: #fff;
+  font-size: 12px;
+}
+
+.patient-home-booking {
+  padding: 27px 30px 25px;
+  border: 1px solid #dfe8f0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 5px 24px #24496305;
+}
+
+.patient-home-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 15px;
+}
+
+.patient-home-section-heading h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.patient-home-section-heading > span {
+  color: #778a9c;
+  font-size: 12px;
+}
+
+.appointment-finder-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #e6edf3;
+}
+
+.appointment-finder-tabs > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 13px 3px 14px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #6b7e91;
+  font-size: 14px;
+}
+
+.appointment-finder-tabs > button.active {
+  color: #1261c4;
+  border-bottom-color: #1261c4;
+  font-weight: 600;
+}
+
+.appointment-finder-form {
+  padding-top: 24px;
+}
+
+.appointment-finder-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.appointment-finder-field {
+  min-width: 0;
+}
+
+.appointment-finder-field > span {
+  display: block;
+  margin-bottom: 9px;
+  color: #334f68;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.appointment-finder-field small {
+  margin-left: 6px;
+  color: #7b8d9e;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.appointment-finder-field select,
+.appointment-finder-search {
+  min-height: 48px;
+}
+
+.appointment-finder-field select:disabled {
+  color: #8a99a8;
+  background: #f6f8fa;
+}
+
+.appointment-finder-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 13px;
+  border: 1px solid #dce4ef;
+  border-radius: 8px;
+  color: #7f95aa;
+}
+
+.appointment-finder-search:focus-within {
+  border-color: #69a3ec;
+  box-shadow: 0 0 0 3px #e9f2ff;
+}
+
+.appointment-finder-search input:not([type="checkbox"]):not([type="radio"]) {
+  min-width: 0;
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-left: 0;
+}
+
+.appointment-finder-submit {
+  min-height: 48px;
+  min-width: 190px;
+  font-size: 14px;
+}
+
+.appointment-finder-note {
+  min-height: 21px;
+  margin: 16px 0 0;
+  color: #728598;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.appointment-finder-state {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 125px;
+  margin: 0;
+  color: #6e8397;
+  font-size: 14px;
+}
+
+.appointment-finder-error > p,
+.patient-home-feedback > p {
+  flex: 1;
+  margin: 0;
+  color: #ab4e4e;
+}
+
+.patient-home-heading-signed-in {
+  margin-bottom: 25px;
+}
+
+.patient-home-heading-signed-in h1 {
+  font-size: 29px;
+}
+
+.patient-home-plan {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.patient-home-plan-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.patient-home-next,
+.patient-home-reminders {
+  min-width: 0;
+  padding: 23px 25px;
+  border: 1px solid #dfe8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.patient-home-next-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 23px;
+}
+
+.patient-home-next-heading h2,
+.patient-home-reminders h2,
+.patient-home-empty h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.patient-home-next-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.patient-home-appointment-date {
+  display: grid;
+  grid-template-columns: 23px auto;
+  column-gap: 10px;
+  row-gap: 3px;
+}
+
+.patient-home-appointment-date > svg {
+  grid-row: 1 / 3;
+  align-self: center;
+  color: #5686b3;
+}
+
+.patient-home-appointment-date strong {
+  color: #244866;
+  font-size: 18px;
+}
+
+.patient-home-appointment-date span,
+.patient-home-appointment-doctor span {
+  color: #74879a;
+  font-size: 13px;
+}
+
+.patient-home-appointment-doctor {
+  flex: 1;
+  min-width: 160px;
+}
+
+.patient-home-appointment-doctor strong,
+.patient-home-appointment-doctor span {
+  display: block;
+}
+
+.patient-home-appointment-doctor strong {
+  color: #37546e;
+  font-size: 15px;
+}
+
+.patient-home-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.patient-home-appointment-note {
+  border-top: 1px solid #e8eef4;
+  padding-top: 14px;
+  margin: 19px 0 0;
+  color: #74879a;
+  font-size: 13px;
+}
+
+.patient-home-empty,
+.patient-home-feedback {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  min-height: 125px;
+  color: #7191af;
+}
+
+.patient-home-empty p {
+  margin: 7px 0 0;
+  color: #75899b;
+  font-size: 14px;
+}
+
+.patient-home-reminders h2 {
+  margin-bottom: 12px;
+}
+
+.patient-home-reminder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  color: #4b6c89;
+  font-size: 13px;
+}
+
+.patient-home-reminder + .patient-home-reminder {
+  border-top: 1px solid #edf1f6;
+}
+
+.patient-home-reminder > span {
+  flex: 1;
+}
+
+.patient-home-reminder:hover {
+  color: #1261c4;
+}
+
+.patient-home-before-visit {
+  margin-top: 23px;
+  color: #72889b;
+}
+
+.patient-home-before-visit summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 0;
+  font-size: 13px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.patient-home-before-visit summary::-webkit-details-marker {
+  display: none;
+}
+
+.patient-home-before-visit summary:focus-visible {
+  outline: 3px solid #80b6f5;
+  outline-offset: 3px;
+}
+
+.patient-home-before-visit[open] summary > svg:last-child {
+  transform: rotate(180deg);
+}
+
+.patient-home-before-visit > p {
+  max-width: 840px;
+  margin: 8px 0 0;
+  color: #6e8294;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.patient-public-app .patient-public-footer {
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  align-items: center;
+  gap: 20px;
+}
+
+.patient-public-footer > small {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+}
+
+.patient-login-page {
+  width: min(1010px, calc(100% - 48px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 80px;
+  align-items: center;
+  margin: 55px auto 65px;
+  min-height: 450px;
+}
+
+.patient-login-intro h1 {
+  margin: 18px 0;
+  font-size: clamp(26px, 3.1vw, 35px);
+  line-height: 1.55;
+  color: #203e59;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.patient-login-reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid #dde6ee;
+  color: #5982a4;
+}
+
+.patient-login-reminder strong,
+.patient-login-reminder span {
+  display: block;
+}
+
+.patient-login-reminder strong {
+  color: #486680;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.patient-login-reminder span {
+  margin-top: 7px;
+  color: #7a8e9f;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.patient-login-card {
+  padding: 32px;
+}
+
+.patient-register-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  margin-bottom: 22px;
+  background: #edf8f3;
+  border-radius: 7px;
+  color: #28755b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.patient-register-details {
+  margin-top: 22px;
+  padding: 0;
+  border-top: 1px solid #e5edf4;
+  border-bottom: 1px solid #e5edf4;
+}
+
+.patient-register-details summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 17px 0;
+  color: #486681;
+  font-size: 13px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.patient-register-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.patient-register-details summary:focus-visible {
+  outline: 3px solid #80b6f5;
+  outline-offset: 3px;
+}
+
+.patient-register-details summary span {
+  color: #7e92a5;
+  font-size: 11px;
+}
+
+.patient-register-details summary > svg {
+  margin-left: auto;
+}
+
+.patient-register-details[open] summary > svg {
+  transform: rotate(180deg);
+}
+
+.patient-register-details > .form-grid {
+  padding-bottom: 18px;
+}
+
+@media (max-width: 1100px) {
+  .patient-home-intro {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 30px;
+  }
+
+  .appointment-finder-fields {
+    gap: 14px;
+  }
+
+  .appointment-finder-submit {
+    min-width: 168px;
+  }
+
+  .patient-home-plan {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+
+  .patient-home-plan-single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .patient-login-page {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 760px) {
+  .patient-public-app .public-header-inner {
+    min-height: 72px;
+  }
+
+  .patient-public-app .public-header nav a {
+    height: 40px;
+  }
+
+  .patient-public-app .hospital-brand strong {
+    font-size: 14px;
+  }
+
+  .patient-public-app .hospital-brand small {
+    font-size: 7px;
+    letter-spacing: 0.65px;
+  }
+
+  .patient-portal-home {
+    width: calc(100% - 36px);
+    padding: 29px 0 32px;
+  }
+
+  .patient-home-intro {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 26px;
+  }
+
+  .patient-home-heading h1,
+  .patient-home-heading-signed-in h1 {
+    font-size: 28px;
+    margin: 10px 0 12px;
+  }
+
+  .patient-home-heading > p {
+    font-size: 14px;
+  }
+
+  .patient-home-service-note {
+    margin-top: 17px;
+  }
+
+  .patient-hospital-figure {
+    display: none;
+  }
+
+  .patient-home-booking {
+    padding: 22px;
+    border-radius: 12px;
+  }
+
+  .patient-home-section-heading h2 {
+    font-size: 17px;
+  }
+
+  .patient-home-section-heading > span {
+    display: none;
+  }
+
+  .appointment-finder-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+  }
+
+  .appointment-finder-submit {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .appointment-finder-note {
+    margin-top: 15px;
+    font-size: 12px;
+  }
+
+  .patient-home-plan {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-bottom: 23px;
+  }
+
+  .patient-home-next,
+  .patient-home-reminders {
+    padding: 21px;
+  }
+
+  .patient-home-next-details {
+    gap: 15px;
+  }
+
+  .patient-home-appointment-date {
+    width: 100%;
+  }
+
+  .patient-home-appointment-doctor {
+    min-width: 0;
+  }
+
+  .patient-home-empty {
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .patient-home-empty p {
+    font-size: 13px;
+  }
+
+  .patient-public-app .patient-public-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 23px 18px;
+    gap: 13px;
+  }
+
+  .patient-public-footer > small {
+    margin-left: 0;
+  }
+
+  .patient-login-page {
+    width: calc(100% - 36px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 25px;
+    margin: 29px auto 35px;
+    min-height: 0;
+  }
+
+  .patient-login-intro h1 {
+    font-size: 24px;
+    margin: 12px 0;
+  }
+
+  .patient-login-intro h1 br {
+    display: none;
+  }
+
+  .patient-login-intro > p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  .patient-login-reminder {
+    display: none;
+  }
+
+  .patient-login-card {
+    padding: 26px 23px;
+  }
+}

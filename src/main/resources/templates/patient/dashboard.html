@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者首页 - 医院管理系统</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+</head>
+<body class="patient-ui theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientDashboard}"></div>
+
+<main class="page patient-dash patient-page-wide">
+        <div class="welcome-card">
+            <div class="welcome-main">
+                <div class="welcome-title">
+                    <span th:text="${currentUser != null && currentUser.realName != null ? '早上好，' + currentUser.realName + '！' : '早上好，欢迎来到医院管理系统！'}"></span>
+                </div>
+                <div class="welcome-sub">就医服务入口</div>
+                <div class="todo-pill" th:if="${todoCount != null}">
+                    您有 <span th:text="${todoCount}" class="inline-gap-xs"></span> 项待办事项
+                </div>
+            </div>
+            <div class="welcome-image">
+                <img src="/images/hospital-outpatient.png" alt="医院外观">
+            </div>
+            <div class="quick-actions">
+                <a href="/patient/appointments/new" class="quick-btn">
+                    <div class="icon">📅</div>
+                    <div>预约挂号</div>
+                </a>
+                <a href="/patient/prescriptions" class="quick-btn">
+                    <div class="icon">💊</div>
+                    <div>购药取药</div>
+                </a>
+                <a href="/patient/reports" class="quick-btn">
+                    <div class="icon">📋</div>
+                    <div>报告单</div>
+                </a>
+                <a href="/patient/hospitalizations" class="quick-btn">
+                    <div class="icon">🏥</div>
+                    <div>住院信息</div>
+                </a>
+                <a href="/patient/payments/history" class="quick-btn">
+                    <div class="icon">¥</div>
+                    <div>账单记录</div>
+                </a>
+                <a href="/patient/profile" class="quick-btn">
+                    <div class="icon">👤</div>
+                    <div>个人信息</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">
+                    <span>今日待办事项</span>
+                    <span class="sub">今日提醒</span>
+                </div>
+                <div th:if="${todayAppointments.isEmpty() and currentHospitalizations.isEmpty()}" class="empty">
+                    今日暂无待办事项
+                </div>
+                <div class="scrollable-container" th:if="${!todayAppointments.isEmpty() or !currentHospitalizations.isEmpty()}">
+                    <div th:each="apt : ${todayAppointments}" class="timeline-item">
+                        <div class="patient-line-main">
+                            <span th:text="${apt.appointmentDate}"></span>
+                            <span class="patient-inline-time" th:text="${apt.appointmentTime}"></span>
+                            <span class="tag tag-apt">挂号</span>
+                        </div>
+                        <div class="patient-line-detail">
+                            状态：<span th:text="${apt.status.chineseName}"></span>
+                        </div>
+                    </div>
+                    <div th:each="hosp : ${currentHospitalizations}" class="timeline-item">
+                        <div class="patient-line-main">
+                            <span th:text="${hosp.admissionDate}"></span>
+                            <span class="tag tag-hosp">住院</span>
+                        </div>
+                        <div class="patient-line-detail">
+                            当前住院记录，状态：
+                            <span th:if="${hosp.status != null}" th:text="${hosp.status.chineseName}"></span>
+                            <span th:if="${hosp.status == null and hosp.requestStatus != null}" th:text="${hosp.requestStatus.chineseName}"></span>
+                            <span th:if="${hosp.status == null and hosp.requestStatus == null}">-</span>
+                            <a href="/patient/hospitalizations" class="link patient-inline-link-gap">查看详情</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>最近就诊记录</span>
+                    <span class="sub">最近动态</span>
+                </div>
+                <div th:if="${recentReports.isEmpty()}" class="empty">暂无最近就诊记录</div>
+                <div class="scrollable-container" th:if="${!recentReports.isEmpty()}">
+                    <div th:each="report : ${recentReports}" class="timeline-item">
+                        <div class="patient-line-main">
+                            <span th:text="${report.reportDate}"></span>
+                            <span class="tag tag-report">报告单</span>
+                        </div>
+                        <div class="patient-line-detail">
+                            <span th:text="${report.reportType}"></span>
+                            <span class="patient-inline-label-gap">状态：<span th:text="${report.status != null ? report.status.chineseName : '-'}"></span></span>
+                            <a th:href="@{/patient/reports/{id}(id=${report.id},from=dashboard)}" class="link patient-inline-link-gap">查看详情</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>演示医院 | 门诊时间：8:00-21:00</div>
+        </div>
+</main>
+</body>
+</html>

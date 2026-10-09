@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${examination.id == null ? '新增检查项目' : '编辑检查项目'}">检查项目表单</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .section-title { font-size:14px; font-weight:600; margin-bottom:12px; padding-left:10px; border-left:3px solid #409EFF; }
+        .admin-form-grid label { display:block; margin-bottom:6px; font-weight:600; font-size:14px; }
+        .admin-form-grid input, .admin-form-grid textarea, .admin-form-grid select { width:100%; padding:8px 10px; border:1px solid #dcdfe6; border-radius:4px; font-size:13px; }
+        .admin-form-grid .form-group { margin-bottom:12px; }
+        .admin-form-grid small { display:block; margin-top:4px; font-size:12px; color:#909399; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/examinations', ${examination.id == null ? '新增检查项目' : '编辑检查项目'}, '维护项目与价格')}"></div>
+
+<main class="page">
+    <div class="card admin-form-grid u-max-720-center">
+        <div class="section-title">基础信息</div>
+        <form th:action="${examination.id == null} ? @{/admin/examinations} : @{/admin/examinations/{id}(id=${examination.id})}"
+              method="post" th:object="${examination}">
+            <input type="hidden" th:field="*{id}" th:if="${examination.id != null}">
+            <div class="form-group">
+                <label>名称 *</label>
+                <input type="text" th:field="*{name}" required>
+                <small>建议：按实际项目名称填写。</small>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>所属科室 *</label>
+                    <select name="departmentId" required>
+                        <option value="">请选择科室</option>
+                        <option th:each="d : ${departments}"
+                                th:value="${d.id}"
+                                th:text="${d.name}"
+                                th:selected="${examination != null and examination.departmentId != null and examination.departmentId == d.id}">
+                        </option>
+                    </select>
+                    <small>用于开单时的科室筛选</small>
+                </div>
+                <div class="form-group">
+                    <label>项目类型 *</label>
+                    <select th:field="*{type}" required>
+                        <option value="">请选择</option>
+                        <option value="检查">检查</option>
+                        <option value="检验">检验</option>
+                    </select>
+                    <small>检查偏影像/超声，检验偏化验</small>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>价格（元）</label>
+                    <input type="number" step="0.01" min="0" th:field="*{price}" placeholder="如：120.00">
+                    <small>可留空后续维护</small>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select th:field="*{status}">
+                        <option value="1">启用</option>
+                        <option value="0">停用</option>
+                    </select>
+                    <small>停用后避免误下单</small>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea rows="4" th:field="*{description}"></textarea>
+            </div>
+            <div class="admin-toolbar u-padding-top8">
+                <button class="btn btn-primary" type="submit">保存</button>
+                <a class="btn ghost" href="/admin/examinations">取消</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

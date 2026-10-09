@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的排班</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .hero-title { font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin: 8px 0 10px; line-height: 1.2; color: #303133; }
+        .hero-text { max-width: 720px; font-size: 14px; line-height: 1.75; color: #909399; }
+        .hint-box { padding: 12px 14px; border-radius: 8px; font-size: 12px; line-height: 1.7; color: #606266; background: #F5F7FA; max-width: 420px; }
+        .status-tag { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .btn-leave {
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: none;
+            background: #F56C6C;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="theme-medical">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/dashboard', '我的排班', '班次与请假状态')}"></div>
+
+    <main class="page">
+        <section class="card">
+            <h1 class="hero-title">我的排班</h1>
+            <p class="hero-text">查看班次与请假状态</p>
+            <div class="sched-stat-grid">
+                <div class="profile-stat-box">
+                    <div class="lbl">排班总数</div>
+                    <div class="val" th:text="${#lists.size(schedules)}">0</div>
+                </div>
+                <div class="profile-stat-box">
+                    <div class="lbl">启用班次</div>
+                    <div class="val" th:text="${schedules.?[status != null and status == 1].size()}">0</div>
+                </div>
+                <div class="profile-stat-box">
+                    <div class="lbl">审批中</div>
+                    <div class="val" th:text="${schedules.?[status != null and status == 2].size()}">0</div>
+                </div>
+                <div class="profile-stat-box">
+                    <div class="lbl">已预约量</div>
+                    <div class="val" th:text="${#aggregates.sum(schedules.![currentAppointments != null ? currentAppointments : 0])}">0</div>
+                </div>
+            </div>
+        </section>
+
+        <div th:if="${success}" class="message-success" th:text="${success}">申请已提交</div>
+        <div th:if="${error}" class="message-error" th:text="${error}">提交失败</div>
+
+        <section class="card">
+            <div class="panel-head">
+                <div>
+                    <div class="panel-title">排班列表</div>
+                    <div class="panel-sub">未来启用班次可请假</div>
+                </div>
+                <div class="hint-box">已预约班次请谨慎操作</div>
+            </div>
+
+            <div th:if="${schedules.isEmpty()}" class="empty">当前暂无排班记录。</div>
+
+            <div class="table-wrap" th:if="${!schedules.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>班次</th>
+                        <th>号源配置</th>
+                        <th>预约情况</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${schedules}">
+                        <td th:text="${s.workDate != null ? #temporals.format(s.workDate, 'yyyy-MM-dd') : ''}">2026-04-05</td>
+                        <td>
+                            <span th:if="${s.workTime.name() == 'MORNING'}" class="work-time morning">上午</span>
+                            <span th:if="${s.workTime.name() == 'AFTERNOON'}" class="work-time afternoon">下午</span>
+                            <span th:if="${s.workTime.name() == 'EVENING'}" class="work-time evening">晚上</span>
+                        </td>
+                        <td>
+                            <div class="metric">可预约上限<strong th:text="${s.maxAppointments != null ? s.maxAppointments : 0}">20</strong></div>
+                        </td>
+                        <td>
+                            <div class="metric">已挂号人数<strong th:text="${s.currentAppointments != null ? s.currentAppointments : 0}">12</strong></div>
+                        </td>
+                        <td>
+                            <span th:if="${s.status != null and s.status == 1}" class="status-tag status-ok">启用中</span>
+                            <span th:if="${s.status != null and s.status == 0}" class="status-tag status-stop">已停用</span>
+                            <span th:if="${s.status != null and s.status == 2}" class="status-tag status-pending">请假审批中</span>
+                        </td>
+                        <td>
+                            <form th:if="${s.status != null and s.status == 1 and s.workDate != null and s.workDate >= T(java.time.LocalDate).now()}"
+                                  th:action="@{/doctor/schedules/{id}/leave(id=${s.id})}" method="post" class="u-inline">
+                                <button type="submit" class="btn-leave">申请请假</button>
+                            </form>
+                            <span th:if="${s.status != null and s.status == 2}" class="inline-note">已提交，待审批</span>
+                            <span th:if="${s.status != null and s.status == 0}" class="inline-note">班次已停用</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

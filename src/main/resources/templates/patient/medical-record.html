@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>就诊病历</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-mr .page { max-width: 960px; }
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+        .record-header-left h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .record-header-left p { font-size: 12px; color: #909399; }
+        .record-meta { font-size: 12px; color: #909399; text-align: right; }
+        .record-block { padding: 12px 0; border-top: 1px solid #ebeef5; }
+        .record-label { font-size: 13px; font-weight: 600; color: #303133; margin-bottom: 4px; }
+        .record-content { font-size: 13px; color: #606266; white-space: pre-wrap; }
+        .actions { margin-top: 18px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn {
+            padding: 8px 18px;
+            border-radius: 18px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .btn-primary { background: #409EFF; color: #fff; box-shadow: 0 2px 6px rgba(64, 158, 255, 0.4); }
+        .btn-secondary { background: #F5F7FA; color: #606266; border: 1px solid #dcdfe6; }
+    </style>
+</head>
+<body class="patient-ui patient-mr theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/appointments/new#my-appointments', '就诊病历', '查看本次病历')}"></div>
+
+<main class="page">
+    <div class="card" th:if="${record}">
+        <div class="record-header">
+            <div class="record-header-left">
+                <h2>本次就诊记录</h2>
+                <p>
+                    医生：
+                    <span th:text="${doctorUser != null ? doctorUser.realName : (doctor != null ? doctor.doctorCode : '未知')}"></span>
+                </p>
+            </div>
+            <div class="record-meta">
+                <span>创建时间：</span>
+                <span th:text="${record.createdAt != null ? #temporals.format(record.createdAt, 'yyyy-MM-dd HH:mm') : '-'}"></span>
+            </div>
+        </div>
+
+        <div class="record-block">
+            <div class="record-label">诊断结果</div>
+            <div class="record-content" th:text="${record.diagnosis != null and record.diagnosis != '' ? record.diagnosis : '暂无诊断结果'}"></div>
+        </div>
+
+        <div class="record-block">
+            <div class="record-label">处方</div>
+            <div class="record-content" th:text="${record.prescription != null and record.prescription != '' ? record.prescription : '暂无处方'}"></div>
+        </div>
+
+        <div class="record-block" th:if="${record.examinationItems != null and record.examinationItems != ''}">
+            <div class="record-label">检查项目</div>
+            <div class="record-content" th:text="${record.examinationItems}"></div>
+        </div>
+
+        <div class="record-block" th:if="${record.medicalRecordContent != null and record.medicalRecordContent != ''}">
+            <div class="record-label">病历内容</div>
+            <div class="record-content" th:text="${record.medicalRecordContent}"></div>
+        </div>
+
+        <div class="actions">
+            <a href="/patient/appointments/new#my-appointments" class="btn btn-secondary">返回列表</a>
+            <button type="button" class="btn btn-primary" onclick="window.print()">打印</button>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,56 @@
+# Build outputs
+target/
+node_modules/
+frontend/dist/
+/src/main/resources/static/spa/
+.mvn/wrapper/maven-wrapper.jar
+
+# Local credentials (examples are safe to commit)
+.env
+.env.*
+!.env.example
+!**/.env.example
+**/application-local*.properties
+**/application-local*.yml
+**/application-local*.yaml
+!**/application-local.example.properties
+config/*
+!config/application-local.example.properties
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.credentials
+
+# User data, database dumps, and logs
+uploads/
+avatars/
+/src/main/resources/static/avatars/
+*.log
+*.hprof
+*.sql.gz
+*.dump
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+*.csv
+*.tsv
+outputs/
+*.zip
+
+# Editor state and temporary documents
+.idea/
+.run/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db
+speech_temp.*

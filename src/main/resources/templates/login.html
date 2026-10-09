@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统一登录 - 医院管理系统</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page auth-unified">
+    <main class="auth-shell auth-shell-split">
+        <section class="auth-brand">
+            <div class="auth-brand-top">
+                <div class="auth-logo">医</div>
+                <div class="auth-brand-title">医院管理系统</div>
+            </div>
+            <div>
+                <h2 class="auth-brand-headline">一套系统，串联完整就医服务</h2>
+                <p class="auth-brand-sub">统一登录入口，支持患者、医生与管理员账号。</p>
+                <ul class="auth-brand-points">
+                    <li><span>✓</span> 三端角色协同与权限控制</li>
+                    <li><span>✓</span> 预约、诊疗、住院、药品全流程</li>
+                    <li><span>✓</span> AI 辅助建议与生成审计</li>
+                </ul>
+            </div>
+            <div>
+                <img class="auth-illustration" src="/images/hospital-outpatient.png" alt="系统背景图">
+                <div class="auth-brand-foot">© 医院管理系统</div>
+            </div>
+        </section>
+
+        <section class="auth-panel">
+            <h1 class="auth-title">欢迎回来</h1>
+            <p class="auth-subtitle">请输入您的凭据以访问系统</p>
+
+            <div th:if="${param.error}" class="auth-alert">
+                <span th:if="${param.reason != null and #strings.equals(param.reason[0], 'disabled')}">账号已禁用或待审核，暂时无法登录。</span>
+                <span th:if="${param.reason == null or #strings.equals(param.reason[0], 'bad_credentials')}">用户名或密码错误，请重试。</span>
+                <span th:if="${param.reason != null and #strings.equals(param.reason[0], 'locked')}">账号已锁定，请联系管理员。</span>
+                <span th:if="${param.reason != null and #strings.equals(param.reason[0], 'expired')}">登录凭据已过期，请重置密码后重试。</span>
+            </div>
+
+            <form th:action="@{/login}" method="post" class="auth-form">
+                <div class="auth-field">
+                    <label class="auth-label" for="username">用户名</label>
+                    <input id="username" name="username" type="text" required class="auth-input" placeholder="请输入您的账号">
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label" for="password">密码</label>
+                    <input id="password" name="password" type="password" required class="auth-input" placeholder="请输入您的密码">
+                </div>
+
+                <button type="submit" class="auth-submit">登录</button>
+            </form>
+
+            <div class="auth-links">
+                <div class="auth-link-row">
+                    还没有账号？
+                    <a class="auth-link" href="/register">立即注册</a>
+                </div>
+                <div class="auth-link-row">
+                    <a class="auth-link" href="/">返回首页</a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

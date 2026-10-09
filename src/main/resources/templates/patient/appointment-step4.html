@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约挂号 - 确认</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .apt-wizard .page { max-width: 720px; }
+        .steps { display: flex; margin-bottom: 16px; gap: 8px; }
+        .step {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 999px;
+            font-size: 12px;
+            text-align: center;
+            background: #E4E7ED;
+            color: #606266;
+        }
+        .step.active { background: #409EFF; color: #fff; }
+
+        .card {
+            background:#fff;
+            border-radius:8px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.04);
+            padding:18px 20px;
+        }
+        .card-title {
+            font-size:16px;
+            font-weight:600;
+            margin-bottom:8px;
+        }
+        .card-sub {
+            font-size:12px;
+            color:#909399;
+            margin-bottom:12px;
+        }
+
+        .summary-box {
+            background:#F9FAFB;
+            border-radius:8px;
+            padding:14px 12px;
+            margin-bottom:16px;
+            font-size:13px;
+        }
+        .summary-row { margin-bottom:6px; }
+        .summary-row:last-child { margin-bottom:0; }
+
+        .form-group { margin-bottom:16px; }
+        label { display:block; margin-bottom:6px; font-size:13px; font-weight:600; }
+        textarea {
+            width:100%;
+            padding:8px 10px;
+            border:1px solid #dcdfe6;
+            border-radius:4px;
+            font-size:13px;
+            resize:vertical;
+        }
+
+        .btn-primary {
+            flex:2;
+            padding:10px 0;
+            background:#409EFF;
+            color:#fff;
+            border:none;
+            border-radius:20px;
+            cursor:pointer;
+            font-size:14px;
+        }
+        .btn-secondary {
+            flex:1;
+            padding:10px 0;
+            background:#909399;
+            color:#fff;
+            border:none;
+            border-radius:20px;
+            cursor:pointer;
+            font-size:13px;
+            text-decoration:none;
+            text-align:center;
+            display:inline-block;
+        }
+    </style>
+</head>
+<body class="patient-ui apt-wizard theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/appointments/new', '预约挂号', '步骤四：确认挂号')}"></div>
+
+    <main class="page">
+        <div class="steps">
+            <div class="step">1. 选择科室</div>
+            <div class="step">2. 选择医生</div>
+            <div class="step">3. 选择时间</div>
+            <div class="step active">4. 确认挂号</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">确认挂号信息</div>
+            <div class="card-sub">确认信息后提交挂号</div>
+
+            <div class="summary-box">
+                <div class="summary-row">
+                    <strong>科室：</strong><span th:text="${department?.name ?: doctor?.department}"></span>
+                </div>
+                <div class="summary-row">
+                    <strong>医生：</strong><span th:text="${doctorUser?.realName ?: doctor?.doctorCode}"></span>
+                    <span class="u-muted-ml6" th:text="${'(' + doctor?.title + ')'}"></span>
+                </div>
+                <div class="summary-row">
+                    <strong>日期：</strong><span th:text="${schedule?.workDate}"></span>
+                </div>
+                <div class="summary-row">
+                    <strong>时间段：</strong><span th:text="${timeSlot}"></span>
+                </div>
+                <div class="summary-row">
+                    <strong>号源情况：</strong>
+                    <span th:if="${generalMax != null}">
+                        普通门诊 <span th:text="${generalCurrent}"></span>/<span th:text="${generalMax}"></span>
+                    </span>
+                    <span th:if="${expertMax != null}" class="u-ml10">
+                        专家门诊 <span th:text="${expertCurrent}"></span>/<span th:text="${expertMax}"></span>
+                    </span>
+                </div>
+            </div>
+
+            <form th:action="@{/patient/appointments}" method="post">
+                <input type="hidden" name="doctorId" th:value="${doctor?.id}">
+                <input type="hidden" name="date" th:value="${schedule?.workDate}">
+                <input type="hidden" name="timeSlot" th:value="${timeSlot}">
+                <div class="form-group">
+                    <label>挂号类型</label>
+                    <div class="u-flex-gap16-sm">
+                        <label th:if="${generalMax != null and generalCurrent != null and generalCurrent lt generalMax}" class="u-fw400">
+                            <input type="radio" name="clinicType" value="GENERAL" checked> 普通门诊（剩余 <span th:text="${generalMax - generalCurrent}"></span>）
+                        </label>
+                        <label th:if="${expertMax != null and expertCurrent != null and expertCurrent lt expertMax}" class="u-fw400">
+                            <input type="radio" name="clinicType" value="EXPERT"
+                                   th:checked="${generalMax == null or generalCurrent == null or generalCurrent ge generalMax}"> 专家门诊（剩余 <span th:text="${expertMax - expertCurrent}"></span>）
+                        </label>
+                    </div>
+                    <div th:if="${(generalMax == null or generalCurrent == null or generalCurrent ge generalMax) and (expertMax == null or expertCurrent == null or expertCurrent ge expertMax)}"
+                         class="u-danger-xs-mt6">
+                        当前时段普通门诊和专家门诊均已满，请返回上一步选择其他时段。
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>症状描述（可选）</label>
+                    <textarea name="symptoms" rows="4" placeholder="请简要描述您的主要症状，有助于医生提前了解病情。"></textarea>
+                </div>
+                <div class="u-flex-gap10-mt4">
+                    <!-- 属性内不可用 >= / <=，XML 会把 > 当成标签结束；改用 SpEL 的 ge / le / lt -->
+                    <button type="submit" class="btn-primary"
+                            th:disabled="${(generalMax == null or generalCurrent == null or generalCurrent ge generalMax) and (expertMax == null or expertCurrent == null or expertCurrent ge expertMax)}">确认挂号</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

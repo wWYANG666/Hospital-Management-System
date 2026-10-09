@@ -1,0 +1,16 @@
+{
+  "bloodTemplate": {
+    "findingDefault": "血细胞计数及分类结果待完整录入。",
+    "impression": "结合白细胞、红细胞、血红蛋白及血小板等指标，评估是否存在感染、贫血或出血倾向，建议与临床症状及其他化验结果综合判断。"
+  },
+  "imagingTemplate": {
+    "findingDefault": "影像所见待补充具体描述（如病灶部位、大小、密度/信号特征等）。",
+    "impression": "根据上述影像学特征，考虑良恶性性质及范围，建议结合病史及必要时进一步影像/病理检查综合评估。"
+  },
+  "generalTemplate": {
+    "findingDefault": "检查结果待完善。",
+    "impression": "建议结合本次检查结果与临床表现进行综合判断，必要时复查或追加相关检查。"
+  },
+  "clinicalNoteTemplate": "【临床提示】当前记录中的临床信息：%s。报告解读时应结合患者症状、体征与既往史。",
+  "clinicalNoteFallback": "【临床提示】请结合患者主诉、体征及既往史对本报告进行综合解读。"
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>住院管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .request-item { border: 1px solid #EBEEF5; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; background: #FFFBF0; border-left: 4px solid #E6A23C; }
+        .request-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; font-size: 13px; margin-bottom: 12px; }
+        .request-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '住院管理', '审批与住院记录')}"></div>
+
+<main class="page">
+    <section class="card">
+        <h1 class="admin-hero-title">住院管理总览</h1>
+        <p class="admin-hero-text">审批申请与住院记录</p>
+        <div class="admin-hero-stats">
+            <div class="admin-hero-stat">
+                <div class="lbl">住院总数</div>
+                <div class="val" th:text="${hospitalizations.size()}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">住院中</div>
+                <div class="val" th:text="${hospitalizations.?[status.name() == 'ADMITTED'].size()}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">待审批申请</div>
+                <div class="val" th:text="${pendingRequests != null ? pendingRequests.size() : 0}">0</div>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${success}" class="admin-msg-success"><span th:text="${success}">操作成功</span></div>
+    <div th:if="${error}" class="admin-msg-error"><span th:text="${error}">操作失败</span></div>
+
+    <div class="card" th:if="${pendingRequests != null and !pendingRequests.isEmpty()}">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">待审批的床位分配</div>
+                <div class="admin-panel-sub">待审批申请</div>
+            </div>
+        </div>
+        <div th:each="req : ${pendingRequests}" class="request-item">
+            <div class="request-grid">
+                <div><strong>患者：</strong><span th:text="${requestUserMap.containsKey(req.patientId) ? requestUserMap[req.patientId].realName : '未知'}"></span></div>
+                <div><strong>申请时间：</strong><span th:text="${req.requestTime != null ? #temporals.format(req.requestTime, 'yyyy-MM-dd HH:mm') : ''}"></span></div>
+                <div><strong>住院原因：</strong><span th:text="${req.admissionReason != null ? req.admissionReason : ''}"></span></div>
+                <div><strong>床位：</strong>
+                    <span th:if="${req.bedId != null and bedMap.containsKey(req.bedId)}" th:text="${bedMap[req.bedId].bedNumber}">已选床位</span>
+                    <span th:if="${req.bedId == null}">尚未由医生分配床位</span>
+                </div>
+            </div>
+            <div class="request-actions">
+                <form th:if="${req.bedId != null}" th:action="@{/admin/beds/assign}" method="post" class="u-inline-block">
+                    <input type="hidden" name="hospitalizationId" th:value="${req.id}">
+                    <input type="hidden" name="bedId" th:value="${req.bedId}">
+                    <button type="submit" class="btn btn-primary">同意分配</button>
+                </form>
+                <form th:action="@{/admin/beds/reject}" method="post" class="u-inline-block">
+                    <input type="hidden" name="hospitalizationId" th:value="${req.id}">
+                    <button type="submit" class="btn-cancel u-btn-pill-compact">拒绝</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">住院信息列表</div>
+                <div class="admin-panel-sub">全部住院记录</div>
+            </div>
+        </div>
+
+        <div class="admin-toolbar">
+            <button type="button" onclick="confirmBulkDelete()" class="btn-cancel u-pill-btn" id="bulkDeleteBtn" disabled>删除选中</button>
+        </div>
+        <form id="bulkDeleteForm" th:action="@{/admin/hospitalizations/bulk-delete}" method="post">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="u-w40"><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+                        <th>患者姓名</th>
+                        <th>主治医生</th>
+                        <th>床位号</th>
+                        <th>入院日期</th>
+                        <th>出院日期</th>
+                        <th>状态</th>
+                        <th>总费用</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="hosp : ${hospitalizations}">
+                        <td><input type="checkbox" name="ids" th:value="${hosp.id}" class="hospitalization-checkbox" onchange="updateBulkDeleteButton()"></td>
+                        <td th:text="${patientUserMap.containsKey(hosp.patientId) ? patientUserMap[hosp.patientId].realName : '未知'}"></td>
+                        <td th:text="${doctorUserMap.containsKey(hosp.id) ? doctorUserMap[hosp.id].realName : '未分配'}"></td>
+                        <td th:text="${hosp.bedId != null and bedMap.containsKey(hosp.bedId) ? bedMap[hosp.bedId].bedNumber : '未分配'}"></td>
+                        <td th:text="${#temporals.format(hosp.admissionDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${hosp.dischargeDate != null ? #temporals.format(hosp.dischargeDate, 'yyyy-MM-dd') : '未出院'}"></td>
+                        <td>
+                            <span th:if="${hosp.status != null}" class="tag-inline" th:classappend="${hosp.status.name() == 'ADMITTED'} ? ' tag-male' : ' tag-female'"
+                                  th:text="${hosp.status.chineseName}"></span>
+                            <span th:if="${hosp.status == null and hosp.requestStatus != null}" class="tag-inline tag-female"
+                                  th:text="${hosp.requestStatus.chineseName}"></span>
+                            <span th:if="${hosp.status == null and hosp.requestStatus == null}" class="muted">-</span>
+                        </td>
+                        <td th:text="${hosp.totalCost != null ? ('¥' + hosp.totalCost) : '未结算'}"></td>
+                        <td>
+                            <a th:if="${hosp.status != null and hosp.status.name() == 'DISCHARGED' and (hosp.totalCost == null or hosp.totalCost == 0)}"
+                               th:href="@{/admin/hospitalizations/{id}/settle(id=${hosp.id})}"
+                               class="btn btn-primary u-chip-xs-wide">结算</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    function toggleAll(source) {
+        document.querySelectorAll('.hospitalization-checkbox').forEach(function (cb) { cb.checked = source.checked; });
+        updateBulkDeleteButton();
+    }
+    function updateBulkDeleteButton() {
+        var n = document.querySelectorAll('.hospitalization-checkbox:checked').length;
+        document.getElementById('bulkDeleteBtn').disabled = n === 0;
+    }
+    function confirmBulkDelete() {
+        var n = document.querySelectorAll('.hospitalization-checkbox:checked').length;
+        if (n === 0) {
+            alert('请至少选择一条住院记录');
+            return;
+        }
+        if (confirm('确认删除选中的 ' + n + ' 条住院记录吗？\n删除后无法恢复！')) {
+            document.getElementById('bulkDeleteForm').submit();
+        }
+    }
+</script>
+</body>
+</html>

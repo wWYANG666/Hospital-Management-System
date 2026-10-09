@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 首页顶栏：与 dashboard 一致 -->
+<div th:fragment="topbarDashboard" class="topbar portal-topbar portal-topbar--doctor">
+    <div class="topbar-left">
+        <div class="logo">医</div>
+        <div>
+            <div class="top-title-main">医生工作台</div>
+            <div class="top-title-sub">今日门诊安排与待处理事项</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="/doctor/profile" class="avatar-link" aria-label="个人资料">
+            <div class="avatar">医</div>
+        </a>
+    </div>
+</div>
+
+<!-- 子页顶栏：返回 + 标题 + 头像 -->
+<div th:fragment="topbarSub (backUrl, title, subtitle)" class="topbar portal-topbar portal-topbar--doctor">
+    <div class="topbar-left">
+        <a class="back-btn" th:href="${backUrl}" title="返回">←</a>
+        <div>
+            <div class="top-title-main" th:text="${title}">页面标题</div>
+            <div class="top-title-sub" th:text="${subtitle}">副标题</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="/doctor/profile" class="avatar-link" aria-label="个人资料">
+            <div class="avatar">医</div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

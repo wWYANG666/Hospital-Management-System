@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药品入库记录</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .status-pending { color: #E6A23C; font-weight: 600; }
+        .status-approved { color: #67C23A; font-weight: 600; }
+        .status-cancelled { color: #C0C4CC; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/medicines', '药品入库记录', '查看入库记录')}"></div>
+
+<main class="page">
+    <div class="card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>入库时间</th>
+                    <th>药品名称</th>
+                    <th>批次号</th>
+                    <th>生产日期</th>
+                    <th>有效期</th>
+                    <th>数量</th>
+                    <th>采购单价</th>
+                    <th>总金额</th>
+                    <th>存放位置</th>
+                    <th>操作人</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="inbound : ${inbounds}">
+                    <td th:text="${inbound.inboundDate != null ? #temporals.format(inbound.inboundDate, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                    <td th:text="${medicineMap.containsKey(inbound.medicineId) ? medicineMap[inbound.medicineId].name : '未知'}"></td>
+                    <td th:text="${inbound.batchNumber}"></td>
+                    <td th:text="${inbound.productionDate != null ? #temporals.format(inbound.productionDate, 'yyyy-MM-dd') : '-'}"></td>
+                    <td th:text="${inbound.expiryDate != null ? #temporals.format(inbound.expiryDate, 'yyyy-MM-dd') : ''}"></td>
+                    <td th:text="${inbound.quantity}"></td>
+                    <td>¥<span th:text="${inbound.purchasePrice}"></span></td>
+                    <td>¥<span th:text="${inbound.totalAmount}"></span></td>
+                    <td th:text="${inbound.location}"></td>
+                    <td th:text="${inbound.operator ?: '-'}"></td>
+                    <td>
+                        <span th:if="${inbound.status == 0}" class="status-pending">待审核</span>
+                        <span th:if="${inbound.status == 1}" class="status-approved">已审核</span>
+                        <span th:if="${inbound.status == -1}" class="status-cancelled">已取消</span>
+                    </td>
+                </tr>
+                <tr th:if="${inbounds.isEmpty()}">
+                    <td colspan="11" class="empty u-center-p32">暂无入库记录</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

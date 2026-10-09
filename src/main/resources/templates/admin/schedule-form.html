@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增排班</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub(${selectedDoctorId != null and selectedDepartmentId != null ? '/admin/departments/' + selectedDepartmentId + '/doctors/' + selectedDoctorId + '/schedules' : '/admin/schedules'}, '新增排班', '设置班次与号源')}"></div>
+
+<main class="page">
+    <section class="card">
+        <h1 class="admin-hero-title">新增排班</h1>
+        <p class="admin-hero-text">设置日期、班次和号源</p>
+    </section>
+
+    <section class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">排班信息</div>
+                <div class="admin-panel-sub">填写排班参数</div>
+            </div>
+        </div>
+
+        <form th:action="@{/admin/schedules}" method="post">
+            <div class="admin-form-grid">
+                <div class="form-group">
+                    <label>医生</label>
+                    <select name="doctorId" required class="u-input-basic">
+                        <option value="">请选择医生</option>
+                        <option th:each="d : ${doctors}"
+                                th:value="${d.id}"
+                                th:selected="${selectedDoctorId != null and selectedDoctorId == d.id}"
+                                th:text="${d.doctorCode + ' - ' + d.department}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>科室</label>
+                    <select name="departmentId" required class="u-input-basic">
+                        <option value="">请选择科室</option>
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.id}"
+                                th:selected="${selectedDepartmentId != null and selectedDepartmentId == dept.id}"
+                                th:text="${dept.name}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>开始日期</label>
+                    <input type="date" name="startDate" required class="u-input-basic">
+                </div>
+                <div class="form-group">
+                    <label>结束日期</label>
+                    <input type="date" name="endDate" required class="u-input-basic">
+                    <div class="u-text-xs-muted-tight">范围内按天生成排班记录。</div>
+                </div>
+                <div class="form-group">
+                    <label>班次</label>
+                    <select name="workTime" required class="u-input-basic">
+                        <option value="MORNING">上午</option>
+                        <option value="AFTERNOON">下午</option>
+                        <option value="EVENING">晚上</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>最大号源</label>
+                    <input type="number" name="maxAppointments" value="20" required class="u-input-basic">
+                </div>
+                <div class="form-group">
+                    <label>专家号号源（可选）</label>
+                    <input type="number" name="expertMaxAppointments" value="0" min="0" class="u-input-basic">
+                    <div class="u-text-xs-muted-tight">大于 0 时，会额外生成同日期同班次的「专家号」排班。</div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary u-mt16">保存排班</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

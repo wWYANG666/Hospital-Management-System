@@ -1,0 +1,7 @@
+/* Entry stylesheet: modular imports */
+@import url('/css/ui-utils.css');
+@import url('/css/shared-shell.css');
+@import url('/css/admin-ui.css');
+@import url('/css/doctor-ui.css');
+/* 三端统一页宽、顶栏与卡片节奏（最后加载以覆盖上文） */
+@import url('/css/unified-portal.css');

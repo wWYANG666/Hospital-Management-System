@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约挂号 - 选择时间</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .apt-wizard .page { max-width: 900px; }
+        .steps { display: flex; margin-bottom: 16px; gap: 8px; }
+        .step {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 999px;
+            font-size: 12px;
+            text-align: center;
+            background: #E4E7ED;
+            color: #606266;
+        }
+        .step.active { background: #409EFF; color: #fff; }
+
+        .card {
+            background:#fff;
+            border-radius:8px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.04);
+            padding:18px 20px;
+        }
+        .card-title {
+            font-size:16px;
+            font-weight:600;
+            margin-bottom:8px;
+        }
+        .card-sub {
+            font-size:12px;
+            color:#909399;
+            margin-bottom:12px;
+        }
+
+        .schedule-item {
+            border-radius:8px;
+            padding:12px 10px;
+            background:#fff;
+            border:1px solid #E4E7ED;
+            cursor:pointer;
+            transition:all .2s;
+            text-align:center;
+            font-size:13px;
+        }
+        .schedule-item.available {
+            border-left:4px solid #67C23A;
+        }
+        .schedule-item.full {
+            border-left:4px solid #F56C6C;
+            opacity:0.6;
+        }
+        .schedule-item:hover {
+            box-shadow:0 6px 16px rgba(0,0,0,0.06);
+            transform:translateY(-1px);
+        }
+        .time-title { font-weight:600; margin-bottom:4px; }
+        .badge-available { color:#67C23A; font-size:12px; }
+        .badge-full { color:#F56C6C; font-size:12px; }
+        .badge-none { color:#909399; font-size:12px; }
+
+        .hint-error {
+            background:#FDE2E2;
+            color:#F56C6C;
+            padding:10px 12px;
+            border-radius:6px;
+            border-left:4px solid #F56C6C;
+            margin-bottom:12px;
+            font-size:13px;
+        }
+        .hint-info {
+            background:#ECF5FF;
+            color:#409EFF;
+            padding:10px 12px;
+            border-radius:6px;
+            border-left:4px solid #409EFF;
+            margin-bottom:12px;
+            font-size:13px;
+        }
+        .apt-choose-title { font-size:16px; font-weight:600; }
+        .apt-choose-meta { font-size:12px; color:#909399; margin-top:2px; }
+        .apt-doctor-card {
+            background:#fff;
+            padding:12px 14px;
+            border-radius:8px;
+            margin-bottom:16px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.03);
+            font-size:13px;
+        }
+        .form-label-sm { display:block; margin-bottom:6px; font-weight:600; font-size:13px; }
+        .form-label-md { display:block; margin-bottom:10px; font-weight:600; font-size:14px; }
+        .date-input-compact { padding:8px 10px; border:1px solid #dcdfe6; border-radius:4px; font-size:14px; }
+        .slot-disabled { cursor:not-allowed; opacity:0.6; }
+        .badge-danger-text { color:#F56C6C; }
+        .u-mb-16 { margin-bottom:16px; }
+        .u-mb-20 { margin-bottom:20px; }
+        .u-mb-25 { margin-bottom:25px; }
+    </style>
+    <script>
+        function selectTimeSlot(element) {
+            var doctorId = element.getAttribute('data-doctor-id');
+            var date = element.getAttribute('data-date');
+            var timeSlot = element.getAttribute('data-time-slot');
+            var url = '/patient/appointments/new/step4?doctorId=' + doctorId + '&date=' + date + '&timeSlot=' + encodeURIComponent(timeSlot);
+            window.location.href = url;
+        }
+    </script>
+</head>
+<body class="patient-ui apt-wizard theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/appointments/new', '预约挂号', '步骤三：选择时间')}"></div>
+
+    <main class="page">
+        <div class="steps">
+            <div class="step">1. 选择科室</div>
+            <div class="step">2. 选择医生</div>
+            <div class="step active">3. 选择时间</div>
+            <div class="step">4. 确认挂号</div>
+        </div>
+        <div class="u-mb-14">
+            <div class="apt-choose-title">选择日期和时间</div>
+            <div class="apt-choose-meta">
+                医生：<span th:text="${doctorUser?.realName ?: doctor?.doctorCode}"></span> |
+                科室：<span th:text="${doctor?.department}"></span>
+            </div>
+        </div>
+        <div th:if="${error}" class="hint-error">
+            <strong>错误：</strong><span th:text="${error}"></span>
+        </div>
+        <div th:if="${info}" class="hint-info">
+            <strong>提示：</strong><span th:text="${info}"></span>
+        </div>
+        <div class="apt-doctor-card">
+            <p><strong>医生：</strong><span th:text="${doctorUser?.realName ?: doctor?.doctorCode}"></span></p>
+            <p><strong>科室：</strong><span th:text="${doctor?.department}"></span></p>
+            <p><strong>职称：</strong><span th:text="${doctor?.title}"></span></p>
+        </div>
+
+        <div class="u-mb-16">
+            <label class="form-label-sm">选择日期：</label>
+            <form th:action="@{/patient/appointments/new/step3}" method="get">
+                <input type="hidden" name="doctorId" th:value="${doctorId}">
+                <input type="date"
+                       name="date"
+                       th:value="${selectedDate}"
+                       th:min="${minDate}"
+                       onchange="this.form.submit()"
+                       class="date-input-compact">
+            </form>
+        </div>
+
+        <div class="u-mb-20">
+            <label class="form-label-md">选择时间段：</label>
+
+            <div class="u-mb-25">
+                <h3 class="u-info-14-primary">上午时段（9:00-12:00）</h3>
+                <div class="u-grid-3-gap10">
+                    <div th:each="slot : ${timeSlots}"
+                         th:if="${slot.workTime == T(xmu.edu.yiyuan.entity.Schedule.WorkTime).MORNING}"
+                         th:class="${slot.hasSchedule != null and slot.hasSchedule == true} ? (${slot.available} ? 'schedule-item available' : 'schedule-item full') : 'schedule-item'"
+                         th:data-doctor-id="${doctorId}"
+                         th:data-date="${selectedDate}"
+                         th:data-time-slot="${slot.time}"
+                         th:onclick="${slot.hasSchedule != null and slot.hasSchedule == true and slot.available} ? 'selectTimeSlot(this)' : ''"
+                         th:classappend="${slot.hasSchedule == null or slot.hasSchedule == false} ? ' slot-disabled' : ''">
+                        <div class="time-title" th:text="${slot.time}"></div>
+                        <div th:if="${slot.hasSchedule != null and slot.hasSchedule == true and slot.bookedBySelf != null and slot.bookedBySelf == true}" class="u-line15-mt4">
+                            <div class="badge-full">您已预约该时段</div>
+                        </div>
+                        <div th:if="${slot.hasSchedule != null and slot.hasSchedule == true and (slot.bookedBySelf == null or slot.bookedBySelf == false)}" class="u-line15-mt4">
+                            <div th:if="${slot.generalRemaining != null}" class="badge-available" th:classappend="${slot.generalRemaining gt 0} ? '' : ' badge-danger-text'">
+                                普通剩余 <span th:text="${slot.generalRemaining}"></span>
+                            </div>
+                            <div th:if="${slot.expertRemaining != null}" class="badge-available" th:classappend="${slot.expertRemaining gt 0} ? '' : ' badge-danger-text'">
+                                专家剩余 <span th:text="${slot.expertRemaining}"></span>
+                            </div>
+                            <div th:if="${(slot.generalRemaining == null or slot.generalRemaining le 0) and (slot.expertRemaining == null or slot.expertRemaining le 0)}" class="badge-full">
+                                已满
+                            </div>
+                        </div>
+                        <div th:if="${slot.hasSchedule == null or slot.hasSchedule == false}" class="badge-none">
+                            无排班
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="u-mb-25">
+                <h3 class="u-info-14-primary">下午时段（14:00-17:00）</h3>
+                <div class="u-grid-3-gap10">
+                    <div th:each="slot : ${timeSlots}"
+                         th:if="${slot.workTime == T(xmu.edu.yiyuan.entity.Schedule.WorkTime).AFTERNOON}"
+                         th:class="${slot.hasSchedule != null and slot.hasSchedule == true} ? (${slot.available} ? 'schedule-item available' : 'schedule-item full') : 'schedule-item'"
+                         th:data-doctor-id="${doctorId}"
+                         th:data-date="${selectedDate}"
+                         th:data-time-slot="${slot.time}"
+                         th:onclick="${slot.hasSchedule != null and slot.hasSchedule == true and slot.available} ? 'selectTimeSlot(this)' : ''"
+                         th:classappend="${slot.hasSchedule == null or slot.hasSchedule == false} ? ' slot-disabled' : ''">
+                        <div class="time-title" th:text="${slot.time}"></div>
+                        <div th:if="${slot.hasSchedule != null and slot.hasSchedule == true and slot.bookedBySelf != null and slot.bookedBySelf == true}" class="u-line15-mt4">
+                            <div class="badge-full">您已预约该时段</div>
+                        </div>
+                        <div th:if="${slot.hasSchedule != null and slot.hasSchedule == true and (slot.bookedBySelf == null or slot.bookedBySelf == false)}" class="u-line15-mt4">
+                            <div th:if="${slot.generalRemaining != null}" class="badge-available" th:classappend="${slot.generalRemaining gt 0} ? '' : ' badge-danger-text'">
+                                普通剩余 <span th:text="${slot.generalRemaining}"></span>
+                            </div>
+                            <div th:if="${slot.expertRemaining != null}" class="badge-available" th:classappend="${slot.expertRemaining gt 0} ? '' : ' badge-danger-text'">
+                                专家剩余 <span th:text="${slot.expertRemaining}"></span>
+                            </div>
+                            <div th:if="${(slot.generalRemaining == null or slot.generalRemaining le 0) and (slot.expertRemaining == null or slot.expertRemaining le 0)}" class="badge-full">
+                                已满
+                            </div>
+                        </div>
+                        <div th:if="${slot.hasSchedule == null or slot.hasSchedule == false}" class="badge-none">
+                            无排班
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="u-info-14-primary">晚上时段（18:30-21:30）</h3>
+                <div class="u-grid-3-gap10">
+                    <div th:each="slot : ${timeSlots}"
+                         th:if="${slot.workTime == T(xmu.edu.yiyuan.entity.Schedule.WorkTime).EVENING}"
+                         th:class="${slot.hasSchedule != null and slot.hasSchedule == true} ? (${slot.available} ? 'schedule-item available' : 'schedule-item full') : 'schedule-item'"
+                         th:data-doctor-id="${doctorId}"
+                         th:data-date="${selectedDate}"
+                         th:data-time-slot="${slot.time}"
+                         th:onclick="${slot.hasSchedule != null and slot.hasSchedule == true and slot.available} ? 'selectTimeSlot(this)' : ''"
+                         th:classappend="${slot.hasSchedule == null or slot.hasSchedule == false} ? ' slot-disabled' : ''">
+                        <div class="time-title" th:text="${slot.time}"></div>
+                        <div th:if="${slot.hasSchedule != null and slot.hasSchedule == true and slot.bookedBySelf != null and slot.bookedBySelf == true}" class="u-line15-mt4">
+                            <div class="badge-full">您已预约该时段</div>
+                        </div>
+                        <div th:if="${slot.hasSchedule != null and slot.hasSchedule == true and (slot.bookedBySelf == null or slot.bookedBySelf == false)}" class="u-line15-mt4">
+                            <div th:if="${slot.generalRemaining != null}" class="badge-available" th:classappend="${slot.generalRemaining gt 0} ? '' : ' badge-danger-text'">
+                                普通剩余 <span th:text="${slot.generalRemaining}"></span>
+                            </div>
+                            <div th:if="${slot.expertRemaining != null}" class="badge-available" th:classappend="${slot.expertRemaining gt 0} ? '' : ' badge-danger-text'">
+                                专家剩余 <span th:text="${slot.expertRemaining}"></span>
+                            </div>
+                            <div th:if="${(slot.generalRemaining == null or slot.generalRemaining le 0) and (slot.expertRemaining == null or slot.expertRemaining le 0)}" class="badge-full">
+                                已满
+                            </div>
+                        </div>
+                        <div th:if="${slot.hasSchedule == null or slot.hasSchedule == false}" class="badge-none">
+                            无排班
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

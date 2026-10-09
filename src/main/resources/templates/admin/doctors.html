@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生信息管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '医生信息管理', '账号与信息管理')}"></div>
+
+<main class="page">
+    <section class="card">
+        <h1 class="admin-hero-title">医生信息总览</h1>
+        <p class="admin-hero-text">管理账号与科室归属</p>
+        <div class="admin-hero-stats">
+            <div class="admin-hero-stat">
+                <div class="lbl">医生总数</div>
+                <div class="val" th:text="${doctors != null ? doctors.size() : 0}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">已配置科室</div>
+                <div class="val" th:text="${doctors != null ? doctors.?[department != null and !department.isEmpty()].size() : 0}">0</div>
+            </div>
+            <div class="admin-hero-stat">
+                <div class="lbl">待补充职称</div>
+                <div class="val" th:text="${doctors != null ? doctors.?[title == null or title.isEmpty()].size() : 0}">0</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="admin-panel-head">
+            <div>
+                <div class="admin-panel-title">医生列表</div>
+                <div class="admin-panel-sub">支持新增与重置</div>
+            </div>
+        </div>
+
+        <div class="admin-toolbar">
+            <a href="/admin/doctors/new" class="btn btn-primary">添加医生</a>
+            <a class="btn ghost" href="/admin/doctors">刷新列表</a>
+            <span class="u-meta-muted">请通过修改密码页面设置账号密码</span>
+        </div>
+
+        <div class="table-wrap" th:if="${doctors != null and !doctors.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>医生 ID</th>
+                    <th>工号</th>
+                    <th>用户名</th>
+                    <th>姓名</th>
+                    <th>科室</th>
+                    <th>职称</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${doctors}">
+                    <td th:text="${d.id}"></td>
+                    <td th:text="${d.doctorCode}"></td>
+                    <td th:text="${userMap.containsKey(d.id) ? userMap[d.id].username : ''}"></td>
+                    <td th:text="${userMap.containsKey(d.id) ? userMap[d.id].realName : ''}"></td>
+                    <td><span class="tag-inline tag-male" th:text="${d.department}"></span></td>
+                    <td th:text="${d.title != null and !d.title.isEmpty() ? d.title : '待补充'}"></td>
+                    <td>
+                        <a th:if="${userMap.containsKey(d.id)}"
+                           th:href="@{/admin/users/{id}/change-password(id=${userMap[d.id].id}, departmentId=${departmentId})}"
+                           class="btn-cancel u-pill-xs-rounded">修改密码</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${doctors == null or doctors.isEmpty()}">当前还没有医生数据。</div>
+    </section>
+</main>
+</body>
+</html>

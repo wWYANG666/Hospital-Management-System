@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 管理首页顶栏：与医生端 dashboard 同结构，链接为 /admin/* -->
+<div th:fragment="topbarAdminDashboard" class="topbar portal-topbar portal-topbar--admin">
+    <div class="topbar-left">
+        <div class="logo">管</div>
+        <div>
+            <div class="top-title-main">管理后台</div>
+            <div class="top-title-sub">医院运营与资源调度</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="/admin/profile" class="avatar-link" aria-label="管理员资料">
+            <div class="avatar">管</div>
+        </a>
+    </div>
+</div>
+
+<!-- 管理子页：返回 + 标题 + 头像 -->
+<div th:fragment="topbarAdminSub (backUrl, title, subtitle)" class="topbar portal-topbar portal-topbar--admin">
+    <div class="topbar-left">
+        <a class="back-btn" th:href="${backUrl}" title="返回">←</a>
+        <div>
+            <div class="top-title-main" th:text="${title}">页面标题</div>
+            <div class="top-title-sub" th:text="${subtitle}">副标题</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="/admin/profile" class="avatar-link" aria-label="管理员资料">
+            <div class="avatar">管</div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

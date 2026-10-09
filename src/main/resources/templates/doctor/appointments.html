@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史挂号</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="theme-medical doctor-page-appointments-history">
+    <div th:replace="~{doctor/fragments :: topbarSub('/doctor/dashboard', '历史挂号', '就诊记录与病历')}"></div>
+
+    <div class="page">
+        <div class="card">
+            <div class="card-title">
+                <span>历史挂号概览</span>
+                <span class="badge-count" th:text="${#lists.size(appointments)} + ' 条'">0 条</span>
+            </div>
+            <div class="card-sub">按时间回顾病历与诊断记录</div>
+            <div class="stats-grid">
+                <div class="stat-card item">
+                    <div class="stat-label">历史挂号总数</div>
+                    <div class="stat-number" th:text="${#lists.size(appointments)}">0</div>
+                </div>
+                <div class="stat-card item">
+                    <div class="stat-label">已完成诊疗</div>
+                    <div class="stat-number" th:text="${appointments.?[status.name() == 'COMPLETED'].size()}">0</div>
+                </div>
+                <div class="stat-card item">
+                    <div class="stat-label">有病历记录</div>
+                    <div class="stat-number" th:text="${recordMap != null ? #maps.size(recordMap) : 0}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>挂号记录列表</span>
+            </div>
+            <div class="card-sub">全部历史挂号</div>
+
+            <div th:if="${appointments.isEmpty()}" class="empty">
+                当前暂无挂号记录。
+            </div>
+
+            <div class="table-wrap" th:if="${!appointments.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>患者姓名</th>
+                        <th>预约时间</th>
+                        <th>状态</th>
+                        <th>主诉</th>
+                        <th>病历状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="apt : ${appointments}">
+                        <td th:text="${apt.patientId != null and userMap[apt.patientId] != null ? userMap[apt.patientId].realName : apt.patientId}">—</td>
+                        <td th:text="${apt.appointmentDate + ' ' + apt.appointmentTime}">—</td>
+                        <td>
+                            <span class="doctor-apt-status"
+                                  th:classappend="${' doctor-apt-status--' + apt.status.name()}"
+                                  th:text="${apt.status.chineseName}">—</span>
+                        </td>
+                        <td th:text="${apt.symptoms != null && !apt.symptoms.isEmpty() ? apt.symptoms : '未填写主诉'}">—</td>
+                        <td>
+                            <span th:if="${recordMap != null and recordMap.containsKey(apt.id)}"
+                                  class="doctor-apt-record-badge doctor-apt-record-badge--done">已生成病历</span>
+                            <span th:unless="${recordMap != null and recordMap.containsKey(apt.id)}"
+                                  class="doctor-apt-record-badge doctor-apt-record-badge--none">尚未生成病历</span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a th:if="${recordMap != null and recordMap.containsKey(apt.id)}"
+                                   th:href="@{/doctor/appointments/{id}/record(id=${apt.id})}"
+                                   class="btn btn-view">查看病历</a>
+                                <a th:if="${apt.status != null and apt.status.name() != 'CANCELLED'}"
+                                   th:href="@{/doctor/diagnose/{id}(id=${apt.id})}"
+                                   class="btn btn-edit">重新诊断</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

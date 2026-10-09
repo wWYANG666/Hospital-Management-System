@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员首页</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+</head>
+<body class="admin-dashboard theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminDashboard}"></div>
+
+<div class="page">
+    <div class="card">
+        <div class="card-title">
+            <span>运营总览</span>
+        </div>
+        <div class="card-sub">今日核心指标与快捷入口</div>
+        <div class="quick-actions">
+            <a href="/admin/departments" class="quick-btn">
+                <div class="icon">🏢</div>
+                <div>科室管理</div>
+            </a>
+            <a href="/admin/patients" class="quick-btn">
+                <div class="icon">👥</div>
+                <div>患者管理</div>
+            </a>
+            <a href="/admin/beds" class="quick-btn">
+                <div class="icon">🛏️</div>
+                <div>病床管理</div>
+            </a>
+            <a href="/admin/medicines" class="quick-btn">
+                <div class="icon">💊</div>
+                <div>药品管理</div>
+            </a>
+            <a href="/admin/reports" class="quick-btn">
+                <div class="icon">📄</div>
+                <div>报告单管理</div>
+            </a>
+            <a href="/admin/ai-logs" class="quick-btn">
+                <div class="icon">🧾</div>
+                <div>AI 审计</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">
+                <span>今日指标</span>
+            </div>
+            <div class="card-sub">KPI 快速查看</div>
+            <div class="dash-metric-grid">
+                <div class="card admin-kpi-tile">
+                    <div class="admin-kpi-tile__label">今日门诊量</div>
+                    <div class="admin-kpi-tile__value" th:text="${todayAppointments}">0</div>
+                </div>
+                <div class="card admin-kpi-tile">
+                    <div class="admin-kpi-tile__label">在院人数</div>
+                    <div class="admin-kpi-tile__value" th:text="${inHospitalCount}">0</div>
+                </div>
+                <div class="card admin-kpi-tile">
+                    <div class="admin-kpi-tile__label">待审批住院申请</div>
+                    <div class="admin-kpi-tile__value" th:text="${pendingHospitalizations}">0</div>
+                </div>
+                <div class="card admin-kpi-tile">
+                    <div class="admin-kpi-tile__label">低库存药品</div>
+                    <div class="admin-kpi-tile__value" th:text="${lowStockMedicines.size()}">0</div>
+                </div>
+                <div class="card admin-kpi-tile">
+                    <div class="admin-kpi-tile__label">床位占用率</div>
+                    <div class="admin-kpi-tile__value"><span th:text="${bedOccupancyRate}">0.0</span>%</div>
+                </div>
+                <div class="card admin-kpi-tile">
+                    <div class="admin-kpi-tile__label">已占用 / 总床位</div>
+                    <div class="admin-kpi-tile__value">
+                        <span th:text="${occupiedBeds}">0</span> / <span th:text="${totalBeds}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-summary-section">
+            <div class="card-title">
+                <span>AI 运营摘要</span>
+            </div>
+            <div class="card-sub">点击按钮生成可复制的管理摘要</div>
+            <div class="admin-panel-head">
+                <div></div>
+                <button type="button" class="btn btn-primary" onclick="loadAdminSummary()">生成摘要</button>
+            </div>
+            <textarea id="adminSummaryText"
+                      readonly
+                      class="admin-summary-output"
+                      placeholder="点击“生成摘要”后显示结果"></textarea>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <span>库存预警</span>
+        </div>
+        <div class="card-sub">
+            库存低于 10 的药品
+            <a href="/admin/medicines" class="todo-action doctor-inline-link-gap">进入药品管理 →</a>
+        </div>
+        <div class="admin-warning-list" th:if="${!lowStockMedicines.isEmpty()}">
+            <div class="dash-warning-item" th:each="m : ${lowStockMedicines}">
+                <div>
+                    <div class="admin-warning-name" th:text="${m.name}">药品</div>
+                    <div class="admin-warning-meta">规格：<span th:text="${m.specification}">-</span></div>
+                </div>
+                <div class="admin-warning-stock" th:text="${m.stock}">0</div>
+            </div>
+        </div>
+        <div class="dash-warning-item empty-state" th:if="${lowStockMedicines.isEmpty()}">当前暂无低库存药品</div>
+    </div>
+</div>
+
+<script>
+    async function loadAdminSummary() {
+        const output = document.getElementById('adminSummaryText');
+        if (output) output.value = '生成中...';
+        try {
+            const resp = await fetch('/admin/ai/summary', { method: 'POST' });
+            const text = await resp.text();
+            if (output) output.value = (text && text.trim()) ? text : '当前数据不足，暂时无法生成摘要。';
+        } catch (e) {
+            if (output) output.value = '生成摘要失败，请稍后重试。';
+            console.error(e);
+        }
+    }
+</script>
+</body>
+</html>

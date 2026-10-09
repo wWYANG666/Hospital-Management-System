@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约挂号 - 选择科室</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .apt-wizard .page { max-width: 900px; }
+        .steps { display: flex; margin-bottom: 16px; gap: 8px; }
+        .step {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 999px;
+            font-size: 12px;
+            text-align: center;
+            background: #E4E7ED;
+            color: #606266;
+        }
+        .step.active { background: #409EFF; color: #fff; }
+
+        .card {
+            background:#fff;
+            border-radius:8px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.04);
+            padding:18px 20px;
+        }
+        .card-title {
+            font-size:16px;
+            font-weight:600;
+            margin-bottom:12px;
+        }
+        .card-sub {
+            font-size:12px;
+            color:#909399;
+            margin-bottom:16px;
+        }
+
+        .department-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+            gap:12px;
+        }
+        .department-card {
+            background:#F9FAFB;
+            border-radius:8px;
+            padding:14px 12px;
+            cursor:pointer;
+            border:1px solid #E4E7ED;
+            transition:all .2s;
+            text-align:left;
+        }
+        .department-card:hover {
+            border-color:#409EFF;
+            box-shadow:0 6px 16px rgba(0,0,0,0.06);
+            transform:translateY(-1px);
+        }
+        .dept-name { font-size:15px; font-weight:600; margin-bottom:4px; }
+        .dept-desc { font-size:13px; color:#909399; }
+        .empty {
+            text-align:center;
+            color:#C0C4CC;
+            padding:24px 10px;
+            font-size:14px;
+        }
+
+        .spacer { height: 14px; }
+
+        .timeline { margin-top:4px; }
+        .item {
+            padding:10px 0;
+            border-bottom:1px solid #EBEEF5;
+            display:flex;
+            gap:10px;
+        }
+        .item-icon { width:22px; font-size:16px; margin-top:2px; }
+        .item-main { flex:1; font-size:13px; }
+        .item-title { font-weight:600; margin-bottom:2px; }
+        .item-meta { font-size:12px; color:#909399; margin-bottom:4px; }
+        .item-status { font-size:12px; }
+        .item-actions { margin-top:4px; }
+
+        .tag-status {
+            display:inline-flex;
+            align-items:center;
+            padding:2px 8px;
+            border-radius:999px;
+            font-size:12px;
+            margin-right:6px;
+        }
+        .tag-pending { background:#FFF6E6; color:#E6A23C; }
+        .tag-confirmed { background:#ECF5FF; color:#409EFF; }
+        .tag-completed { background:#F0F9EB; color:#67C23A; }
+        .tag-cancelled { background:#F4F4F5; color:#909399; }
+
+        .btn-cancel {
+            padding:4px 10px;
+            border-radius:999px;
+            border:none;
+            background:#F56C6C;
+            color:#fff;
+            font-size:12px;
+            cursor:pointer;
+        }
+        .btn-link {
+            padding:4px 10px;
+            border-radius:999px;
+            border:1px solid #dcdfe6;
+            background:#fff;
+            color:#409EFF;
+            font-size:12px;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-block;
+            margin-left:8px;
+        }
+    </style>
+</head>
+<body class="patient-ui apt-wizard theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '预约挂号', '步骤一：选择科室')}"></div>
+
+    <main class="page">
+        <div class="steps">
+            <div class="step active">1. 选择科室</div>
+            <div class="step">2. 选择医生</div>
+            <div class="step">3. 选择时间</div>
+            <div class="step">4. 确认挂号</div>
+        </div>
+
+        <div class="card u-mb-14">
+            <div class="card-title">AI 导诊助手</div>
+            <div class="card-sub">请用自然语言描述一下不适，系统会给出建议就诊科室（仅供参考）。</div>
+            <div class="form-group">
+                <textarea id="triageDesc" class="u-min-h80"
+                          placeholder="例如：最近两天反复胸闷、活动后气短、偶尔心慌。"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="runTriage()">生成就诊建议</button>
+            <div id="triageResult" class="u-note-hidden">
+                <div><strong>建议科室：</strong><span id="triageDept"></span></div>
+                <div class="u-mt-4"><strong>就诊紧急程度：</strong><span id="triageUrgency"></span></div>
+                <div class="u-mt-4"><strong>说明：</strong><span id="triageAdvice"></span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">请选择科室</div>
+            <div class="card-sub">先选择就诊科室</div>
+
+            <div th:if="${departments.isEmpty()}" class="empty">
+                暂无可选科室
+            </div>
+            <div th:unless="${departments.isEmpty()}" class="department-grid">
+                <div th:each="dept : ${departments}" class="department-card"
+                     th:onclick="'window.location.href=\'/patient/appointments/new/step2?departmentId=' + ${dept.id} + '\''">
+                    <div class="dept-name" th:text="${dept.name}"></div>
+                    <div class="dept-desc" th:text="${dept.description ?: '暂无科室介绍'}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="my-appointments" class="spacer"></div>
+
+        <div class="card">
+            <div class="card-title">我的挂号</div>
+            <div class="card-sub">查看历史挂号记录</div>
+
+            <div class="timeline" th:if="${appointments != null and !appointments.isEmpty()}">
+                <div class="item" th:each="apt : ${appointments}">
+                    <div class="item-icon">📅</div>
+                    <div class="item-main">
+                        <div class="item-title">
+                            <span th:text="${apt.appointmentDate}"></span>
+                            <span class="u-inline-gap-4">·</span>
+                            <span th:text="${apt.appointmentTime}"></span>
+                            <span th:if="${clinicTypeMap != null and clinicTypeMap[apt.id] != null}" class="u-ml8-primary-xs"
+                                  th:text="${'[' + clinicTypeMap[apt.id] + ']'}"></span>
+                        </div>
+                        <div class="item-meta">
+                            医生：
+                            <span th:if="${apt.doctorId != null and doctorMap[apt.doctorId] != null and userMap[apt.doctorId] != null}"
+                                  th:text="${userMap[apt.doctorId].realName + '（' + doctorMap[apt.doctorId].department + '）'}"></span>
+                            <span th:unless="${apt.doctorId != null and doctorMap[apt.doctorId] != null and userMap[apt.doctorId] != null}"
+                                  th:text="${apt.doctorId}"></span>
+                            <span class="u-ml-8">挂号时间：<span th:text="${apt.createdAt != null ? #temporals.format(apt.createdAt, 'yyyy-MM-dd HH:mm') : '-'}"></span></span>
+                        </div>
+                        <div class="item-status">
+                            <span class="tag-status"
+                                  th:classappend="${apt.status.name() == 'PENDING' ? ' tag-pending' : (apt.status.name() == 'CONFIRMED' ? ' tag-confirmed' : (apt.status.name() == 'COMPLETED' ? ' tag-completed' : ' tag-cancelled'))}"
+                                  th:text="${apt.status.chineseName}"></span>
+                            <span th:if="${apt.symptoms != null and !apt.symptoms.isEmpty()}" class="u-text-xs-secondary">
+                                症状：<span th:text="${apt.symptoms}"></span>
+                            </span>
+                        </div>
+                        <div class="item-actions">
+                            <form th:if="${apt.status.name() == 'PENDING' or apt.status.name() == 'CONFIRMED'}"
+                                  th:action="@{/patient/appointments/{id}/cancel(id=${apt.id})}"
+                                  method="post" class="u-inline">
+                                <button type="submit" class="btn-cancel">取消挂号</button>
+                            </form>
+
+                            <a th:if="${apt.status.name() == 'COMPLETED' and ((recordMap != null and recordMap.containsKey(apt.id)) or (apt.diagnosis != null and !apt.diagnosis.isEmpty()) or (apt.prescription != null and !apt.prescription.isEmpty()))}"
+                               th:href="@{/patient/appointments/{id}/record(id=${apt.id})}"
+                               class="btn-link">查看诊断/病历</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty" th:if="${appointments == null or appointments.isEmpty()}">
+                暂无挂号记录
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function runTriage() {
+            var desc = document.getElementById('triageDesc') ? document.getElementById('triageDesc').value : '';
+            var params = new URLSearchParams();
+            params.append('description', desc || '');
+
+            var resultWrap = document.getElementById('triageResult');
+            var deptEl = document.getElementById('triageDept');
+            var urgEl = document.getElementById('triageUrgency');
+            var advEl = document.getElementById('triageAdvice');
+
+            if (resultWrap) resultWrap.style.display = 'block';
+            if (deptEl) deptEl.textContent = '生成中…';
+            if (urgEl) urgEl.textContent = '';
+            if (advEl) advEl.textContent = '';
+
+            try {
+                var resp = await fetch('/patient/ai/triage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                    body: params.toString()
+                });
+                var data = await resp.json();
+                if (deptEl) deptEl.textContent = data.department || '-';
+                if (urgEl) urgEl.textContent = data.urgency || '-';
+                if (advEl) advEl.textContent = data.advice || '';
+            } catch (e) {
+                if (deptEl) deptEl.textContent = '-';
+                if (urgEl) urgEl.textContent = '生成失败';
+                if (advEl) advEl.textContent = '网络或服务器异常，请稍后重试。';
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告单管理</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <script>
+        function toggleAllReports(source) {
+            document.querySelectorAll('input[name="ids"]').forEach(function(cb) { cb.checked = source.checked; });
+        }
+        function confirmBulkDeleteReports() {
+            var checked = document.querySelectorAll('input[name="ids"]:checked').length;
+            if (checked === 0) {
+                alert('请先勾选要删除的报告单');
+                return false;
+            }
+            return confirm('确定要删除已勾选的 ' + checked + ' 份报告单吗？此操作不可恢复。');
+        }
+    </script>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub('/admin/dashboard', '报告单管理', '报告列表与维护')}"></div>
+
+<main class="page">
+    <div class="card">
+        <div class="card-title u-mb-12">报告单列表</div>
+        <form th:action="@{/admin/reports/bulk-delete}" method="post" onsubmit="return confirmBulkDeleteReports()">
+            <div class="admin-toolbar">
+                <button class="btn-cancel u-pill-btn" type="submit">删除选中</button>
+                <span class="u-text-xs-muted">勾选后可批量删除。</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" onclick="toggleAllReports(this)"></th>
+                        <th>ID</th>
+                        <th>患者</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>生成时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${reports}">
+                        <td><input type="checkbox" name="ids" th:value="${r.id}"></td>
+                        <td th:text="${r.id}"></td>
+                        <td th:text="${patientUserMap.containsKey(r.patientId) ? patientUserMap[r.patientId].realName : r.patientId}"></td>
+                        <td th:text="${r.reportType}"></td>
+                        <td>
+                            <span class="tag-inline" th:classappend="${r.status.name() == 'COMPLETED' ? ' tag-male' : ' tag-female'}"
+                                  th:text="${r.status.chineseName}"></span>
+                        </td>
+                        <td th:text="${r.reportDate != null ? #temporals.format(r.reportDate, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                        <td>
+                            <a th:href="@{/admin/reports/{id}/preview(id=${r.id})}" class="btn btn-primary u-chip-xs">查看</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

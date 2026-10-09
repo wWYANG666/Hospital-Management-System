@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者注册 - 医院管理系统</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f7fb;
+            margin: 0;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(0deg, rgba(245,247,251,0.86), rgba(245,247,251,0.86)),
+                url("/images/hospital-outpatient.png") center/cover no-repeat;
+            z-index: 0;
+        }
+        .container {
+            max-width: 760px;
+            margin: 28px auto;
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.08);
+            position: relative;
+            z-index: 1;
+        }
+        h1 { margin-top: 0; color: #333; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .full { grid-column: 1 / span 2; }
+        label { display: block; margin-bottom: 6px; color: #444; font-weight: 600; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #d6d9df; border-radius: 6px; box-sizing: border-box; }
+        .msg { margin-bottom: 14px; padding: 10px; border-radius: 6px; }
+        .msg.error { color: #842029; background: #f8d7da; }
+        .actions { margin-top: 16px; display: flex; gap: 10px; }
+        button, .link-btn { padding: 10px 14px; border: none; border-radius: 6px; text-decoration: none; cursor: pointer; font-weight: 600; }
+        button { background: #667eea; color: #fff; }
+        .link-btn { background: #e9edf7; color: #334; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>患者注册</h1>
+
+    <div th:if="${error}" class="msg error" th:text="${message}"></div>
+
+    <form th:action="@{/register/patient}" method="post">
+        <div class="grid">
+            <div>
+                <label for="username">用户名 *</label>
+                <input id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">密码 *</label>
+                <input id="password" name="password" type="password" required>
+            </div>
+            <div>
+                <label for="realName">真实姓名 *</label>
+                <input id="realName" name="realName" required>
+            </div>
+            <div>
+                <label for="phone">手机号</label>
+                <input id="phone" name="phone">
+            </div>
+            <div>
+                <label for="email">邮箱</label>
+                <input id="email" name="email" type="email">
+            </div>
+            <div>
+                <label for="idCard">身份证号</label>
+                <input id="idCard" name="idCard">
+            </div>
+            <div>
+                <label for="gender">性别</label>
+                <select id="gender" name="gender">
+                    <option value="">请选择</option>
+                    <option value="MALE">男</option>
+                    <option value="FEMALE">女</option>
+                </select>
+            </div>
+            <div>
+                <label for="birthday">出生日期</label>
+                <input id="birthday" name="birthday" type="date">
+            </div>
+            <div class="full">
+                <label for="address">地址</label>
+                <input id="address" name="address">
+            </div>
+            <div>
+                <label for="emergencyContact">紧急联系人</label>
+                <input id="emergencyContact" name="emergencyContact">
+            </div>
+            <div>
+                <label for="emergencyPhone">紧急联系电话</label>
+                <input id="emergencyPhone" name="emergencyPhone">
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="submit">提交注册</button>
+            <a class="link-btn" href="/register">返回</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

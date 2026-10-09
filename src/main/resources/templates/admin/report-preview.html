@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告单预览</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <style>
+        .report-sheet { background: #fff; padding: 28px 28px 20px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #409EFF; padding-bottom: 14px; }
+        .report-header h1 { color: #409EFF; font-size: 20px; margin-bottom: 6px; }
+        .report-header .sub { font-size: 12px; color: #909399; }
+        .report-info table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .report-info td { padding: 8px 4px; border-bottom: 1px solid #EBEEF5; }
+        .report-info td:first-child { font-weight: 600; width: 120px; color: #606266; }
+        .report-content { margin-top: 16px; padding: 14px; background: #F5F7FA; border-radius: 6px; min-height: 120px; font-size: 13px; }
+        .report-actions { margin-top: 20px; text-align: center; }
+        @media print {
+            .topbar, .report-actions { display: none !important; }
+            .report-sheet { box-shadow: none; }
+        }
+            .report-page { max-width: 900px; }
+        .report-block-title { margin-bottom:10px; color:#303133; font-size:14px; }
+        .report-pre { white-space:pre-wrap; line-height:1.6; color:#555; }
+        .report-rx-section { margin-top:24px; }
+        .report-rx-title { margin-bottom:10px; font-size:15px; }
+        .report-rx-empty { color:#909399; padding:8px 0; }
+    </style>
+</head>
+<body class="theme-medical">
+<div th:replace="~{admin/fragments :: topbarAdminSub(${adminBackUrl}, '报告单预览', '查看报告内容')}"></div>
+
+<main class="page report-page">
+    <div class="report-sheet" th:if="${report}">
+        <div class="report-header">
+            <h1>医院检验/检查报告单</h1>
+            <div class="sub">本报告仅供临床参考，不作为唯一诊断依据</div>
+        </div>
+        <div class="report-info">
+            <table>
+                <tr>
+                    <td>报告名称：</td>
+                    <td th:text="${examination != null ? examination.name : report.reportType}"></td>
+                </tr>
+                <tr>
+                    <td>报告类型：</td>
+                    <td th:text="${examination != null ? (examination.type != null ? examination.type : '检查') : '检查'}"></td>
+                </tr>
+                <tr>
+                    <td>生成时间：</td>
+                    <td th:text="${report.reportDate != null ? #temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss') : ''}"></td>
+                </tr>
+                <tr th:if="${patientUser != null}">
+                    <td>患者姓名：</td>
+                    <td th:text="${patientUser.realName}"></td>
+                </tr>
+                <tr th:if="${doctorUser != null}">
+                    <td>医生姓名：</td>
+                    <td th:text="${doctorUser.realName}"></td>
+                </tr>
+                <tr>
+                    <td>状态：</td>
+                    <td th:text="${report.status.chineseName}"></td>
+                </tr>
+            </table>
+        </div>
+        <div class="report-content">
+            <h3 class="report-block-title">报告内容</h3>
+            <div th:if="${report.reportContent != null and !report.reportContent.isEmpty()}"
+                 class="report-pre"
+                 th:text="${report.reportContent}"></div>
+            <div th:if="${report.reportContent == null or report.reportContent.isEmpty()}" class="u-muted-italic">暂无内容</div>
+        </div>
+
+        <div class="report-rx-section">
+            <h3 class="report-rx-title">处方列表</h3>
+            <div th:if="${prescriptions == null or #lists.isEmpty(prescriptions)}" class="report-rx-empty">该挂号暂时无处方。</div>
+            <div class="table-wrap" th:if="${prescriptions != null and !#lists.isEmpty(prescriptions)}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>处方号</th>
+                        <th>开方时间</th>
+                        <th>状态</th>
+                        <th>合计金额</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${prescriptions}">
+                        <td th:text="${p.prescriptionNumber}"></td>
+                        <td th:text="${p.createdAt != null ? #temporals.format(p.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                        <td th:text="${p.status != null ? p.status.chineseName : '-'}"></td>
+                        <td th:text="${totalAmountMap != null && totalAmountMap[p.id] != null ? totalAmountMap[p.id] : '0.00'}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <button type="button" onclick="window.print()" class="btn btn-primary">打印</button>
+            <a href="/admin/dashboard" class="btn ghost">返回管理首页</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

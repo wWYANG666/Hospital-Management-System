@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>住院信息</title>
+    <link rel="stylesheet" href="/css/doctor-shell.css">
+    <link rel="stylesheet" href="/css/patient-ui.css">
+    <style>
+        .patient-hosp .page { max-width: 1040px; }
+        .patient-hosp .card-title { font-size: 18px; margin-bottom: 8px; }
+        .patient-hosp .card-sub { font-size: 13px; color: #909399; margin-bottom: 14px; }
+        .hospitalization-item {
+            padding: 16px;
+            border-bottom: 1px solid #EBEEF5;
+            font-size: 14px;
+            background: #FAFCFF;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .hospitalization-item:last-child { margin-bottom: 0; }
+        .item-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+        .item-title { font-size: 15px; font-weight: 600; color: #303133; }
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-admitted { color: #409EFF; background: #ECF5FF; }
+        .status-discharged { color: #67C23A; background: #F0F9EB; }
+        .pay-paid { color: #67C23A; background: #F0F9EB; }
+        .pay-unpaid { color: #E6A23C; background: #FFF6E6; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
+        .info-row { display: flex; align-items: flex-start; gap: 6px; line-height: 1.6; }
+        .label { min-width: 84px; color: #606266; font-weight: 600; }
+        .value { color: #303133; word-break: break-word; }
+        .action-row {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed #E4E7ED;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .empty { text-align: center; color: #C0C4CC; padding: 30px 10px; font-size: 14px; }
+        .patient-hosp .btn {
+            padding: 8px 14px;
+            background: #409EFF;
+            color: #fff;
+            border-radius: 18px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .patient-hosp .btn.disabled { background: #dcdfe6; color: #909399; cursor: not-allowed; }
+        .footer { text-align: center; margin-top: 16px; font-size: 12px; color: #909399; }
+        .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
+        .alert.success { background: #f0f9eb; color: #529b2e; }
+        .alert.error { background: #fef0f0; color: #c45656; }
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; gap: 8px; }
+            .item-head { align-items: flex-start; flex-direction: column; }
+        }
+    </style>
+</head>
+<body class="patient-ui patient-hosp theme-medical">
+<div th:replace="~{patient/fragments :: topbarPatientSub('/patient/dashboard', '住院信息', '当前与历史住院')}"></div>
+
+<main class="page">
+        <div th:if="${success}" class="alert success"><span th:text="${success}">操作成功</span></div>
+        <div th:if="${error}" class="alert error"><span th:text="${error}">操作失败</span></div>
+
+        <div class="card">
+            <div class="card-title">当前住院状态</div>
+            <div class="card-sub">当前住院记录</div>
+
+            <div th:if="${currentHospitalizations.isEmpty()}" class="empty">当前无住院记录</div>
+            <div th:each="hosp : ${currentHospitalizations}" class="hospitalization-item">
+                <div class="item-head">
+                    <div class="item-title">住院记录 #<span th:text="${hosp.id}"></span></div>
+                    <span class="status-tag status-admitted">住院中</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="label">入院日期</span>
+                        <span class="value" th:text="${hosp.admissionDate}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">主治医生ID</span>
+                        <span class="value" th:text="${hosp.doctorId}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">病床ID</span>
+                        <span class="value" th:text="${hosp.bedId != null ? hosp.bedId : '未分配'}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">状态</span>
+                        <span class="value">住院中</span>
+                    </div>
+                    <div class="info-row u-grid-full">
+                        <span class="label">诊断</span>
+                        <span class="value" th:text="${hosp.diagnosis != null and !hosp.diagnosis.isEmpty() ? hosp.diagnosis : (hosp.dischargeDiagnosis != null and !hosp.dischargeDiagnosis.isEmpty() ? hosp.dischargeDiagnosis : '暂无诊断')}"></span>
+                    </div>
+                </div>
+                <div class="action-row">
+                    <a th:href="@{/patient/hospitalizations/__${hosp.id}__/detail}"
+                       class="btn u-link-success">查看医嘱与病历</a>
+                    <form th:if="${hosp.bedId != null}"
+                          th:action="@{/patient/hospitalizations/{id}/request-discharge(id=${hosp.id})}"
+                          method="post">
+                        <button class="btn"
+                                type="submit"
+                                th:disabled="${dischargeRequestedMap != null and dischargeRequestedMap.containsKey(hosp.id)}"
+                                th:classappend="${dischargeRequestedMap != null and dischargeRequestedMap.containsKey(hosp.id) ? ' disabled' : ''}">
+                            <span th:text="${dischargeRequestedMap != null and dischargeRequestedMap.containsKey(hosp.id) ? '已申请出院，待医生处理' : '申请出院'}"></span>
+                        </button>
+                    </form>
+                    <form th:if="${hosp.bedId == null}"
+                          th:action="@{/patient/hospitalizations/{id}/cancel(id=${hosp.id})}"
+                          method="post">
+                        <button class="btn u-bg-muted" type="submit">取消住院</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">历史住院记录</div>
+            <div class="card-sub">历史住院记录</div>
+
+            <div th:if="${historyHospitalizations.isEmpty()}" class="empty">暂无历史住院记录</div>
+            <div th:each="hosp : ${historyHospitalizations}" class="hospitalization-item">
+                <div class="item-head">
+                    <div class="item-title">住院记录 #<span th:text="${hosp.id}"></span></div>
+                    <span class="status-tag status-discharged">已出院</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="label">入院日期</span>
+                        <span class="value" th:text="${hosp.admissionDate}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">出院日期</span>
+                        <span class="value" th:text="${hosp.dischargeDate != null ? hosp.dischargeDate : '-'}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">总费用</span>
+                        <span class="value" th:text="${hosp.totalCost != null ? hosp.totalCost : '-'}"></span>
+                    </div>
+                    <div class="info-row" th:if="${hosp.totalCost != null}">
+                        <span class="label">支付状态</span>
+                        <span th:if="${paidMap != null and paidMap[hosp.id] != null and paidMap[hosp.id]}" class="status-tag pay-paid">已支付</span>
+                        <span th:if="${paidMap == null or paidMap[hosp.id] == null or !paidMap[hosp.id]}" class="status-tag pay-unpaid">待支付</span>
+                    </div>
+                    <div class="info-row u-grid-full">
+                        <span class="label">诊断</span>
+                        <span class="value" th:text="${hosp.diagnosis != null and !hosp.diagnosis.isEmpty() ? hosp.diagnosis : (hosp.dischargeDiagnosis != null and !hosp.dischargeDiagnosis.isEmpty() ? hosp.dischargeDiagnosis : '暂无诊断')}"></span>
+                    </div>
+                </div>
+                <div class="action-row">
+                    <a th:href="@{/patient/hospitalizations/__${hosp.id}__/detail}"
+                       class="btn u-link-success">查看医嘱与病历</a>
+                    <a th:if="${hosp.totalCost != null and (paidMap == null or paidMap[hosp.id] == null or !paidMap[hosp.id])}"
+                       th:href="@{/patient/payments/hospitalization/{id}/alipay(id=${hosp.id})}"
+                       class="btn">模拟支付宝支付</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">疑问请咨询住院部窗口。</div>
+</main>
+</body>
+</html>
